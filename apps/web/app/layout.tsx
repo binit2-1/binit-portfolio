@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,11 +29,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background font-sans antialiased`}
-      >
-        <Navbar />
-        <main className="mx-auto max-w-3xl px-6 py-12">{children}</main>
+      <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background font-sans antialiased`}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <Navbar />
+          <main className="mx-auto max-w-3xl px-6 pb-16 pt-28">{children}</main>
+        </ThemeProvider>
       </body>
     </html>
   );

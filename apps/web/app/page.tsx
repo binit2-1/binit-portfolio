@@ -1,9 +1,12 @@
 export default function HomePage() {
   return (
-    <section className="flex flex-col gap-4">
-      <h1 className="text-3xl font-bold tracking-tight">Hey, I&apos;m Binit 👋</h1>
-      <p className="text-muted-foreground">
-        I build things for the web. This is my portfolio and blog.
+    <section className="mx-auto flex min-h-[68vh] max-w-xl flex-col items-center justify-center gap-4 text-center">
+      <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Archive - 2026</p>
+      <h1 className="text-balance text-5xl font-semibold uppercase tracking-tight md:text-6xl">
+        Yo, I&apos;m Binit and I build web experiences.
+      </h1>
+      <p className="max-w-md text-sm text-muted-foreground md:text-base">
+        Design engineer and full-stack developer focused on performant interfaces.
       </p>
     </section>
   );

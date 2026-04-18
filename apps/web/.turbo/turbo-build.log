@@ -5,15 +5,15 @@
 ▲ Next.js 16.2.4 (Turbopack)
 
   Creating an optimized production build ...
-✓ Compiled successfully in 1532ms
+✓ Compiled successfully in 2.1s
   Running TypeScript ...
-  Finished TypeScript in 1392ms ...
-  Collecting page data using 8 workers ...
-  Generating static pages using 8 workers (0/6) ...
-  Generating static pages using 8 workers (1/6) 
-  Generating static pages using 8 workers (2/6) 
-  Generating static pages using 8 workers (4/6) 
-✓ Generating static pages using 8 workers (6/6) in 392ms
+  Finished TypeScript in 1850ms ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/7) ...
+  Generating static pages using 9 workers (1/7) 
+  Generating static pages using 9 workers (3/7) 
+  Generating static pages using 9 workers (5/7) 
+✓ Generating static pages using 9 workers (7/7) in 436ms
   Finalizing page optimization ...
 
 Route (app)
@@ -21,6 +21,7 @@ Route (app)
 ├ ○ /_not-found
 ├ ○ /about
 ├ ○ /work
+├ ○ /writings
 └ ● /writings/[slug]
 
 
