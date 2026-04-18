@@ -40,12 +40,6 @@ const Skiper26 = () => {
         </p>
       </div>
 
-      <div className="text-foreground grid content-start justify-items-center gap-6 py-20 text-center">
-        <span className="after:from-background after:to-foreground relative max-w-[12ch] text-xs uppercase leading-tight opacity-40 after:absolute after:left-1/2 after:top-full after:h-16 after:w-px after:bg-gradient-to-b after:content-['']">
-          Click to toggle the theme
-        </span>
-      </div>
-
       <ThemeToggleButton
         variant={variant}
         start={start}
@@ -621,9 +615,8 @@ export const ThemeToggleButton = ({
         className,
       )}
       onClick={toggleTheme}
-      aria-label="Toggle theme"
+      aria-label="Theme"
     >
-      <span className="sr-only">Toggle theme</span>
       <svg viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
         <motion.g
           animate={{ rotate: isDark ? -180 : 0 }}

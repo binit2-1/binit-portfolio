@@ -1,3 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "@repo/ui/styles/globals.css";
+
+/* Site-wide sans: Helvetica Neue (see app/layout.tsx + app/fonts/) */
+/* Display: Basteleur (Moonlight 400 / Bold 700) — use Tailwind `font-display` + font-normal | font-bold */
+@theme inline {
+  --font-sans: var(--font-helvetica-neue), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-basteleur), var(--font-helvetica-neue), ui-sans-serif, sans-serif;
+}

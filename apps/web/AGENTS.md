@@ -43,13 +43,9 @@ It explains how the project is organized, what each folder does, and how to make
   - Reads post data via `@/lib/writings`.
 - `components/navbar.tsx`
   - Top navigation with active route highlighting.
-  - Includes theme toggle control.
+  - Client component; uses Skiper `ThemeToggleButton` from `packages/ui` (see `skiper-ui/skiper26.tsx`).
 - `components/theme-provider.tsx`
-  - Thin wrapper around `next-themes` provider.
-- `components/theme-toggle.tsx`
-  - Client-side dark/light switch using `next-themes`.
-  - Uses `framer-motion` for knob animation.
-  - Uses View Transition API when available.
+  - Thin client wrapper around `next-themes` provider.
 - `lib/writings.ts`
   - In-memory data helpers for writings (`getAllWritings`, `getWritingBySlug`).
   - Current state is placeholder content until real MD/MDX file loading is added.
@@ -80,6 +76,13 @@ It explains how the project is organized, what each folder does, and how to make
   3. `@import "@repo/ui/styles/globals.css";`
 - If a CSS import is referenced in `apps/web`, dependency must exist in `apps/web/package.json` too.
 - Dark mode is class-based (`next-themes` + `attribute="class"`).
+
+## Rendering and SEO
+
+- Prefer **Server Components** by default (`app/*` routes and most of `components/*` with **no** `"use client"`).
+- Ship **server-rendered HTML** for page content, headings, and navigation chrome whenever possible so crawlers and social previews see real text and structure without waiting on JavaScript.
+- Add `"use client"` only when the component truly needs the browser (state, effects, browser APIs, event handlers, or libraries that require the client such as `next-themes`, Framer Motion, or route hooks like `usePathname`).
+- When interactivity is required, split work: keep a **server** parent for layout and SEO-critical copy, and colocate a **small client** child for the interactive island.
 
 ## Navigation and Route Conventions
 
@@ -120,6 +123,7 @@ When changing UI/layout/theme, always run:
 - Keep changes scoped and reversible.
 - Prefer editing files in `apps/web` unless shared behavior belongs in `packages/ui`.
 - Do not remove existing route metadata unless replacing with better metadata.
+- **Default to server-rendered components** for new UI; reserve the client boundary for interactivity or third-party constraints (see **Rendering and SEO** above).
 - For new client components that depend on browser APIs, always include `"use client"`.
 - Preserve accessibility:
   - icon-only buttons must include `aria-label`.

@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
+import { basteleur, helveticaNeue } from "@/lib/fonts";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -28,8 +24,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background font-sans antialiased`}>
+    <html
+      lang="en"
+      className={`${helveticaNeue.variable} ${basteleur.variable}`}
+      suppressHydrationWarning
+    >
+      <body
+        className={`${helveticaNeue.className} ${geistMono.variable} min-h-screen bg-background font-sans font-light antialiased`}
+      >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Navbar />
           <main className="mx-auto max-w-3xl px-6 pb-16 pt-28">{children}</main>
