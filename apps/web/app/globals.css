@@ -15,6 +15,22 @@
   --about-mask-belt: 14px;
 }
 
+/* Mobile: stable viewport height (not 100vh), reduce sideways pan / elastic overscroll. */
+@layer base {
+  html {
+    overflow-x: hidden;
+    max-width: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+    overscroll-behavior-y: none;
+    touch-action: pan-y;
+  }
+}
+
 /* Home: when a social link is hovered, dim + blur the rest of the hero (reference: focus spotlight) */
 @layer components {
   .social-hover-focus > p,

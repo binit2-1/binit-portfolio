@@ -183,15 +183,15 @@ export function GithubCalendar({
   const shapeClass = getShapeClass(shape);
 
   return (
-    <div className={cn("flex flex-col gap-3", className)}>
+    <div className={cn("flex w-full min-w-0 max-w-full flex-col gap-3", className)}>
       {showTotal && (
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="break-words text-center text-sm text-muted-foreground">
           <span className="font-medium text-foreground">@{username}</span> — {data?.totalContributions ?? 0}{" "}
           contributions in the last year
         </p>
       )}
 
-      <div className="flex max-w-full justify-center gap-[3px] overflow-x-auto pb-1 md:gap-1">
+      <div className="flex w-full min-w-0 justify-center gap-[3px] overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:thin] md:gap-1">
         {weeks.map((week, weekIndex) => (
           <div key={weekIndex} className="flex flex-col gap-[3px] md:gap-1">
             {week.map((day) => {

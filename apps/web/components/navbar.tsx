@@ -16,15 +16,15 @@ export function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav className="sticky top-0 z-50 w-full shrink-0 border-b border-border/40 bg-background/85 backdrop-blur-md supports-[backdrop-filter]:bg-background/70">
-      <div className="mx-auto flex w-full max-w-(--site-max-width) items-center justify-center px-6 py-4">
-        <ul className="flex items-center gap-8">
+    <nav className="fixed inset-x-0 top-0 z-50 w-full border-b border-border/40 bg-background/85 backdrop-blur-md supports-[backdrop-filter]:bg-background/70">
+      <div className="mx-auto flex w-full max-w-(--site-max-width) min-w-0 items-center justify-center px-4 py-4 sm:px-6">
+        <ul className="flex min-w-0 flex-wrap items-center justify-center gap-x-3 gap-y-2 sm:gap-x-6 md:gap-x-8">
           {NAV_LINKS.map(({ href, label }) => (
             <li key={href}>
               <Link
                 href={href}
                 className={cn(
-                  "font-normal text-sm transition-colors hover:text-foreground",
+                  "whitespace-nowrap text-xs font-normal transition-colors hover:text-foreground sm:text-sm",
                   pathname === href ? "text-foreground" : "text-muted-foreground",
                 )}
               >

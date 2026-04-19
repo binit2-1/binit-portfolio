@@ -40,7 +40,7 @@ export function AboutPageContent() {
 
   return (
     <>
-      <div className="relative z-10 w-full">
+      <div className="relative z-10 w-full min-w-0">
         <section className="mx-auto flex min-h-[calc(100dvh-var(--site-nav-h))] w-full flex-col items-center justify-center px-4 text-center sm:px-6">
           <h1 className="sr-only">About</h1>
           <p className={sectionTextClass}>
@@ -74,7 +74,7 @@ export function AboutPageContent() {
           transition={inViewTransition}
         >
           <h2 className="sr-only">GitHub contributions</h2>
-          <div className="flex w-full max-w-[min(100%,52rem)] justify-center">
+          <div className="flex w-full min-w-0 max-w-[min(100%,52rem)] justify-center">
             <GithubCalendar username="binit2-1" colorSchema="orange" variant="default" showTotal />
           </div>
         </InView>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist_Mono } from "next/font/google";
 import { LenisProvider } from "@/components/lenis-provider";
 import { Navbar } from "@/components/navbar";
@@ -19,6 +19,13 @@ export const metadata: Metadata = {
   description: "Developer portfolio and blog",
 };
 
+/** Mobile: pin to device width, avoid accidental mini-viewport quirks; `viewport-fit` for notched screens. */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -31,14 +38,16 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className={`${helveticaNeue.className} ${geistMono.variable} min-h-screen bg-background font-sans font-light antialiased`}
+        className={`${helveticaNeue.className} ${geistMono.variable} min-h-dvh bg-background font-sans font-light antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <LenisProvider>
-            <div className="flex min-h-screen flex-col">
+            <div className="flex min-h-dvh w-full min-w-0 flex-col overflow-x-hidden">
               <Navbar />
-              <div className="site-shell mx-auto flex w-full max-w-(--site-max-width) flex-1 flex-col px-6 pb-16">
-                <main className="flex-1 pt-0">{children}</main>
+              {/* Reserve height: fixed nav is out of flow */}
+              <div className="h-[var(--site-nav-h)] shrink-0" aria-hidden />
+              <div className="site-shell mx-auto flex w-full min-w-0 max-w-(--site-max-width) flex-1 flex-col px-4 pb-16 sm:px-6">
+                <main className="min-w-0 flex-1 pt-0">{children}</main>
               </div>
             </div>
           </LenisProvider>
