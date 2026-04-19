@@ -4,8 +4,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { InView } from "@/components/core/in-view";
 import GlowingScrollIndicator from "@/components/glowing-scroll-indicator";
+import { GithubCalendar } from "@/components/ui/github-calendar";
 
 import { AboutViewportMask } from "./about-viewport-mask";
+
+/** Matches the hero copy in section 1. */
+const sectionTextClass =
+  "w-full max-w-2xl font-sans font-bold select-none text-base tracking-tighter text-foreground md:text-xl";
 
 const scrollReveal = {
   hidden: { opacity: 0, y: 28, filter: "blur(14px)" },
@@ -38,7 +43,7 @@ export function AboutPageContent() {
       <div className="relative z-10 w-full">
         <section className="mx-auto flex min-h-[calc(100dvh-var(--site-nav-h))] w-full flex-col items-center justify-center px-4 text-center sm:px-6">
           <h1 className="sr-only">About</h1>
-          <p className="w-full max-w-2xl font-sans font-bold select-none text-base tracking-tighter text-foreground md:text-xl">
+          <p className={sectionTextClass}>
             I am a full-stack developer and computer science student focused on developer experience and systems
             architecture. From building custom React renderers to engineering lightweight Go applications, I love
             diving deep into how things work under the hood. I build interactive apps with taste, prioritizing speed,
@@ -55,7 +60,7 @@ export function AboutPageContent() {
           transition={inViewTransition}
         >
           <h2 className="sr-only">More</h2>
-          <p className="w-full max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          <p className={sectionTextClass}>
             Section 2 placeholder — add content here (e.g. experience, stack, or projects).
           </p>
         </InView>
@@ -63,15 +68,15 @@ export function AboutPageContent() {
         <InView
           as="section"
           once
-          className="mx-auto flex min-h-[80vh] w-full flex-col items-center justify-center px-4 py-16 text-center sm:px-6"
+          className="mx-auto flex min-h-[80vh] w-full flex-col items-center justify-center px-4 py-16 sm:px-6"
           variants={scrollReveal}
           viewOptions={inViewOptions}
           transition={inViewTransition}
         >
-          <h2 className="sr-only">Even more</h2>
-          <p className="w-full max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Section 3 placeholder — add content here (e.g. contact, timeline, or links).
-          </p>
+          <h2 className="sr-only">GitHub contributions</h2>
+          <div className="flex w-full max-w-[min(100%,52rem)] justify-center">
+            <GithubCalendar username="binit2-1" colorSchema="orange" variant="default" showTotal />
+          </div>
         </InView>
       </div>
 

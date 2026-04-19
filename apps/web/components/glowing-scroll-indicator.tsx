@@ -2,29 +2,42 @@
 
 import { motion, MotionValue, useScroll, useTransform } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 import React, { useEffect } from "react";
 
 const ACCENT = "#FF5800";
 const BARS = 40;
 
+/** In dark mode, higher floors so inactive bars stay visibly light (whiteish) on near-black backgrounds. */
+const OPACITY_STOPS = {
+  light: [0.12, 0.38, 1, 0.38, 0.12] as const,
+  dark: [0.32, 0.62, 1, 0.62, 0.32] as const,
+};
+
 const ScrollBar = ({
   index,
   scrollProgress,
+  opacityStops,
 }: {
   index: number;
   scrollProgress: MotionValue<number>;
+  opacityStops: readonly [number, number, number, number, number];
 }) => {
   const thisBarPosition = index / BARS;
   const preStep = Math.max(0, (index - 3) / BARS);
   const postStep = Math.min(1, (index + 3) / BARS);
 
   const height = useTransform(scrollProgress, [0, preStep, thisBarPosition, postStep, 1], [4, 10, 26, 10, 4]);
-  const opacity = useTransform(scrollProgress, [0, preStep, thisBarPosition, postStep, 1], [0.1, 0.4, 1, 0.4, 0.1]);
+  const opacity = useTransform(
+    scrollProgress,
+    [0, preStep, thisBarPosition, postStep, 1],
+    [...opacityStops],
+  );
   const width = useTransform(scrollProgress, [0, thisBarPosition, 1], [1, 3.5, 1]);
 
   return (
     <motion.div
-      className="bg-white"
+      className="bg-foreground"
       style={{
         height,
         opacity,
@@ -42,10 +55,13 @@ const ScrollIndicatorBars = ({
   direction: "vertical" | "horizontal";
 }) => {
   const ref = React.useRef<HTMLElement | null>(containerElement);
+  const { resolvedTheme } = useTheme();
 
   React.useEffect(() => {
     ref.current = containerElement;
   }, [containerElement]);
+
+  const opacityStops = resolvedTheme === "dark" ? OPACITY_STOPS.dark : OPACITY_STOPS.light;
 
   const { scrollXProgress, scrollYProgress } = useScroll(
     containerElement ? { container: ref } : undefined,
@@ -58,9 +74,10 @@ const ScrollIndicatorBars = ({
     <div className="relative flex w-fit items-end justify-center gap-0.5 md:gap-1">
       {Array.from({ length: BARS }).map((_, index) => (
         <ScrollBar
-          key={`scroll-bar-${index}`}
+          key={`scroll-bar-${index}-${opacityStops[0]}`}
           index={index}
           scrollProgress={direction === "vertical" ? scrollYProgress : scrollXProgress}
+          opacityStops={opacityStops}
         />
       ))}
       <motion.div
@@ -89,7 +106,13 @@ const ScrollIndicator = ({
   const [container, setContainer] = React.useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    setContainer(document.getElementById(scrollContainerId));
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) setContainer(document.getElementById(scrollContainerId));
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [scrollContainerId]);
 
   if (!container) {
