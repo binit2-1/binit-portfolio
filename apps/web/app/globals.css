@@ -7,6 +7,12 @@
 @theme inline {
   --font-sans: var(--font-helvetica-neue), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-basteleur), var(--font-helvetica-neue), ui-sans-serif, sans-serif;
+  /* Whole-site horizontal cap (layout shell): 196.5 character widths, never wider than viewport. */
+  --site-max-width: min(100%, 196.5ch);
+  /* Sticky navbar row (py-4 + links + toggle); About mask/belt use the same token. */
+  --site-nav-h: 5rem;
+  /* Opaque belt under nav on About only (see about-viewport-mask). */
+  --about-mask-belt: 14px;
 }
 
 /* Home: when a social link is hovered, dim + blur the rest of the hero (reference: focus spotlight) */

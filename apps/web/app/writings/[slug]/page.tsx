@@ -37,7 +37,7 @@ export default async function WritingPage({
   const { frontmatter, content } = post;
 
   return (
-    <article className="flex flex-col gap-8">
+    <article className="flex flex-col gap-8 pt-28">
       <header className="flex flex-col gap-2">
         <time className="text-xs text-muted-foreground">
           {new Date(frontmatter.date).toLocaleDateString("en-US", {
