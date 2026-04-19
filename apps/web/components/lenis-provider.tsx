@@ -27,51 +27,22 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   const [lenis, setLenis] = useState<Lenis | null>(null);
 
   useEffect(() => {
-    const root = document.documentElement;
+    if (!shouldUseLenis()) return;
 
-    let instance: Lenis | null = null;
+    const instance = new Lenis({
+      autoRaf: true,
+      smoothWheel: true,
+      gestureOrientation: "vertical",
+    });
+    queueMicrotask(() => {
+      setLenis(instance);
+    });
 
-    const stop = () => {
-      if (instance) {
-        instance.destroy();
-        instance = null;
-      }
-      root.classList.remove("lenis");
+    return () => {
+      instance.destroy();
       queueMicrotask(() => {
         setLenis(null);
       });
-    };
-
-    const start = () => {
-      stop();
-      if (!shouldUseLenis()) return;
-
-      root.classList.add("lenis");
-      instance = new Lenis({
-        autoRaf: true,
-        smoothWheel: true,
-      });
-      queueMicrotask(() => {
-        setLenis(instance);
-      });
-    };
-
-    start();
-
-    const coarse = window.matchMedia("(pointer: coarse)");
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onChange = () => start();
-    coarse.addEventListener("change", onChange);
-    reduced.addEventListener("change", onChange);
-
-    return () => {
-      coarse.removeEventListener("change", onChange);
-      reduced.removeEventListener("change", onChange);
-      if (instance) {
-        instance.destroy();
-        root.classList.remove("lenis");
-      }
-      setLenis(null);
     };
   }, []);
 

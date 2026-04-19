@@ -53,7 +53,6 @@ export function AboutPageContent() {
 
         <InView
           as="section"
-          once
           className="mx-auto flex min-h-[80vh] w-full flex-col items-center justify-center px-4 py-16 text-center sm:px-6"
           variants={scrollReveal}
           viewOptions={inViewOptions}
@@ -67,7 +66,6 @@ export function AboutPageContent() {
 
         <InView
           as="section"
-          once
           className="mx-auto flex min-h-[80vh] w-full flex-col items-center justify-center px-4 py-16 sm:px-6"
           variants={scrollReveal}
           viewOptions={inViewOptions}
