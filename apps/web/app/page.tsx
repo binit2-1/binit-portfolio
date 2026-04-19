@@ -1,10 +1,16 @@
 import { basteleur } from "@/lib/fonts";
+import { getAgeOnDate } from "@/lib/birthday";
+
+/** Recompute age on each request so it stays correct around your birthday (17 Nov). */
+export const dynamic = "force-dynamic";
 
 export default function HomePage() {
+  const age = getAgeOnDate();
+
   return (
     <section className="mx-auto flex min-h-[68vh] max-w-xl flex-col items-center justify-center gap-4 text-center">
       <p className="font-sans font-light text-xs uppercase tracking-[0.28em] text-muted-foreground">
-        Archive - 2026
+        Bangalore, {age}
       </p>
       <h1
         className={`${basteleur.className} text-balance text-5xl font-bold uppercase leading-[1.05] tracking-tight md:text-6xl`}
