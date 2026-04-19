@@ -17,7 +17,12 @@
     transition:
       opacity 300ms ease,
       filter 300ms ease,
-      transform 300ms ease;
+      transform 300ms ease,
+      color 300ms ease;
+  }
+
+  .social-hover-focus .social-links > a {
+    color: var(--foreground);
   }
 
   .social-hover-focus:has(.social-links a:is(:hover, :focus-visible)) > p,
@@ -31,6 +36,7 @@
     > a:not(:is(:hover, :focus-visible)) {
     opacity: 0.28;
     filter: blur(2px);
+    color: var(--muted-foreground);
   }
 
   .social-hover-focus .social-links > a:is(:hover, :focus-visible) {
@@ -38,5 +44,6 @@
     z-index: 1;
     opacity: 1;
     filter: none;
+    color: #ff5800;
   }
 }
