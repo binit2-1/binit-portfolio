@@ -23,13 +23,13 @@ export function AboutViewportMask({
         style={{ top: "calc(var(--site-nav-h) + var(--about-mask-belt))" }}
         aria-hidden
       >
-        <div className="pointer-events-auto col-span-3 row-start-1 bg-background" />
-        <div className="pointer-events-auto row-start-2 col-start-1 bg-background" />
+        <div className="pointer-events-none col-span-3 row-start-1 bg-background" />
+        <div className="pointer-events-none row-start-2 col-start-1 bg-background" />
         {/* No overlays here: gradient “feather” layers sat above z-10 copy and showed the next
             section through semi-transparent areas — reads as a dark ghost band under the hero. */}
         <div ref={onHoleRef} className="relative row-start-2 col-start-2 min-h-0 min-w-0" />
-        <div className="pointer-events-auto row-start-2 col-start-3 bg-background" />
-        <div className="pointer-events-auto col-span-3 row-start-3 bg-background" />
+        <div className="pointer-events-none row-start-2 col-start-3 bg-background" />
+        <div className="pointer-events-none col-span-3 row-start-3 bg-background" />
       </div>
     </>
   );

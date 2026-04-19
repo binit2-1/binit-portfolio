@@ -20,6 +20,10 @@ function shouldUseLenis(): boolean {
   if (typeof window === "undefined") return false;
   if (window.matchMedia("(pointer: coarse)").matches) return false;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+  // Temporary fallback: Chromium has shown intermittent scroll lock with our
+  // current layout/mask stack; prefer native scrolling there for reliability.
+  const ua = window.navigator.userAgent;
+  if (/(Chrome|Chromium|CriOS|Edg|OPR)\/\d+/.test(ua)) return false;
   return true;
 }
 
