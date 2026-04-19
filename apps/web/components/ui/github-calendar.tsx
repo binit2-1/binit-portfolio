@@ -163,14 +163,14 @@ export function GithubCalendar({
   if (loading) {
     return (
       <div
-        className={cn("flex animate-pulse gap-1", className)}
+        className={cn("flex w-full max-w-full justify-center gap-px overflow-x-hidden", className)}
         aria-busy
         aria-label="Loading contribution calendar"
       >
         {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="flex flex-col gap-0.5 sm:gap-1">
+          <div key={i} className="flex flex-col gap-px sm:gap-1">
             {Array.from({ length: 7 }).map((_, j) => (
-              <div key={j} className="size-2 rounded-[2px] bg-muted sm:size-2.5" />
+              <div key={j} className="size-[5px] rounded-[2px] bg-muted sm:size-2.5" />
             ))}
           </div>
         ))}
@@ -191,9 +191,9 @@ export function GithubCalendar({
         </p>
       )}
 
-      <div className="flex w-full min-w-0 justify-center gap-0.5 overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:thin] sm:gap-[3px] md:gap-1">
+      <div className="flex w-full min-w-0 max-w-full justify-center gap-px overflow-x-hidden pb-1 sm:gap-[3px] md:gap-1">
         {weeks.map((week, weekIndex) => (
-          <div key={weekIndex} className="flex flex-col gap-0.5 sm:gap-[3px] md:gap-1">
+          <div key={weekIndex} className="flex flex-col gap-px sm:gap-[3px] md:gap-1">
             {week.map((day) => {
               const isGlowing = variant === "city-lights" && day.contributionCount > 0;
               const isMinimal = variant === "minimal";
@@ -204,7 +204,7 @@ export function GithubCalendar({
                   key={day.date}
                   title={`${day.contributionCount} contributions on ${day.date}`}
                   className={cn(
-                    "aspect-square w-2 shrink-0 transition-colors duration-200 sm:w-2.5 md:w-3",
+                    "aspect-square w-[5px] shrink-0 transition-colors duration-200 sm:w-2.5 md:w-3",
                     bg.className,
                     shapeClass,
                     isMinimal && "scale-75 rounded-full",
