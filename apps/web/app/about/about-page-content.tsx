@@ -87,6 +87,17 @@ export function AboutPageContent() {
         </InView>
       </div>
 
+      <div
+        className="pointer-events-none fixed inset-x-0"
+        style={{ top: "var(--about-fixed-line-top, 20vh)", zIndex: 80 }}
+        aria-hidden
+      >
+        <div
+          className="w-full bg-[#FF5800]"
+          style={{ height: "1px", transform: "scaleY(0.5)", transformOrigin: "center" }}
+        />
+      </div>
+
       {maskEnabled ? <AboutViewportMask onHoleRef={setHoleEl} /> : null}
 
       <div className="pointer-events-none fixed bottom-6 left-1/2 z-45 -translate-x-1/2 p-1 md:bottom-8">

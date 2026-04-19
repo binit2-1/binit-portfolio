@@ -13,6 +13,8 @@
   --site-nav-h: 5rem;
   /* Opaque belt under nav on About only (see about-viewport-mask). */
   --about-mask-belt: 14px;
+  /* About fixed rule vertical position. */
+  --about-fixed-line-top: 50vh;
 }
 
 /* Mobile: stable viewport height (not 100vh), reduce sideways pan / elastic overscroll. */

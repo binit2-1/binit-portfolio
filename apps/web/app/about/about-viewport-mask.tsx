@@ -14,7 +14,7 @@ export function AboutViewportMask({
     <>
       {/* Blocks bleed in the band directly under the nav (height mismatch / subpixels). */}
       <div
-        className="pointer-events-none fixed inset-x-0 top-0 z-[39] bg-background"
+        className="pointer-events-none fixed inset-x-0 top-0 z-39 bg-background"
         style={{ height: "calc(var(--site-nav-h) + var(--about-mask-belt))" }}
         aria-hidden
       />
