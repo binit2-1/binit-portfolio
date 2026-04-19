@@ -3,7 +3,9 @@
 import { motion, MotionValue, useScroll, useTransform } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
+
+import { useLenisInstance } from "@/components/lenis-provider";
 
 const ACCENT = "#FF5800";
 const BARS = 40;
@@ -50,12 +52,17 @@ const ScrollBar = ({
 const ScrollIndicatorBars = ({
   containerElement,
   direction,
+  draggable,
 }: {
   containerElement: HTMLElement | null;
   direction: "vertical" | "horizontal";
+  draggable: boolean;
 }) => {
   const ref = React.useRef<HTMLElement | null>(containerElement);
+  const trackRef = React.useRef<HTMLDivElement>(null);
+  const dragRef = React.useRef(false);
   const { resolvedTheme } = useTheme();
+  const lenis = useLenisInstance();
 
   React.useEffect(() => {
     ref.current = containerElement;
@@ -70,8 +77,82 @@ const ScrollIndicatorBars = ({
   const scrollProgress = direction === "vertical" ? scrollYProgress : scrollXProgress;
   const left = useTransform(scrollProgress, [0, 1], [0, 100]);
 
+  const applyScrollFromClientX = useCallback(
+    (clientX: number) => {
+      const track = trackRef.current;
+      if (!track) return;
+      const rect = track.getBoundingClientRect();
+      const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+
+      const scrollEl = ref.current;
+      if (scrollEl) {
+        if (direction === "vertical") {
+          const max = scrollEl.scrollHeight - scrollEl.clientHeight;
+          if (max <= 0) return;
+          scrollEl.scrollTop = ratio * max;
+        } else {
+          const max = scrollEl.scrollWidth - scrollEl.clientWidth;
+          if (max <= 0) return;
+          scrollEl.scrollLeft = ratio * max;
+        }
+        return;
+      }
+
+      if (direction === "vertical") {
+        if (lenis) {
+          if (lenis.limit <= 0) return;
+          lenis.scrollTo(ratio * lenis.limit, { immediate: true });
+        } else {
+          const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+          if (max <= 0) return;
+          window.scrollTo(0, ratio * max);
+        }
+      } else {
+        const max = Math.max(0, document.documentElement.scrollWidth - window.innerWidth);
+        if (max <= 0) return;
+        window.scrollTo(ratio * max, 0);
+      }
+    },
+    [direction, lenis],
+  );
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!draggable) return;
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    dragRef.current = true;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    applyScrollFromClientX(e.clientX);
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!draggable || !dragRef.current) return;
+    applyScrollFromClientX(e.clientX);
+  };
+
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragRef.current) return;
+    dragRef.current = false;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      /* released */
+    }
+  };
+
   return (
-    <div className="relative flex w-fit items-end justify-center gap-0.5 md:gap-1">
+    <div
+      ref={trackRef}
+      className={
+        draggable
+          ? "pointer-events-auto relative flex w-fit cursor-grab touch-none select-none items-end justify-center gap-0.5 active:cursor-grabbing md:gap-1"
+          : "relative flex w-fit items-end justify-center gap-0.5 md:gap-1"
+      }
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+      aria-label={draggable ? "Drag horizontally to scroll the page" : undefined}
+    >
       {Array.from({ length: BARS }).map((_, index) => (
         <ScrollBar
           key={`scroll-bar-${index}-${opacityStops[0]}`}
@@ -99,9 +180,11 @@ const ScrollIndicatorBars = ({
 const ScrollIndicator = ({
   scrollContainerId,
   direction,
+  draggable,
 }: {
   scrollContainerId: string;
   direction: "vertical" | "horizontal";
+  draggable: boolean;
 }) => {
   const [container, setContainer] = React.useState<HTMLElement | null>(null);
 
@@ -119,21 +202,26 @@ const ScrollIndicator = ({
     return null;
   }
 
-  return <ScrollIndicatorBars containerElement={container} direction={direction} />;
+  return <ScrollIndicatorBars containerElement={container} direction={direction} draggable={draggable} />;
 };
 
 export default function GlowingScrollIndicator({
   scrollContainerId,
   direction = "vertical",
+  draggable = true,
 }: {
   scrollContainerId?: string;
   direction?: "vertical" | "horizontal";
+  /** When true, drag horizontally on the indicator to seek scroll position. */
+  draggable?: boolean;
 }) {
   const pathname = usePathname();
 
   if (scrollContainerId) {
-    return <ScrollIndicator key={pathname} scrollContainerId={scrollContainerId} direction={direction} />;
+    return (
+      <ScrollIndicator key={pathname} scrollContainerId={scrollContainerId} direction={direction} draggable={draggable} />
+    );
   }
 
-  return <ScrollIndicatorBars key={pathname} containerElement={null} direction={direction} />;
+  return <ScrollIndicatorBars key={pathname} containerElement={null} direction={direction} draggable={draggable} />;
 }
