@@ -17,6 +17,9 @@ export function useLenisInstance(): Lenis | null {
  * wrong scroll limits, and “whole page” overscroll glitches common with JS scroll.
  */
 function shouldUseLenis(): boolean {
+  // Production reliability first: native scroll avoids Chromium-specific lockups
+  // reported only on deployed builds.
+  if (process.env.NODE_ENV === "production") return false;
   if (typeof window === "undefined") return false;
   if (window.matchMedia("(pointer: coarse)").matches) return false;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;

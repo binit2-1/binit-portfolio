@@ -185,7 +185,7 @@ export function GithubCalendar({
   return (
     <div className={cn("flex w-full min-w-0 max-w-full flex-col gap-3", className)}>
       {showTotal && (
-        <p className="break-words text-center text-sm text-muted-foreground">
+        <p className="wrap-break-word text-center text-sm text-muted-foreground">
           <span className="font-medium text-foreground">@{username}</span> — {data?.totalContributions ?? 0}{" "}
           contributions in the last year
         </p>
