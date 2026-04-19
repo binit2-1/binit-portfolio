@@ -33,3 +33,15 @@ export const basteleur = localFont({
   variable: "--font-basteleur",
   display: "swap",
 });
+
+export const helveticaOblique = localFont({
+  src: [
+    {
+      path: "../app/fonts/Helvetica-Oblique.ttf",
+      weight: "400",
+      style: "oblique",
+    },
+  ],
+  variable: "--font-helvetica-oblique",
+  display: "swap",
+});

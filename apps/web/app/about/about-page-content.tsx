@@ -7,6 +7,7 @@ import GlowingScrollIndicator from "@/components/glowing-scroll-indicator";
 import { GithubCalendar } from "@/components/ui/github-calendar";
 
 import { AboutViewportMask } from "./about-viewport-mask";
+import { AboutSectionHeadings } from "./about-section-headings";
 
 /** Matches the hero copy in section 1. */
 const sectionTextClass =
@@ -90,6 +91,7 @@ export function AboutPageContent() {
       </div>
 
       <AboutViewportMask onHoleRef={setHoleEl} />
+      <AboutSectionHeadings labels={["HELLO", "STACK", "CONTRI"]} />
 
       <div className="pointer-events-none fixed bottom-6 left-1/2 z-45 -translate-x-1/2 p-1 md:bottom-8">
         <div className="flex h-20 items-end justify-center">

@@ -7,6 +7,7 @@
 @theme inline {
   --font-sans: var(--font-helvetica-neue), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-basteleur), var(--font-helvetica-neue), ui-sans-serif, sans-serif;
+  --font-oblique: var(--font-helvetica-oblique), ui-sans-serif, system-ui, sans-serif;
   /* Whole-site horizontal cap (layout shell): 196.5 character widths, never wider than viewport. */
   --site-max-width: min(100%, 196.5ch);
   /* Sticky navbar row (py-4 + links + toggle); About mask/belt use the same token. */
@@ -20,7 +21,7 @@
 /* On mobile, push the orange line & mask higher so text isn't clipped. */
 @media (max-width: 639px) {
   :root {
-    --about-fixed-line-top: 42vh;
+    --about-fixed-line-top: 38vh;
   }
 }
 

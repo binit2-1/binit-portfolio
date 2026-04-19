@@ -4,7 +4,7 @@ import { FloatingThemeToggle } from "@/components/floating-theme-toggle";
 import { LenisProvider } from "@/components/lenis-provider";
 import { Navbar } from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
-import { basteleur, helveticaNeue } from "@/lib/fonts";
+import { basteleur, helveticaNeue, helveticaOblique } from "@/lib/fonts";
 import "./globals.css";
 
 const geistMono = Geist_Mono({
@@ -35,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${helveticaNeue.variable} ${basteleur.variable}`}
+      className={`${helveticaNeue.variable} ${basteleur.variable} ${helveticaOblique.variable}`}
       suppressHydrationWarning
     >
       <body
