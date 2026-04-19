@@ -14,7 +14,14 @@
   /* Opaque belt under nav on About only (see about-viewport-mask). */
   --about-mask-belt: 14px;
   /* About fixed rule vertical position. */
-  --about-fixed-line-top: 50vh;
+  --about-fixed-line-top: 45vh;
+}
+
+/* On mobile, push the orange line & mask higher so text isn't clipped. */
+@media (max-width: 639px) {
+  :root {
+    --about-fixed-line-top: 42vh;
+  }
 }
 
 /* Mobile: stable viewport height (not 100vh), reduce sideways pan / elastic overscroll. */

@@ -15,12 +15,17 @@ export function AboutViewportMask({
       {/* Blocks bleed in the band directly under the nav (height mismatch / subpixels). */}
       <div
         className="pointer-events-none fixed inset-x-0 top-0 z-39 bg-background"
-        style={{ height: "calc(var(--site-nav-h) + var(--about-mask-belt))" }}
+        style={{ height: "calc(var(--site-nav-h) + var(--about-mask-belt))", touchAction: "manipulation" }}
         aria-hidden
       />
       <div
-        className="pointer-events-none fixed right-0 bottom-0 left-0 z-38 grid grid-cols-[min(1.5rem,5vw)_1fr_min(1.5rem,5vw)] grid-rows-[1fr_min(60dvh,min(560px,85dvh))_1fr]"
-        style={{ top: "calc(var(--site-nav-h) + var(--about-mask-belt))" }}
+        className="pointer-events-none fixed right-0 bottom-0 left-0 z-38 grid grid-cols-[min(1.5rem,5vw)_1fr_min(1.5rem,5vw)]"
+        style={{
+          top: "calc(var(--site-nav-h) + var(--about-mask-belt))",
+          gridTemplateRows:
+            "calc(var(--about-fixed-line-top) - var(--site-nav-h) - var(--about-mask-belt)) 1fr 0px",
+          touchAction: "manipulation",
+        }}
         aria-hidden
       >
         <div className="pointer-events-none col-span-3 row-start-1 bg-background" />

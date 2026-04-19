@@ -24,10 +24,6 @@ const inViewTransition = {
 
 export function AboutPageContent() {
   const [holeEl, setHoleEl] = useState<HTMLDivElement | null>(null);
-  const [maskEnabled] = useState(() => {
-    if (typeof window === "undefined") return true;
-    return !/(Chrome|Chromium|CriOS|Edg|OPR)\/\d+/.test(window.navigator.userAgent);
-  });
   const holeRootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -35,16 +31,11 @@ export function AboutPageContent() {
   }, [holeEl]);
 
   const inViewOptions = useMemo(
-    () =>
-      maskEnabled
-        ? {
-            root: holeRootRef,
-            amount: 0.28 as const,
-          }
-        : {
-            amount: 0.28 as const,
-          },
-    [maskEnabled],
+    () => ({
+      root: holeRootRef,
+      amount: 0.28 as const,
+    }),
+    [],
   );
 
   return (
@@ -98,7 +89,7 @@ export function AboutPageContent() {
         />
       </div>
 
-      {maskEnabled ? <AboutViewportMask onHoleRef={setHoleEl} /> : null}
+      <AboutViewportMask onHoleRef={setHoleEl} />
 
       <div className="pointer-events-none fixed bottom-6 left-1/2 z-45 -translate-x-1/2 p-1 md:bottom-8">
         <div className="flex h-20 items-end justify-center">
