@@ -8,3 +8,35 @@
   --font-sans: var(--font-helvetica-neue), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-basteleur), var(--font-helvetica-neue), ui-sans-serif, sans-serif;
 }
+
+/* Home: when a social link is hovered, dim + blur the rest of the hero (reference: focus spotlight) */
+@layer components {
+  .social-hover-focus > p,
+  .social-hover-focus > h1,
+  .social-hover-focus .social-links > a {
+    transition:
+      opacity 300ms ease,
+      filter 300ms ease,
+      transform 300ms ease;
+  }
+
+  .social-hover-focus:has(.social-links a:is(:hover, :focus-visible)) > p,
+  .social-hover-focus:has(.social-links a:is(:hover, :focus-visible)) > h1 {
+    opacity: 0.28;
+    filter: blur(2px);
+  }
+
+  .social-hover-focus:has(.social-links a:is(:hover, :focus-visible))
+    .social-links
+    > a:not(:is(:hover, :focus-visible)) {
+    opacity: 0.28;
+    filter: blur(2px);
+  }
+
+  .social-hover-focus .social-links > a:is(:hover, :focus-visible) {
+    position: relative;
+    z-index: 1;
+    opacity: 1;
+    filter: none;
+  }
+}
