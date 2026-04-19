@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono } from "next/font/google";
+import { FloatingThemeToggle } from "@/components/floating-theme-toggle";
 import { LenisProvider } from "@/components/lenis-provider";
 import { Navbar } from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -49,6 +50,7 @@ export default function RootLayout({
               <div className="site-shell mx-auto flex w-full min-w-0 max-w-(--site-max-width) flex-1 flex-col px-4 pb-16 sm:px-6">
                 <main className="min-w-0 flex-1 pt-0">{children}</main>
               </div>
+              <FloatingThemeToggle />
             </div>
           </LenisProvider>
         </ThemeProvider>

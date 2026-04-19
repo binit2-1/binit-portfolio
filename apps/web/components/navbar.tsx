@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@repo/ui/lib/utils";
-import { ThemeToggleButton } from "@repo/ui/components/ui/skiper-ui/skiper26";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -32,7 +31,6 @@ export function Navbar() {
               </Link>
             </li>
           ))}
-          <ThemeToggleButton variant="circle" start="center" blur className="size-6" />
         </ul>
       </div>
     </nav>
