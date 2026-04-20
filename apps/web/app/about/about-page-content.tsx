@@ -79,7 +79,7 @@ export function AboutPageContent() {
         {/* ── Section 1 ── */}
         <section
           className={snapSectionClass}
-          style={{ paddingTop: `calc(-1 * var(--about-fixed-line-top))` }}
+          style={{ marginTop: "-30px" }}
         >
           <h1 className="sr-only">About</h1>
           <p className={sectionTextClass}>
@@ -98,7 +98,7 @@ export function AboutPageContent() {
           viewOptions={inViewOptions}
           transition={inViewTransition}
         >
-          <div style={{ paddingTop: `calc(-1 * var(--about-fixed-line-top))` }} className="flex w-full flex-col items-center justify-center flex-1">
+          <div style={{ marginTop: "-30px" }} className="flex w-full flex-col items-center justify-center flex-1">
             <h2 className="sr-only">More</h2>
             <p className={sectionTextClass}>
               Section 2 placeholder — add content here (e.g. experience, stack, or projects).
@@ -114,7 +114,7 @@ export function AboutPageContent() {
           viewOptions={inViewOptions}
           transition={inViewTransition}
         >
-          <div style={{ paddingTop: `calc(-1 * var(--about-fixed-line-top))` }} className="flex w-full flex-col items-center justify-center flex-1">
+          <div style={{ marginTop: "-30px" }} className="flex w-full flex-col items-center justify-center flex-1">
             <h2 className="sr-only">GitHub contributions</h2>
             <div className="flex w-full min-w-0 max-w-[min(100%,52rem)] justify-center">
               <GithubCalendar username="binit2-1" colorSchema="orange" variant="default" showTotal />
