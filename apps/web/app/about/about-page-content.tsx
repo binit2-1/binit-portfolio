@@ -8,6 +8,7 @@ import { GithubCalendar } from "@/components/ui/github-calendar";
 
 import { AboutViewportMask } from "./about-viewport-mask";
 import { AboutSectionHeadings } from "./about-section-headings";
+import { useSnapScroll } from "./use-snap-scroll";
 
 /** Matches the hero copy in section 1. */
 const sectionTextClass =
@@ -23,9 +24,29 @@ const inViewTransition = {
   ease: [0.16, 1, 0.3, 1] as const,
 };
 
+/**
+ * Section labels — add new entries here and match with a <section> below.
+ * The heading component and snap logic auto-adapt to however many you have.
+ */
+const SECTION_LABELS = ["HELLO", "STACK", "CONTRI"];
+
+/**
+ * Shared section class: each section is exactly 1 viewport tall,
+ * and centers content in the visible band below the orange line.
+ */
+const snapSectionClass =
+  "mx-auto flex h-dvh w-full flex-col items-center justify-center px-4 text-center sm:px-6";
+
 export function AboutPageContent() {
   const [holeEl, setHoleEl] = useState<HTMLDivElement | null>(null);
   const holeRootRef = useRef<HTMLDivElement | null>(null);
+
+  /* ── GSAP snap scroll ── */
+  const { activeIndex, scrollToSection } = useSnapScroll({
+    sectionCount: SECTION_LABELS.length,
+    duration: 0.85,
+    ease: "power3.inOut",
+  });
 
   useEffect(() => {
     holeRootRef.current = holeEl;
@@ -39,10 +60,27 @@ export function AboutPageContent() {
     [],
   );
 
+  /* ── Set body styles for the About page ── */
+  useEffect(() => {
+    const html = document.documentElement;
+    // Prevent native scroll-snap from interfering with GSAP
+    html.style.overscrollBehaviorY = "none";
+    document.body.style.overscrollBehaviorY = "none";
+
+    return () => {
+      html.style.overscrollBehaviorY = "";
+      document.body.style.overscrollBehaviorY = "";
+    };
+  }, []);
+
   return (
     <>
       <div className="relative z-10 w-full min-w-0">
-        <section className="mx-auto flex min-h-[calc(100dvh-var(--site-nav-h))] w-full flex-col items-center justify-center px-4 text-center sm:px-6">
+        {/* ── Section 1 ── */}
+        <section
+          className={snapSectionClass}
+          style={{ paddingTop: "var(--about-fixed-line-top)" }}
+        >
           <h1 className="sr-only">About</h1>
           <p className={sectionTextClass}>
             I am a full-stack developer and computer science student focused on developer experience and systems
@@ -52,29 +90,35 @@ export function AboutPageContent() {
           </p>
         </section>
 
+        {/* ── Section 2 ── */}
         <InView
           as="section"
-          className="mx-auto flex min-h-[80vh] w-full flex-col items-center justify-center px-4 py-16 text-center sm:px-6"
+          className={snapSectionClass}
           variants={scrollReveal}
           viewOptions={inViewOptions}
           transition={inViewTransition}
         >
-          <h2 className="sr-only">More</h2>
-          <p className={sectionTextClass}>
-            Section 2 placeholder — add content here (e.g. experience, stack, or projects).
-          </p>
+          <div style={{ paddingTop: "var(--about-fixed-line-top)" }} className="flex w-full flex-col items-center justify-center flex-1">
+            <h2 className="sr-only">More</h2>
+            <p className={sectionTextClass}>
+              Section 2 placeholder — add content here (e.g. experience, stack, or projects).
+            </p>
+          </div>
         </InView>
 
+        {/* ── Section 3 ── */}
         <InView
           as="section"
-          className="mx-auto flex min-h-[80vh] w-full flex-col items-center justify-center px-4 py-16 sm:px-6"
+          className={snapSectionClass}
           variants={scrollReveal}
           viewOptions={inViewOptions}
           transition={inViewTransition}
         >
-          <h2 className="sr-only">GitHub contributions</h2>
-          <div className="flex w-full min-w-0 max-w-[min(100%,52rem)] justify-center">
-            <GithubCalendar username="binit2-1" colorSchema="orange" variant="default" showTotal />
+          <div style={{ paddingTop: "var(--about-fixed-line-top)" }} className="flex w-full flex-col items-center justify-center flex-1">
+            <h2 className="sr-only">GitHub contributions</h2>
+            <div className="flex w-full min-w-0 max-w-[min(100%,52rem)] justify-center">
+              <GithubCalendar username="binit2-1" colorSchema="orange" variant="default" showTotal />
+            </div>
           </div>
         </InView>
       </div>
@@ -91,7 +135,7 @@ export function AboutPageContent() {
       </div>
 
       <AboutViewportMask onHoleRef={setHoleEl} />
-      <AboutSectionHeadings labels={["HELLO", "STACK", "CONTRI"]} />
+      <AboutSectionHeadings labels={SECTION_LABELS} activeIndex={activeIndex} />
 
       <div className="pointer-events-none fixed bottom-6 left-1/2 z-45 -translate-x-1/2 p-1 md:bottom-8">
         <div className="flex h-20 items-end justify-center">

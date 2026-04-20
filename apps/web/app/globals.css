@@ -84,3 +84,6 @@
     color: #ff5800;
   }
 }
+
+/* About page: snap-scroll is handled by GSAP ScrollTrigger in use-snap-scroll.ts.
+   No CSS scroll-snap rules needed — GSAP manages all snapping behaviour. */
