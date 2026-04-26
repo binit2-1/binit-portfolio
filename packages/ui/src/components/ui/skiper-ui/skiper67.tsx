@@ -126,7 +126,6 @@ export type Skiper67Props = {
   type?: string;
   poster?: string;
   className?: string;
-  orientation?: "landscape" | "portrait";
 };
 
 const DEFAULT_SKIPER_VIDEO = "/showreel/skiper-ui-showreel.mp4";
@@ -186,7 +185,7 @@ function getYouTubeThumbnailUrl(videoId: string) {
   return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 }
 
-export const Skiper67 = ({ src, type, poster, className, orientation = "landscape" }: Skiper67Props) => {
+export const Skiper67 = ({ src, type, poster, className }: Skiper67Props) => {
   const [showVideoPopOver, setShowVideoPopOver] = useState(false);
   const resolvedSrc = src?.trim() || DEFAULT_SKIPER_VIDEO;
   const resolvedType = type?.trim() || "video/mp4";
@@ -214,14 +213,8 @@ export const Skiper67 = ({ src, type, poster, className, orientation = "landscap
     y.set(e.clientY - bounds.top);
   };
 
-  const previewFrameClassName =
-    orientation === "portrait" ? "w-16 aspect-[9/16] md:w-[4.5rem]" : "w-28 aspect-video md:w-32";
-  const modalFrameClassName =
-    orientation === "portrait"
-      ? "relative aspect-[9/16] w-[min(42vw,270px)] md:w-[min(18vw,270px)]"
-      : "relative aspect-video w-[min(76vw,540px)] md:w-[min(36vw,540px)]";
-  const previewMediaClassName =
-    orientation === "portrait" ? "h-full w-full object-contain bg-black" : "h-full w-full object-cover";
+  const previewFrameClassName = "w-28 aspect-video md:w-32";
+  const previewMediaClassName = "h-full w-full object-cover";
 
   return (
     <section className={cn("relative flex h-full w-full items-center justify-center bg-[#f5f4f3]", className)}>
@@ -233,7 +226,6 @@ export const Skiper67 = ({ src, type, poster, className, orientation = "landscap
             type={resolvedType}
             youTubeEmbedSrc={modalYouTubeEmbedSrc}
             poster={poster}
-            orientation={orientation}
           />
         )}
       </AnimatePresence>
@@ -284,14 +276,12 @@ const VideoPopOver = ({
   type,
   youTubeEmbedSrc,
   poster,
-  orientation,
 }: {
   setShowVideoPopOver: (showVideoPopOver: boolean) => void;
   src: string;
   type: string;
   youTubeEmbedSrc: string | null;
   poster?: string;
-  orientation: "landscape" | "portrait";
 }) => {
   const modalRef = useRef<HTMLDivElement | null>(null);
 
@@ -319,11 +309,8 @@ const VideoPopOver = ({
   }, [youTubeEmbedSrc]);
 
   const modalFrameClassName =
-    orientation === "portrait"
-      ? "relative aspect-[9/16] w-[min(42vw,270px)] md:w-[min(18vw,270px)]"
-      : "relative aspect-video w-[min(76vw,540px)] md:w-[min(36vw,540px)]";
-  const mediaClassName =
-    orientation === "portrait" ? "h-full w-full object-contain bg-black" : "h-full w-full object-cover";
+    "relative aspect-video max-h-[72vh] w-[min(84vw,620px)] overflow-hidden rounded-2xl bg-black shadow-[0_20px_60px_rgba(0,0,0,0.45)] md:w-[min(42vw,620px)]";
+  const mediaClassName = "h-full w-full object-cover";
 
   return (
     <div className="fixed inset-0 z-[101]">
@@ -335,7 +322,7 @@ const VideoPopOver = ({
         className="bg-background/90 absolute inset-0 h-full w-full backdrop-blur-lg"
         onClick={() => setShowVideoPopOver(false)}
       ></motion.div>
-      <div className="absolute inset-0 grid place-items-center px-4">
+      <div className="absolute inset-0 grid place-items-center px-4 py-8">
         <motion.div
           ref={modalRef}
           initial={{ clipPath: "inset(43.5% 43.5% 33.5% 43.5% )", opacity: 0 }}

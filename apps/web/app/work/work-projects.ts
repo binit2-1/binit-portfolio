@@ -13,7 +13,6 @@ export const WORK_PROJECTS: WorkProject[] = [
     video: {
       src: "/videos/work/composter.mp4",
       type: "video/mp4",
-      orientation: "landscape",
     },
   },
   {
@@ -25,7 +24,6 @@ export const WORK_PROJECTS: WorkProject[] = [
     video: {
       src: "/videos/work/hackerquare.mp4",
       type: "video/mp4",
-      orientation: "landscape",
     },
   },
   {
@@ -37,7 +35,6 @@ export const WORK_PROJECTS: WorkProject[] = [
     video: {
       src: "/videos/work/munshi.mp4",
       type: "video/mp4",
-      orientation: "portrait",
     },
   },
 ];

@@ -2,7 +2,6 @@ export type WorkProjectVideoSource = {
   src: string;
   type?: string;
   poster?: string;
-  orientation?: "landscape" | "portrait";
 };
 
 export type WorkProject = {

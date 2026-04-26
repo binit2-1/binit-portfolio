@@ -22,7 +22,7 @@ export function WorkProjectSpotlight({ projects, activeIndex }: WorkProjectSpotl
         height: "max(0px, calc(var(--about-fixed-line-top, 20vh) - var(--site-nav-h, 0px)))",
       }}
     >
-      <div className="mx-auto grid h-full w-full max-w-5xl grid-cols-[minmax(0,32vw)_1fr] items-end gap-5 px-4 pb-2 sm:px-6 md:grid-cols-[minmax(0,15rem)_1fr]">
+      <div className="mx-auto grid h-full w-full max-w-3xl grid-cols-[minmax(0,11rem)_1fr] items-end gap-3 px-4 pb-2 sm:px-6 md:grid-cols-[minmax(0,12rem)_1fr] md:gap-4">
         <div className="pointer-events-auto">
           <WorkProjectVideoPlayer video={currentProject.video} />
         </div>
