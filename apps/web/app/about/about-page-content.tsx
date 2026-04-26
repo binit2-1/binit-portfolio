@@ -28,7 +28,7 @@ const inViewTransition = {
  * Section labels — add new entries here and match with a <section> below.
  * The heading component and snap logic auto-adapt to however many you have.
  */
-const SECTION_LABELS = ["HELLO", "STACK", "CONTRI"];
+const SECTION_LABELS = ["HELLO", "EXP", "CONTRI"];
 
 /**
  * Shared section class: each section is exactly 1 viewport tall,
@@ -83,10 +83,7 @@ export function AboutPageContent() {
         >
           <h1 className="sr-only">About</h1>
           <p className={sectionTextClass}>
-            I am a full-stack developer and computer science student focused on developer experience and systems
-            architecture. From building custom React renderers to engineering lightweight Go applications, I love
-            diving deep into how things work under the hood. I build interactive apps with taste, prioritizing speed,
-            clean code, and zero-friction user experiences.
+            I am Full-stack developer with taste. I build and ship with Next.js, React, and Tailwind on the frontend, Express and Go on the backend. I like making things and putting them out into the world.
           </p>
         </section>
 
