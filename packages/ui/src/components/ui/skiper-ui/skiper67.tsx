@@ -346,7 +346,7 @@ const VideoPopOver = ({
   return createPortal(
     <div className="fixed inset-0 z-[1000] isolate" data-work-video-modal="true">
       <motion.div
-        initial={{ opacity: 0 }}
+        initial={{ opacity: 1 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
@@ -409,7 +409,7 @@ const VideoPopOver = ({
             type="button"
             onClick={closeVideoPopOver}
             aria-label="Close video"
-            className="absolute right-3 top-3 z-20 inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+            className="absolute left-3 top-3 z-20 inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
           >
             <XCircleIcon size={28} weight="regular" />
           </button>

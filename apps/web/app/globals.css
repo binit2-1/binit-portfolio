@@ -30,6 +30,13 @@ body[data-work-video-modal-open="true"] [data-work-project-heading="true"] {
   opacity: 0;
 }
 
+body[data-work-video-modal-open="true"] [data-site-navbar="true"] {
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+  transition-duration: 0ms;
+}
+
 /* Mobile: stable viewport height (not 100vh), reduce sideways pan / elastic overscroll. */
 @layer base {
   html {
