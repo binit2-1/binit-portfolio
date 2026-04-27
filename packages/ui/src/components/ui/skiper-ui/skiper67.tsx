@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useSpring } from "framer-motion";
-import { XCircleIcon } from "@phosphor-icons/react/dist/ssr";
+import { XIcon } from "@phosphor-icons/react/dist/ssr";
 import { Play } from "lucide-react";
 import {
   MediaControlBar,
@@ -337,8 +337,10 @@ const VideoPopOver = ({
     void video.play().catch(() => {});
   }, [youTubeEmbedSrc]);
 
+  const modalShellClassName =
+    "relative h-[100dvh] w-full sm:h-auto sm:aspect-video sm:max-h-[72vh] sm:w-[min(84vw,620px)] md:w-[min(42vw,620px)]";
   const modalFrameClassName =
-    "relative h-[100dvh] w-full overflow-hidden bg-black sm:h-auto sm:aspect-video sm:max-h-[72vh] sm:w-[min(84vw,620px)] sm:rounded-2xl sm:shadow-[0_20px_60px_rgba(0,0,0,0.45)] md:w-[min(42vw,620px)]";
+    "relative h-full w-full overflow-hidden bg-black sm:rounded-2xl sm:shadow-[0_20px_60px_rgba(0,0,0,0.45)]";
   const mediaClassName = "h-full w-full object-cover";
 
   if (!portalContainer) return null;
@@ -354,66 +356,68 @@ const VideoPopOver = ({
         onClick={closeVideoPopOver}
       ></motion.div>
       <div className="absolute inset-0 grid place-items-center px-0 py-0 sm:px-4 sm:py-8">
-        <motion.div
-          ref={modalRef}
-          initial={{ clipPath: "inset(43.5% 43.5% 33.5% 43.5%)", opacity: 0 }}
-          animate={{ clipPath: "inset(0 0 0 0)", opacity: 1 }}
-          exit={{
-            clipPath: "inset(43.5% 43.5% 33.5% 43.5%)",
-            opacity: 0,
-            transition: {
-              duration: 1,
-              type: "spring",
-              stiffness: 100,
-              damping: 20,
-              opacity: { duration: 0.2, delay: 0.8 },
-            },
-          }}
-          transition={{
-            duration: 1,
-            type: "spring",
-            stiffness: 100,
-            damping: 20,
-          }}
-          className={modalFrameClassName}
-        >
-          {youTubeEmbedSrc ? (
-            <iframe
-              src={youTubeEmbedSrc}
-              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-              allowFullScreen
-              className="h-full w-full"
-              title="YouTube video player"
-            />
-          ) : (
-            <VideoPlayer style={{ width: "100%", height: "100%" }}>
-              <VideoPlayerContent
-                src={src}
-                autoPlay
-                playsInline
-                slot="media"
-                className={mediaClassName}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                poster={poster}
-              >
-                <source src={src} type={type} />
-              </VideoPlayerContent>
-              <VideoPlayerControlBar className="absolute bottom-0 left-1/2 flex w-full max-w-7xl -translate-x-1/2 items-center justify-center px-5 mix-blend-exclusion md:px-10 md:py-5">
-                <VideoPlayerPlayButton className="h-4 bg-transparent" />
-                <VideoPlayerTimeRange className="bg-transparent" />
-                <VideoPlayerMuteButton className="size-4 bg-transparent" />
-              </VideoPlayerControlBar>
-            </VideoPlayer>
-          )}
+        <div className={modalShellClassName}>
           <button
             type="button"
             onClick={closeVideoPopOver}
             aria-label="Close video"
-            className="absolute left-3 top-3 z-20 inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+            className="absolute right-4  z-50 inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/30 bg-black/80 text-white shadow-[0_8px_24px_rgba(0,0,0,0.35)] transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:right-3 sm:top-3"
           >
-            <XCircleIcon size={28} weight="regular" />
+            <XIcon size={28} weight="bold" />
           </button>
-        </motion.div>
+          <motion.div
+            ref={modalRef}
+            initial={{ clipPath: "inset(43.5% 43.5% 33.5% 43.5%)", opacity: 0 }}
+            animate={{ clipPath: "inset(0 0 0 0)", opacity: 1 }}
+            exit={{
+              clipPath: "inset(43.5% 43.5% 33.5% 43.5%)",
+              opacity: 0,
+              transition: {
+                duration: 1,
+                type: "spring",
+                stiffness: 100,
+                damping: 20,
+                opacity: { duration: 0.2, delay: 0.8 },
+              },
+            }}
+            transition={{
+              duration: 1,
+              type: "spring",
+              stiffness: 100,
+              damping: 20,
+            }}
+            className={modalFrameClassName}
+          >
+            {youTubeEmbedSrc ? (
+              <iframe
+                src={youTubeEmbedSrc}
+                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                allowFullScreen
+                className="h-full w-full"
+                title="YouTube video player"
+              />
+            ) : (
+              <VideoPlayer style={{ width: "100%", height: "100%" }}>
+                <VideoPlayerContent
+                  src={src}
+                  autoPlay
+                  playsInline
+                  slot="media"
+                  className={mediaClassName}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  poster={poster}
+                >
+                  <source src={src} type={type} />
+                </VideoPlayerContent>
+                <VideoPlayerControlBar className="absolute bottom-0 left-1/2 flex w-full max-w-7xl -translate-x-1/2 items-center justify-center px-5 mix-blend-exclusion md:px-10 md:py-5">
+                  <VideoPlayerPlayButton className="h-4 bg-transparent" />
+                  <VideoPlayerTimeRange className="bg-transparent" />
+                  <VideoPlayerMuteButton className="size-4 bg-transparent" />
+                </VideoPlayerControlBar>
+              </VideoPlayer>
+            )}
+          </motion.div>
+        </div>
       </div>
     </div>,
     portalContainer,
