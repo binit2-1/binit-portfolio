@@ -85,9 +85,16 @@ function WorkProjectRow({
 export function WorkProjectList({ projects, activeIndex: activeIndexProp, onActiveIndexChange }: WorkProjectListProps) {
   const [internalActiveIndex, setInternalActiveIndex] = useState(0);
   const listRef = useRef<HTMLUListElement | null>(null);
+  const activeIndexRef = useRef(0);
   const isControlled = typeof activeIndexProp === "number";
   const maxIndex = Math.max(0, projects.length - 1);
   const activeIndex = projects.length === 0 ? -1 : Math.max(0, Math.min(activeIndexProp ?? internalActiveIndex, maxIndex));
+
+  useEffect(() => {
+    if (activeIndex >= 0) {
+      activeIndexRef.current = activeIndex;
+    }
+  }, [activeIndex]);
 
   const commitActiveIndex = useCallback(
     (nextIndex: number) => {
@@ -106,12 +113,20 @@ export function WorkProjectList({ projects, activeIndex: activeIndexProp, onActi
     [isControlled, maxIndex, onActiveIndexChange, projects.length],
   );
 
-  const moveActive = useCallback((nextIndex: number) => {
-    commitActiveIndex(nextIndex);
-  }, [commitActiveIndex]);
+  const moveActiveBy = useCallback(
+    (delta: number) => {
+      if (projects.length === 0) return;
+      commitActiveIndex(activeIndexRef.current + delta);
+    },
+    [commitActiveIndex, projects.length],
+  );
 
   useEffect(() => {
     const onDocumentKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.repeat) {
+        return;
+      }
+
       const target = event.target as HTMLElement | null;
       if (
         target &&
@@ -123,18 +138,22 @@ export function WorkProjectList({ projects, activeIndex: activeIndexProp, onActi
         return;
       }
 
+      if (document.querySelector("[data-work-video-modal='true']")) {
+        return;
+      }
+
       if (event.key === "ArrowDown") {
         event.preventDefault();
-        moveActive(activeIndex + 1);
+        moveActiveBy(1);
       } else if (event.key === "ArrowUp") {
         event.preventDefault();
-        moveActive(activeIndex - 1);
+        moveActiveBy(-1);
       }
     };
 
     document.addEventListener("keydown", onDocumentKeyDown, { capture: true });
     return () => document.removeEventListener("keydown", onDocumentKeyDown, { capture: true });
-  }, [activeIndex, moveActive]);
+  }, [moveActiveBy]);
 
   return (
     <ul
@@ -142,15 +161,6 @@ export function WorkProjectList({ projects, activeIndex: activeIndexProp, onActi
       className="mx-auto w-full max-w-4xl space-y-0.5 outline-none"
       tabIndex={0}
       aria-label="Projects list"
-      onKeyDown={(event) => {
-        if (event.key === "ArrowDown") {
-          event.preventDefault();
-          moveActive(activeIndex + 1);
-        } else if (event.key === "ArrowUp") {
-          event.preventDefault();
-          moveActive(activeIndex - 1);
-        }
-      }}
     >
       {projects.map((project, index) => (
         <WorkProjectRow

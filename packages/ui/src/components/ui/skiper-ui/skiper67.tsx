@@ -1,7 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion, useSpring } from "framer-motion";
-import { Play, Plus } from "lucide-react";
+import { XCircleIcon } from "@phosphor-icons/react/dist/ssr";
+import { Play } from "lucide-react";
 import {
   MediaControlBar,
   MediaController,
@@ -15,6 +16,7 @@ import {
 } from "media-chrome/react";
 import type { ComponentProps } from "react";
 import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { cn } from "@repo/ui/lib/utils";
 
@@ -185,6 +187,8 @@ function getYouTubeThumbnailUrl(videoId: string) {
   return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 }
 
+const MODAL_EXIT_DURATION_MS = 1000;
+
 export const Skiper67 = ({ src, type, poster, className }: Skiper67Props) => {
   const [showVideoPopOver, setShowVideoPopOver] = useState(false);
   const resolvedSrc = src?.trim() || DEFAULT_SKIPER_VIDEO;
@@ -213,15 +217,34 @@ export const Skiper67 = ({ src, type, poster, className }: Skiper67Props) => {
     y.set(e.clientY - bounds.top);
   };
 
+  const openVideoPopOver = () => {
+    document.body.setAttribute("data-work-video-modal-open", "true");
+    setShowVideoPopOver(true);
+  };
+
+  const closeVideoPopOver = () => {
+    setShowVideoPopOver(false);
+  };
+
+  useEffect(() => {
+    if (showVideoPopOver) return;
+
+    const timeout = window.setTimeout(() => {
+      document.body.removeAttribute("data-work-video-modal-open");
+    }, MODAL_EXIT_DURATION_MS);
+
+    return () => window.clearTimeout(timeout);
+  }, [showVideoPopOver]);
+
   const previewFrameClassName = "w-28 aspect-video md:w-32";
   const previewMediaClassName = "h-full w-full object-cover";
 
   return (
-    <section className={cn("relative flex h-full w-full items-center justify-center bg-[#f5f4f3]", className)}>
+    <section className={cn("relative flex w-full items-center justify-center bg-transparent", className)}>
       <AnimatePresence>
         {showVideoPopOver && (
           <VideoPopOver
-            setShowVideoPopOver={setShowVideoPopOver}
+            closeVideoPopOver={closeVideoPopOver}
             src={resolvedSrc}
             type={resolvedType}
             youTubeEmbedSrc={modalYouTubeEmbedSrc}
@@ -234,7 +257,7 @@ export const Skiper67 = ({ src, type, poster, className }: Skiper67Props) => {
         onMouseLeave={() => {
           opacity.set(0);
         }}
-        onClick={() => setShowVideoPopOver(true)}
+        onClick={openVideoPopOver}
         className={previewFrameClassName}
       >
         <motion.div
@@ -261,6 +284,7 @@ export const Skiper67 = ({ src, type, poster, className }: Skiper67Props) => {
             loop
             poster={previewPoster}
             className={previewMediaClassName}
+            style={{ objectFit: "cover" }}
           >
             <source src={resolvedSrc} type={resolvedType} />
           </video>
@@ -271,30 +295,35 @@ export const Skiper67 = ({ src, type, poster, className }: Skiper67Props) => {
 };
 
 const VideoPopOver = ({
-  setShowVideoPopOver,
+  closeVideoPopOver,
   src,
   type,
   youTubeEmbedSrc,
   poster,
 }: {
-  setShowVideoPopOver: (showVideoPopOver: boolean) => void;
+  closeVideoPopOver: () => void;
   src: string;
   type: string;
   youTubeEmbedSrc: string | null;
   poster?: string;
 }) => {
   const modalRef = useRef<HTMLDivElement | null>(null);
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setPortalContainer(document.body);
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setShowVideoPopOver(false);
+        closeVideoPopOver();
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [setShowVideoPopOver]);
+  }, [closeVideoPopOver]);
 
   useEffect(() => {
     if (youTubeEmbedSrc) return;
@@ -309,26 +338,28 @@ const VideoPopOver = ({
   }, [youTubeEmbedSrc]);
 
   const modalFrameClassName =
-    "relative aspect-video max-h-[72vh] w-[min(84vw,620px)] overflow-hidden rounded-2xl bg-black shadow-[0_20px_60px_rgba(0,0,0,0.45)] md:w-[min(42vw,620px)]";
+    "relative h-[100dvh] w-full overflow-hidden bg-black sm:h-auto sm:aspect-video sm:max-h-[72vh] sm:w-[min(84vw,620px)] sm:rounded-2xl sm:shadow-[0_20px_60px_rgba(0,0,0,0.45)] md:w-[min(42vw,620px)]";
   const mediaClassName = "h-full w-full object-cover";
 
-  return (
-    <div className="fixed inset-0 z-[101]">
+  if (!portalContainer) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[1000] isolate" data-work-video-modal="true">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="bg-background/90 absolute inset-0 h-full w-full backdrop-blur-lg"
-        onClick={() => setShowVideoPopOver(false)}
+        className="bg-background absolute inset-0 h-full w-full"
+        onClick={closeVideoPopOver}
       ></motion.div>
-      <div className="absolute inset-0 grid place-items-center px-4 py-8">
+      <div className="absolute inset-0 grid place-items-center px-0 py-0 sm:px-4 sm:py-8">
         <motion.div
           ref={modalRef}
-          initial={{ clipPath: "inset(43.5% 43.5% 33.5% 43.5% )", opacity: 0 }}
+          initial={{ clipPath: "inset(43.5% 43.5% 33.5% 43.5%)", opacity: 0 }}
           animate={{ clipPath: "inset(0 0 0 0)", opacity: 1 }}
           exit={{
-            clipPath: "inset(43.5% 43.5% 33.5% 43.5% )",
+            clipPath: "inset(43.5% 43.5% 33.5% 43.5%)",
             opacity: 0,
             transition: {
               duration: 1,
@@ -362,7 +393,7 @@ const VideoPopOver = ({
                 playsInline
                 slot="media"
                 className={mediaClassName}
-                style={{ width: "100%", height: "100%" }}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 poster={poster}
               >
                 <source src={src} type={type} />
@@ -374,14 +405,17 @@ const VideoPopOver = ({
               </VideoPlayerControlBar>
             </VideoPlayer>
           )}
-          <span
-            onClick={() => setShowVideoPopOver(false)}
-            className="absolute right-2 top-2 z-10 cursor-pointer rounded-full p-1 transition-colors"
+          <button
+            type="button"
+            onClick={closeVideoPopOver}
+            aria-label="Close video"
+            className="absolute right-3 top-3 z-20 inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
           >
-            <Plus className="size-5 rotate-45 text-white" />
-          </span>
+            <XCircleIcon size={28} weight="regular" />
+          </button>
         </motion.div>
       </div>
-    </div>
+    </div>,
+    portalContainer,
   );
 };

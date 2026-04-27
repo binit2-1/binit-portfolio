@@ -21,7 +21,10 @@ export function WorkProjectHeading({ label, activeIndex }: WorkProjectHeadingPro
   }, [activeIndex]);
 
   return (
-    <div className="relative flex h-full w-full items-end justify-end pb-2 pr-1 md:pb-3 md:pr-2">
+    <div
+      data-work-project-heading="true"
+      className="relative flex h-full w-full items-end justify-end pb-3 pr-1 transition-opacity duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] md:pb-4 md:pr-2"
+    >
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={`${activeIndex}-${label}`}

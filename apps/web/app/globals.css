@@ -25,6 +25,11 @@
   }
 }
 
+/* Keep the Work spotlight heading hidden while the expanded video modal is open. */
+body[data-work-video-modal-open="true"] [data-work-project-heading="true"] {
+  opacity: 0;
+}
+
 /* Mobile: stable viewport height (not 100vh), reduce sideways pan / elastic overscroll. */
 @layer base {
   html {
