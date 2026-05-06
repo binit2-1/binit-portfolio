@@ -41,7 +41,7 @@ export function WritingProgressToc({ title, sections }: WritingProgressTocProps)
     const syncFromDot = (event: Event) => {
       const nextId = (event as WritingSectionActiveEvent).detail?.id;
       if (nextId) {
-        setActiveId(nextId);
+        setActiveId((currentId) => (currentId === nextId ? currentId : nextId));
       }
     };
 
@@ -57,7 +57,7 @@ export function WritingProgressToc({ title, sections }: WritingProgressTocProps)
         }
       }
 
-      setActiveId(nextActiveId);
+      setActiveId((currentId) => (currentId === nextActiveId ? currentId : nextActiveId));
     };
 
     const scheduleMeasure = () => {
@@ -108,7 +108,7 @@ export function WritingProgressToc({ title, sections }: WritingProgressTocProps)
           height: isOpen ? OPEN_HEIGHT : CLOSED_HEIGHT,
         }}
         transition={{ duration: 0.46, ease: EASE }}
-        className={`pointer-events-auto relative overflow-hidden border border-border/70 bg-background/84 text-foreground shadow-[0_18px_70px_rgba(0,0,0,0.2)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#181818]/88 ${
+        className={`writing-progress-toc pointer-events-auto relative overflow-hidden border border-border/70 bg-background/84 text-foreground shadow-[0_18px_70px_rgba(0,0,0,0.2)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#181818]/88 ${
           isOpen
             ? "w-[min(calc(100vw-2rem),35rem)] rounded-[1.75rem]"
             : "w-[min(calc(100vw-3rem),21.75rem)] rounded-full"

@@ -43,16 +43,16 @@ function WritingTransitionLink({
       return;
     }
 
-    event.preventDefault();
-    onIntent?.();
-
     const doc = document as ViewTransitionDocument;
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const prefersDirectNavigation = window.matchMedia("(pointer: coarse)").matches;
 
-    if (!doc.startViewTransition || prefersReducedMotion) {
-      router.push(href);
+    if (!doc.startViewTransition || prefersReducedMotion || prefersDirectNavigation) {
       return;
     }
+
+    event.preventDefault();
+    onIntent?.();
 
     doc.startViewTransition(() => {
       router.push(href);
@@ -66,7 +66,6 @@ function WritingTransitionLink({
       className={className}
       onClick={handleClick}
       onFocus={onIntent}
-      onPointerDown={onIntent}
     >
       {children}
     </Link>
@@ -149,20 +148,20 @@ function WritingsSpotlight({ writings, activeIndex }: { writings: WritingPreview
 function WritingRow({
   writing,
   isActive,
-  onMouseEnter,
+  onIntent,
   index,
 }: {
   writing: WritingPreview;
   isActive: boolean;
-  onMouseEnter: () => void;
+  onIntent: () => void;
   index: number;
 }) {
   return (
-    <li data-writing-index={index}>
+    <li data-writing-index={index} onMouseEnter={onIntent}>
       <WritingTransitionLink
         href={writing.href}
         ariaLabel={`Open ${writing.title}`}
-        onIntent={onMouseEnter}
+        onIntent={onIntent}
         className={`group flex min-h-11 cursor-pointer select-none items-center gap-1.5 rounded-xl px-1 py-0.5 text-[16px] leading-6 transition-colors ${
           isActive ? "bg-white/10 text-foreground" : "text-foreground/70 hover:bg-white/3"
         }`}
@@ -218,7 +217,7 @@ export function WritingsPageContent({ writings }: { writings: WritingPreview[] }
               writing={writing}
               index={index}
               isActive={index === safeActiveIndex}
-              onMouseEnter={() => commitActiveIndex(index)}
+              onIntent={() => commitActiveIndex(index)}
             />
           ))}
         </ul>

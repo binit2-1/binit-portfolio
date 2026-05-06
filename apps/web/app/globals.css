@@ -73,6 +73,28 @@ body[data-work-video-modal-open="true"] [data-site-navbar="true"] {
     body {
       touch-action: pan-y;
     }
+
+    .writing-progressive-blur {
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+
+    .writing-progress-toc {
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .writing-progressive-blur {
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+
+    .writing-progress-toc {
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
   }
 }
 

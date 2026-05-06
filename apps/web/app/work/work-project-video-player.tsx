@@ -15,6 +15,7 @@ function normalizeVideo(video?: WorkProjectVideoSource) {
 
   return {
     src,
+    mobileSrc: video?.mobileSrc,
     poster: video?.poster,
     type: video?.type || "video/mp4",
   };
@@ -29,6 +30,7 @@ export function WorkProjectVideoPlayer({ video, className }: WorkProjectVideoPla
       <Skiper67
         key={source.src}
         src={source.src}
+        mobileSrc={source.mobileSrc}
         type={source.type}
         poster={source.poster}
       />

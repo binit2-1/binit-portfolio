@@ -12,7 +12,9 @@ export const WORK_PROJECTS: WorkProject[] = [
     spotlightLabel: "COMPOSTER",
     video: {
       src: "/videos/work/composter.mp4",
+      mobileSrc: "/videos/work/mobile/composter.mp4",
       type: "video/mp4",
+      poster: "/images/work/composter.jpg",
     },
   },
   {
@@ -23,7 +25,9 @@ export const WORK_PROJECTS: WorkProject[] = [
     spotlightLabel: "HACKERSQUARE",
     video: {
       src: "/videos/work/hackerquare.mp4",
+      mobileSrc: "/videos/work/mobile/hackersquare.mp4",
       type: "video/mp4",
+      poster: "/images/work/hackersquare.jpg",
     },
   },
   {
@@ -34,7 +38,9 @@ export const WORK_PROJECTS: WorkProject[] = [
     spotlightLabel: "MUNSHI",
     video: {
       src: "/videos/work/munshi.mp4",
+      mobileSrc: "/videos/work/mobile/munshi.mp4",
       type: "video/mp4",
+      poster: "/images/work/munshi.jpg",
     },
   },
 ];

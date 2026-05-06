@@ -125,6 +125,7 @@ export const VideoPlayerContent = ({
 
 export type Skiper67Props = {
   src?: string;
+  mobileSrc?: string;
   type?: string;
   poster?: string;
   className?: string;
@@ -189,9 +190,11 @@ function getYouTubeThumbnailUrl(videoId: string) {
 
 const MODAL_EXIT_DURATION_MS = 1000;
 
-export const Skiper67 = ({ src, type, poster, className }: Skiper67Props) => {
+export const Skiper67 = ({ src, mobileSrc, type, poster, className }: Skiper67Props) => {
   const [showVideoPopOver, setShowVideoPopOver] = useState(false);
+  const [preferLightweightMedia, setPreferLightweightMedia] = useState(true);
   const resolvedSrc = src?.trim() || DEFAULT_SKIPER_VIDEO;
+  const resolvedMobileSrc = mobileSrc?.trim();
   const resolvedType = type?.trim() || "video/mp4";
   const youTubeId = getYouTubeId(resolvedSrc);
   const previewYouTubeEmbedSrc = youTubeId
@@ -201,6 +204,9 @@ export const Skiper67 = ({ src, type, poster, className }: Skiper67Props) => {
     ? getYouTubeEmbedUrl(youTubeId, { muted: false, controls: true })
     : null;
   const previewPoster = poster || (youTubeId ? getYouTubeThumbnailUrl(youTubeId) : undefined);
+  const previewVideoSrc = resolvedMobileSrc || resolvedSrc;
+  const modalVideoSrc = preferLightweightMedia && resolvedMobileSrc ? resolvedMobileSrc : resolvedSrc;
+  const shouldUsePosterPreview = preferLightweightMedia && Boolean(previewPoster);
 
   const SPRING = {
     mass: 0.1,
@@ -226,6 +232,25 @@ export const Skiper67 = ({ src, type, poster, className }: Skiper67Props) => {
     setShowVideoPopOver(false);
   };
 
+  const handlePreviewKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    openVideoPopOver();
+  };
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(
+      "(pointer: coarse), (max-width: 640px), (prefers-reduced-motion: reduce)",
+    );
+    const syncPreference = () => setPreferLightweightMedia(mediaQuery.matches);
+
+    syncPreference();
+    mediaQuery.addEventListener("change", syncPreference);
+
+    return () => mediaQuery.removeEventListener("change", syncPreference);
+  }, []);
+
   useEffect(() => {
     if (showVideoPopOver) return;
 
@@ -245,7 +270,7 @@ export const Skiper67 = ({ src, type, poster, className }: Skiper67Props) => {
         {showVideoPopOver && (
           <VideoPopOver
             closeVideoPopOver={closeVideoPopOver}
-            src={resolvedSrc}
+            src={modalVideoSrc}
             type={resolvedType}
             youTubeEmbedSrc={modalYouTubeEmbedSrc}
             poster={poster}
@@ -258,6 +283,10 @@ export const Skiper67 = ({ src, type, poster, className }: Skiper67Props) => {
           opacity.set(0);
         }}
         onClick={openVideoPopOver}
+        onKeyDown={handlePreviewKeyDown}
+        role="button"
+        tabIndex={0}
+        aria-label="Open project video"
         className={previewFrameClassName}
       >
         <motion.div
@@ -266,7 +295,16 @@ export const Skiper67 = ({ src, type, poster, className }: Skiper67Props) => {
         >
           <Play className="size-4 fill-white" /> Play
         </motion.div>
-        {youTubeId ? (
+        {shouldUsePosterPreview ? (
+          // eslint-disable-next-line @next/next/no-img-element -- Static public posters prevent heavy preview video downloads on phones.
+          <img
+            src={previewPoster}
+            alt=""
+            className={previewMediaClassName}
+            loading="eager"
+            decoding="async"
+          />
+        ) : youTubeId ? (
           <div className="relative h-full w-full overflow-hidden">
             <iframe
               src={previewYouTubeEmbedSrc || undefined}
@@ -285,8 +323,9 @@ export const Skiper67 = ({ src, type, poster, className }: Skiper67Props) => {
             poster={previewPoster}
             className={previewMediaClassName}
             style={{ objectFit: "cover" }}
+            preload={preferLightweightMedia && previewPoster ? "none" : "metadata"}
           >
-            <source src={resolvedSrc} type={resolvedType} />
+            <source src={previewVideoSrc} type={resolvedType} />
           </video>
         )}
       </div>

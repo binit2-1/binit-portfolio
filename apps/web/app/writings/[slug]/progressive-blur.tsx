@@ -34,7 +34,7 @@ export function ProgressiveBlur({
 
   return (
     <div
-      className={`pointer-events-none fixed left-0 z-40 w-full select-none ${className}`}
+      className={`writing-progressive-blur pointer-events-none fixed left-0 z-40 w-full select-none ${className}`}
       style={style}
       aria-hidden
     />
