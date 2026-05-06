@@ -1,7 +1,6 @@
 "use client";
 
 import { AnimatePresence, motion, useSpring } from "framer-motion";
-import { XIcon } from "@phosphor-icons/react/dist/ssr";
 import { Play } from "lucide-react";
 import {
   MediaControlBar,
@@ -381,7 +380,7 @@ const VideoPopOver = ({
   } as CSSProperties;
   const modalShellClassName = "relative aspect-video max-h-[calc(100dvh-6rem)]";
   const modalFrameClassName =
-    "relative h-full w-full overflow-hidden rounded-xl bg-black shadow-[0_20px_60px_rgba(0,0,0,0.45)] sm:rounded-2xl";
+    "relative h-full w-full overflow-hidden bg-black shadow-[0_20px_60px_rgba(0,0,0,0.45)]";
   const mediaClassName = "h-full w-full object-contain";
 
   if (!portalContainer) return null;
@@ -396,7 +395,7 @@ const VideoPopOver = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="absolute inset-0 h-full w-full bg-background/82 backdrop-blur-lg"
+        className="absolute inset-0 h-full w-full bg-background/28 backdrop-blur-xl"
         onClick={closeVideoPopOver}
       ></motion.div>
       <div
@@ -404,16 +403,6 @@ const VideoPopOver = ({
         style={modalShellStyle}
         data-work-video-modal-shell="true"
       >
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-50 flex justify-end p-2 sm:p-3">
-          <button
-            type="button"
-            onClick={closeVideoPopOver}
-            aria-label="Close video"
-            className="pointer-events-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/35 bg-black/75 text-white shadow-[0_8px_24px_rgba(0,0,0,0.35)] transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:h-12 sm:w-12"
-          >
-            <XIcon size={24} weight="bold" />
-          </button>
-        </div>
         <motion.div
           ref={modalRef}
           initial={{ clipPath: "inset(43.5% 43.5% 33.5% 43.5%)", opacity: 0 }}
