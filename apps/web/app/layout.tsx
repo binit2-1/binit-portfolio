@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { basteleur, helveticaNeue, helveticaOblique } from "@/lib/fonts";
 import { absoluteUrl, getSiteUrl, SITE_AUTHOR, SITE_DESCRIPTION, SITE_KEYWORDS, SITE_NAME, SITE_TITLE, siteImages } from "@/lib/site";
 import "./globals.css";
+import Script from "next/script";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -127,12 +128,13 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
+        <Script defer src="https://cloud.umami.is/script.js" data-website-id="3cf97a47-6679-49e2-a850-be8089109f53"></Script>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <LenisProvider>
             <div className="flex min-h-dvh w-full min-w-0 flex-col overflow-x-hidden">
               <Navbar />
               {/* Reserve height: fixed nav is out of flow */}
-              <div className="h-[var(--site-nav-h)] shrink-0" aria-hidden />
+              <div className="h-(--site-nav-h) shrink-0" aria-hidden />
               <div className="site-shell mx-auto flex w-full min-w-0 max-w-(--site-max-width) flex-1 flex-col px-4 pb-16 sm:px-6">
                 <main className="min-w-0 flex-1 pt-0">{children}</main>
               </div>
