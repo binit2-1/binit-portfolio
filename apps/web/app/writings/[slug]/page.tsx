@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { absoluteUrl, SITE_AUTHOR, SITE_NAME, siteImages } from "@/lib/site";
 import { getAllWritings, getWritingBySlug } from "@/lib/writings";
 import { getWritingSections } from "@/lib/writing-headings";
 import { WritingThumbnail } from "../writing-thumbnail";
@@ -20,7 +21,40 @@ export async function generateMetadata({
   const { slug } = await params;
   try {
     const { frontmatter } = getWritingBySlug(slug);
-    return { title: frontmatter.title, description: frontmatter.summary || frontmatter.subtitle };
+    const description = frontmatter.summary || frontmatter.subtitle;
+    const image = frontmatter.thumbnail || siteImages.logo;
+
+    return {
+      title: frontmatter.title,
+      description,
+      alternates: {
+        canonical: absoluteUrl(`/writings/${slug}`),
+      },
+      openGraph: {
+        type: "article",
+        title: frontmatter.title,
+        description,
+        url: `/writings/${slug}`,
+        siteName: SITE_NAME,
+        publishedTime: frontmatter.date || undefined,
+        authors: [SITE_AUTHOR.name],
+        images: [
+          {
+            url: image,
+            width: frontmatter.thumbnail ? 1200 : 512,
+            height: frontmatter.thumbnail ? 630 : 512,
+            alt: frontmatter.title,
+          },
+        ],
+      },
+      twitter: {
+        card: frontmatter.thumbnail ? "summary_large_image" : "summary",
+        title: frontmatter.title,
+        description,
+        images: [image],
+        creator: "@BinitGupta21",
+      },
+    };
   } catch {
     return {};
   }
@@ -53,9 +87,33 @@ export default async function WritingPage({
         day: "numeric",
       })
     : null;
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: frontmatter.title,
+    description: frontmatter.summary || frontmatter.subtitle,
+    datePublished: frontmatter.date || undefined,
+    dateModified: frontmatter.date || undefined,
+    image: absoluteUrl(frontmatter.thumbnail || siteImages.logo),
+    url: absoluteUrl(`/writings/${slug}`),
+    author: {
+      "@type": "Person",
+      name: SITE_AUTHOR.name,
+      url: absoluteUrl("/"),
+    },
+    publisher: {
+      "@type": "Person",
+      name: SITE_AUTHOR.name,
+      image: absoluteUrl(siteImages.logo),
+    },
+  };
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <ProgressiveBlur position="top" height="130px" blurAmount="5px" />
       <ProgressiveBlur position="bottom" height="170px" blurAmount="6px" />
 

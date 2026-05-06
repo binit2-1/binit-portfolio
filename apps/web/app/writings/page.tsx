@@ -1,8 +1,22 @@
 import type { Metadata } from "next";
+import { absoluteUrl } from "@/lib/site";
 import { getWritingPreviews } from "@/lib/writings";
 import { WritingsPageContent } from "./writings-page-content";
 
-export const metadata: Metadata = { title: "Writings" };
+const description = "Notes by Binit Gupta on interface design, frontend craft, product work, and building smoother web experiences.";
+
+export const metadata: Metadata = {
+  title: "Writings",
+  description,
+  alternates: {
+    canonical: absoluteUrl("/writings"),
+  },
+  openGraph: {
+    title: "Writings by Binit Gupta",
+    description,
+    url: "/writings",
+  },
+};
 
 export default function WritingsPage() {
   const writings = getWritingPreviews();
