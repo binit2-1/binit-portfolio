@@ -12,7 +12,7 @@ import { useSnapScroll } from "./use-snap-scroll";
 
 /** Matches the hero copy in section 1. */
 const sectionTextClass =
-  "w-full max-w-2xl font-sans font-bold select-none text-base tracking-tighter text-foreground md:text-xl";
+  "w-full max-w-2xl rounded-md px-2 py-1 font-sans font-bold select-none text-base tracking-tighter text-foreground transition-[background-color,color,text-shadow,transform] duration-200 hover:bg-foreground/5 hover:text-foreground hover:[text-shadow:0_10px_34px_rgba(0,0,0,0.12)] dark:hover:bg-white/5 md:text-xl";
 
 const scrollReveal = {
   hidden: { opacity: 0, y: 28, filter: "blur(14px)" },
@@ -42,7 +42,7 @@ export function AboutPageContent() {
   const holeRootRef = useRef<HTMLDivElement | null>(null);
 
   /* ── GSAP snap scroll ── */
-  const { activeIndex, scrollToSection } = useSnapScroll({
+  const { activeIndex } = useSnapScroll({
     sectionCount: SECTION_LABELS.length,
     duration: 0.85,
     ease: "power3.inOut",
@@ -113,7 +113,7 @@ export function AboutPageContent() {
         >
           <div style={{ marginTop: "-30px" }} className="flex w-full flex-col items-center justify-center flex-1">
             <h2 className="sr-only">GitHub contributions</h2>
-            <div className="flex w-full min-w-0 max-w-[min(100%,52rem)] justify-center">
+            <div className="flex w-full min-w-0 max-w-[min(100%,52rem)] justify-center rounded-md transition-[background-color,box-shadow] duration-200 hover:bg-foreground/4 hover:shadow-[0_18px_60px_rgba(0,0,0,0.08)] dark:hover:bg-white/4 dark:hover:shadow-none">
               <GithubCalendar username="binit2-1" colorSchema="orange" variant="default" showTotal />
             </div>
           </div>

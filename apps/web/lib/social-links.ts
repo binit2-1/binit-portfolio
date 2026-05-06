@@ -3,4 +3,5 @@ export const SOCIAL_LINKS = {
   x: "https://x.com/BinitGupta21",
   linkedin: "https://www.linkedin.com/in/binitgupta",
   github: "https://github.com/binit2-1",
+  resume: "https://binit2-1.github.io/resume/",
 } as const;

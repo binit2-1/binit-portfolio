@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { absoluteUrl, SITE_AUTHOR, SITE_NAME, siteImages } from "@/lib/site";
 import { getAllWritings, getWritingBySlug } from "@/lib/writings";
@@ -75,6 +76,16 @@ export default async function WritingPage({
   }
 
   const { frontmatter, content } = post;
+  const writings = getAllWritings();
+  const currentIndex = writings.findIndex((writing) => writing.slug === slug);
+  const previousWriting =
+    currentIndex >= 0 && writings.length > 1
+      ? writings[(currentIndex - 1 + writings.length) % writings.length]
+      : null;
+  const nextWriting =
+    currentIndex >= 0 && writings.length > 1
+      ? writings[(currentIndex + 1) % writings.length]
+      : null;
   const sections = [
     { id: "top", title: frontmatter.title, depth: 1 as const },
     ...getWritingSections(content),
@@ -124,6 +135,15 @@ export default async function WritingPage({
       >
         <WritingSectionDot />
 
+        <nav className="mb-8 flex items-center gap-4 text-sm text-muted-foreground" aria-label="Writing navigation">
+          <Link
+            href="/writings"
+            className="rounded-sm transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            Back
+          </Link>
+        </nav>
+
         <header>
           <WritingThumbnail
             title={frontmatter.title}
@@ -152,6 +172,40 @@ export default async function WritingPage({
         </header>
 
         <WritingMdxContent content={content} />
+
+        {(previousWriting || nextWriting) ? (
+          <nav
+            className="mt-14 grid gap-3 border-t border-border pt-5 text-sm text-muted-foreground sm:grid-cols-2"
+            aria-label="Adjacent writings"
+          >
+            {previousWriting ? (
+              <Link
+                href={`/writings/${previousWriting.slug}`}
+                className="group min-w-0 rounded-sm text-left transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                aria-label={`Previous blog: ${previousWriting.frontmatter.title}`}
+              >
+                <span className="block text-xs uppercase tracking-[0.12em] text-muted-foreground/70">Previous blog</span>
+                <span className="mt-1 block truncate text-foreground/85 group-hover:text-foreground">
+                  {previousWriting.frontmatter.title}
+                </span>
+              </Link>
+            ) : (
+              <span aria-hidden />
+            )}
+            {nextWriting ? (
+              <Link
+                href={`/writings/${nextWriting.slug}`}
+                className="group min-w-0 rounded-sm text-left transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-right"
+                aria-label={`Next blog: ${nextWriting.frontmatter.title}`}
+              >
+                <span className="block text-xs uppercase tracking-[0.12em] text-muted-foreground/70">Next blog</span>
+                <span className="mt-1 block truncate text-foreground/85 group-hover:text-foreground">
+                  {nextWriting.frontmatter.title}
+                </span>
+              </Link>
+            ) : null}
+          </nav>
+        ) : null}
       </article>
 
       <WritingProgressToc title={frontmatter.title} sections={sections} />

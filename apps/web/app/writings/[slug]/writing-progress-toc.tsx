@@ -38,6 +38,19 @@ export function WritingProgressToc({ title, sections }: WritingProgressTocProps)
   });
 
   useEffect(() => {
+    if (!isOpen) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [isOpen]);
+
+  useEffect(() => {
     const syncFromDot = (event: Event) => {
       const nextId = (event as WritingSectionActiveEvent).detail?.id;
       if (nextId) {
@@ -108,7 +121,7 @@ export function WritingProgressToc({ title, sections }: WritingProgressTocProps)
           height: isOpen ? OPEN_HEIGHT : CLOSED_HEIGHT,
         }}
         transition={{ duration: 0.46, ease: EASE }}
-        className={`writing-progress-toc pointer-events-auto relative overflow-hidden border border-border/70 bg-background/84 text-foreground shadow-[0_18px_70px_rgba(0,0,0,0.2)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#181818]/88 ${
+        className={`writing-progress-toc pointer-events-auto relative overflow-hidden border border-border/80 bg-background/96 text-foreground shadow-[0_18px_70px_rgba(0,0,0,0.18)] backdrop-blur-2xl dark:border-white/12 dark:bg-[#171717]/96 dark:shadow-[0_18px_80px_rgba(0,0,0,0.48)] ${
           isOpen
             ? "w-[min(calc(100vw-2rem),35rem)] rounded-[1.75rem]"
             : "w-[min(calc(100vw-3rem),21.75rem)] rounded-full"
@@ -132,11 +145,11 @@ export function WritingProgressToc({ title, sections }: WritingProgressTocProps)
                 <button
                   key={section.id}
                   type="button"
-                  className={`relative flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-base text-muted-foreground transition-colors hover:bg-foreground/6 hover:text-foreground ${
+                  className={`relative flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-base text-muted-foreground transition-colors hover:bg-foreground/7 hover:text-foreground dark:hover:bg-white/8 ${
                     section.depth > 2 ? "pl-8 text-sm" : ""
                   } ${
                     section.id === activeId
-                      ? "bg-foreground/10 text-foreground dark:bg-white/12"
+                      ? "bg-foreground/10 text-foreground dark:bg-white/14"
                       : ""
                   }`}
                   onClick={() => scrollToSection(section.id)}
@@ -157,7 +170,7 @@ export function WritingProgressToc({ title, sections }: WritingProgressTocProps)
 
       <button
         type="button"
-        className={`group absolute inset-x-0 bottom-0 flex h-13 w-full items-center gap-3 px-4 text-foreground transition-colors hover:bg-foreground/4 ${
+        className={`group absolute inset-x-0 bottom-0 flex h-13 w-full items-center gap-3 px-4 text-foreground transition-colors hover:bg-foreground/5 dark:hover:bg-white/7 ${
           isOpen ? "border-t border-border/60 dark:border-white/8" : ""
         }`}
         aria-expanded={isOpen}

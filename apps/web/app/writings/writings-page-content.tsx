@@ -22,12 +22,18 @@ function WritingTransitionLink({
   className,
   ariaLabel,
   onIntent,
+  onFirstClick,
+  requireSecondClick = false,
+  isArmed = false,
 }: {
   href: string;
   children: React.ReactNode;
   className?: string;
   ariaLabel?: string;
   onIntent?: () => void;
+  onFirstClick?: () => void;
+  requireSecondClick?: boolean;
+  isArmed?: boolean;
 }) {
   const router = useRouter();
 
@@ -40,6 +46,13 @@ function WritingTransitionLink({
       event.altKey ||
       event.button !== 0
     ) {
+      return;
+    }
+
+    if (requireSecondClick && !isArmed) {
+      event.preventDefault();
+      onIntent?.();
+      onFirstClick?.();
       return;
     }
 
@@ -102,7 +115,17 @@ function WritingHeading({ label, activeIndex }: { label: string; activeIndex: nu
   );
 }
 
-function WritingsSpotlight({ writings, activeIndex }: { writings: WritingPreview[]; activeIndex: number }) {
+function WritingsSpotlight({
+  writings,
+  activeIndex,
+  isArmed,
+  onFirstClick,
+}: {
+  writings: WritingPreview[];
+  activeIndex: number;
+  isArmed: boolean;
+  onFirstClick: () => void;
+}) {
   if (writings.length === 0) return null;
 
   const currentWriting = writings[Math.max(0, Math.min(activeIndex, writings.length - 1))];
@@ -123,6 +146,9 @@ function WritingsSpotlight({ writings, activeIndex }: { writings: WritingPreview
             href={currentWriting.href}
             ariaLabel={`Open ${currentWriting.title}`}
             className="pointer-events-auto relative z-10 block"
+            requireSecondClick
+            isArmed={isArmed}
+            onFirstClick={onFirstClick}
           >
             <WritingThumbnail
               title={currentWriting.title}
@@ -148,12 +174,16 @@ function WritingsSpotlight({ writings, activeIndex }: { writings: WritingPreview
 function WritingRow({
   writing,
   isActive,
+  isArmed,
   onIntent,
+  onFirstClick,
   index,
 }: {
   writing: WritingPreview;
   isActive: boolean;
+  isArmed: boolean;
   onIntent: () => void;
+  onFirstClick: () => void;
   index: number;
 }) {
   return (
@@ -162,8 +192,13 @@ function WritingRow({
         href={writing.href}
         ariaLabel={`Open ${writing.title}`}
         onIntent={onIntent}
-        className={`group flex min-h-11 cursor-pointer select-none items-center gap-1.5 rounded-xl px-1 py-0.5 text-[16px] leading-6 transition-colors ${
-          isActive ? "bg-white/10 text-foreground" : "text-foreground/70 hover:bg-white/3"
+        onFirstClick={onFirstClick}
+        requireSecondClick
+        isArmed={isArmed}
+        className={`group flex min-h-11 cursor-pointer select-none items-center gap-1.5 rounded-xl border px-1 py-0.5 text-[16px] leading-6 transition-[background-color,border-color,color,box-shadow] duration-200 ${
+          isActive
+            ? "border-foreground/12 bg-foreground/7 text-foreground shadow-[0_12px_32px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-white/10 dark:shadow-none"
+            : "border-transparent text-foreground/70 hover:border-foreground/10 hover:bg-foreground/5 hover:text-foreground dark:hover:border-white/8 dark:hover:bg-white/5"
         }`}
       >
         <p className="min-w-0 shrink pl-2.5 truncate whitespace-nowrap leading-6">
@@ -172,8 +207,8 @@ function WritingRow({
           </span>
           <span className="hidden text-foreground/40 md:inline"> {writing.description}</span>
         </p>
-        <span className="h-px min-w-24 flex-1 bg-white/12" aria-hidden />
-        <span className="ml-auto inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-foreground/45 transition-colors group-hover:bg-white/6 group-hover:text-foreground/85">
+        <span className="h-px min-w-24 flex-1 bg-foreground/10 dark:bg-white/12" aria-hidden />
+        <span className="ml-auto inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-foreground/45 transition-colors group-hover:bg-foreground/8 group-hover:text-foreground/85 dark:group-hover:bg-white/8">
           <ArrowSquareOutIcon size={16} weight="regular" />
         </span>
       </WritingTransitionLink>
@@ -183,6 +218,7 @@ function WritingRow({
 
 export function WritingsPageContent({ writings }: { writings: WritingPreview[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [armedIndex, setArmedIndex] = useState<number | null>(null);
   const listRef = useRef<HTMLUListElement | null>(null);
   const maxIndex = Math.max(0, writings.length - 1);
   const safeActiveIndex = Math.max(0, Math.min(activeIndex, maxIndex));
@@ -191,6 +227,7 @@ export function WritingsPageContent({ writings }: { writings: WritingPreview[] }
     (nextIndex: number) => {
       const clamped = Math.max(0, Math.min(nextIndex, maxIndex));
       setActiveIndex(clamped);
+      setArmedIndex((current) => (current === clamped ? current : null));
       const target = listRef.current?.querySelector<HTMLLIElement>(`[data-writing-index="${clamped}"]`);
       target?.scrollIntoView({ block: "nearest", behavior: "smooth" });
     },
@@ -199,7 +236,12 @@ export function WritingsPageContent({ writings }: { writings: WritingPreview[] }
 
   return (
     <>
-      <WritingsSpotlight writings={writings} activeIndex={safeActiveIndex} />
+      <WritingsSpotlight
+        writings={writings}
+        activeIndex={safeActiveIndex}
+        isArmed={armedIndex === safeActiveIndex}
+        onFirstClick={() => setArmedIndex(safeActiveIndex)}
+      />
 
       <section
         className="mx-auto h-auto w-full max-w-5xl overflow-visible px-4 pb-16 sm:px-6"
@@ -217,7 +259,9 @@ export function WritingsPageContent({ writings }: { writings: WritingPreview[] }
               writing={writing}
               index={index}
               isActive={index === safeActiveIndex}
+              isArmed={index === armedIndex}
               onIntent={() => commitActiveIndex(index)}
+              onFirstClick={() => setArmedIndex(index)}
             />
           ))}
         </ul>

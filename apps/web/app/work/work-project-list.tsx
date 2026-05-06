@@ -21,7 +21,7 @@ function ProjectActionLink({
   children: React.ReactNode;
 }) {
   const sharedClassName =
-    "inline-flex h-7 w-7 items-center justify-center rounded-md text-foreground/45 transition-colors";
+    "inline-flex h-7 w-7 items-center justify-center rounded-md text-foreground/45 transition-colors hover:bg-foreground/8 hover:text-foreground/85 dark:hover:bg-white/8";
 
   if (!href) {
     return (
@@ -37,7 +37,7 @@ function ProjectActionLink({
       target="_blank"
       rel="noreferrer"
       aria-label={label}
-      className={`${sharedClassName} hover:bg-white/6 hover:text-foreground/85`}
+      className={sharedClassName}
     >
       {children}
     </Link>
@@ -58,8 +58,10 @@ function WorkProjectRow({
   return (
     <li
       data-work-index={index}
-      className={`group flex min-h-11 cursor-pointer select-none items-center gap-1.5 rounded-xl px-1 py-0.5 text-[16px] leading-6 transition-colors ${
-        isActive ? "bg-white/10 text-foreground" : "text-foreground/70 hover:bg-white/3"
+      className={`group flex min-h-11 cursor-pointer select-none items-center gap-1.5 rounded-xl border px-1 py-0.5 text-[16px] leading-6 transition-[background-color,border-color,color,box-shadow] duration-200 ${
+        isActive
+          ? "border-foreground/12 bg-foreground/7 text-foreground shadow-[0_12px_32px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-white/10 dark:shadow-none"
+          : "border-transparent text-foreground/70 hover:border-foreground/10 hover:bg-foreground/5 hover:text-foreground dark:hover:border-white/8 dark:hover:bg-white/5"
       }`}
       onMouseEnter={onMouseEnter}
     >
@@ -69,7 +71,7 @@ function WorkProjectRow({
         </span>
         <span className="hidden text-foreground/40 md:inline"> {project.description}</span>
       </p>
-      <span className="h-px min-w-24 flex-1 bg-white/12" aria-hidden />
+      <span className="h-px min-w-24 flex-1 bg-foreground/10 dark:bg-white/12" aria-hidden />
       <div className="ml-auto flex shrink-0 items-center gap-0.5">
         <ProjectActionLink href={project.githubUrl} label={`${project.title} GitHub`}>
           <GithubLogoIcon size={16} weight="regular" />

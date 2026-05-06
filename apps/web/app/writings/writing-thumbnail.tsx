@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { CSSProperties } from "react";
 
 type WritingThumbnailProps = {
@@ -16,16 +17,25 @@ export function WritingThumbnail({
   viewTransitionName,
 }: WritingThumbnailProps) {
   const style = viewTransitionName ? ({ viewTransitionName } as CSSProperties) : undefined;
-  const hasThumbnail = Boolean(thumbnail?.trim());
+  const thumbnailSrc = thumbnail?.trim();
+  const hasThumbnail = Boolean(thumbnailSrc);
+  const isRemoteThumbnail = thumbnailSrc?.startsWith("http://") || thumbnailSrc?.startsWith("https://");
 
   return (
     <div
-      className={`aspect-video w-full overflow-hidden rounded-sm border border-white/10 bg-[#171717] shadow-[0_10px_40px_rgba(0,0,0,0.32)] ${className}`}
+      className={`relative aspect-video w-full overflow-hidden rounded-sm border border-white/10 bg-[#171717] shadow-[0_10px_40px_rgba(0,0,0,0.32)] ${className}`}
       style={style}
     >
       {hasThumbnail ? (
-        // eslint-disable-next-line @next/next/no-img-element -- Thumbnails can be arbitrary frontmatter URLs.
-        <img src={thumbnail} alt={title} className="h-full w-full object-cover" loading="eager" />
+        <Image
+          src={thumbnailSrc || ""}
+          alt={title}
+          fill
+          priority={index === 0}
+          sizes="(min-width: 768px) 44rem, calc(100vw - 2rem)"
+          className="object-cover"
+          unoptimized={isRemoteThumbnail}
+        />
       ) : (
         <div className="relative h-full w-full bg-[linear-gradient(135deg,rgba(255,88,0,0.22),transparent_36%),repeating-linear-gradient(0deg,rgba(255,255,255,0.08)_0_1px,transparent_1px_8px),repeating-linear-gradient(90deg,rgba(255,255,255,0.05)_0_1px,transparent_1px_12px)]">
           <div className="absolute top-3 left-3 flex gap-1.5">

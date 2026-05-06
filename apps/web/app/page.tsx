@@ -1,16 +1,14 @@
 import { basteleur } from "@/lib/fonts";
 import { getAgeOnDate } from "@/lib/birthday";
 import { SOCIAL_LINKS } from "@/lib/social-links";
-import { Github, Linkedin, PeerlistSolid, X } from "@/components/icons";
-
-/** Recompute age on each request so it stays correct around your birthday (17 Nov). */
-export const dynamic = "force-dynamic";
+import { CVLogoIcon, Github, Linkedin, PeerlistSolid, X } from "@/components/icons";
 
 const SOCIAL_ITEMS = [
   { href: SOCIAL_LINKS.peerlist, label: "Peerlist", Icon: PeerlistSolid },
   { href: SOCIAL_LINKS.x, label: "X", Icon: X },
   { href: SOCIAL_LINKS.linkedin, label: "LinkedIn", Icon: Linkedin },
   { href: SOCIAL_LINKS.github, label: "GitHub", Icon: Github },
+  { href: SOCIAL_LINKS.resume, label: "Resume", Icon: CVLogoIcon },
 ] as const;
 
 export default function HomePage() {
