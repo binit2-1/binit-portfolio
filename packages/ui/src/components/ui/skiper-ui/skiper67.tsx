@@ -387,7 +387,7 @@ const VideoPopOver = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[1000] isolate flex items-center justify-center p-4 sm:p-6"
+      className="fixed inset-0 z-1000 isolate flex items-center justify-center p-4 sm:p-6"
       data-work-video-modal="true"
     >
       <motion.div
