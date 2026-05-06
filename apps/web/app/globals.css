@@ -27,18 +27,6 @@
   }
 }
 
-/* Keep the Work spotlight heading hidden while the expanded video modal is open. */
-body[data-work-video-modal-open="true"] [data-work-project-heading="true"] {
-  opacity: 0;
-}
-
-body[data-work-video-modal-open="true"] [data-site-navbar="true"] {
-  opacity: 0;
-  pointer-events: none;
-  z-index: 0;
-  transition-duration: 0ms;
-}
-
 ::view-transition-group(writing-thumbnail) {
   animation-duration: 640ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);

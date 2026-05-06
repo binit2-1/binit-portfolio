@@ -14,7 +14,7 @@ export function WorkProjectSpotlight({ projects, activeIndex }: WorkProjectSpotl
 
   const currentProject = projects[Math.max(0, Math.min(activeIndex, projects.length - 1))];
   const spotlightGridClassName =
-    "mx-auto grid h-full w-full max-w-3xl grid-cols-[minmax(0,11rem)_1fr] items-end gap-3 px-4 pb-4 sm:px-6 md:grid-cols-[minmax(0,12rem)_1fr] md:gap-4 md:pb-5";
+    "mx-auto grid h-full w-full max-w-3xl grid-cols-[minmax(0,8.25rem)_minmax(0,1fr)] items-end gap-3 px-4 pb-4 sm:grid-cols-[minmax(0,11rem)_1fr] sm:px-6 md:grid-cols-[minmax(0,12rem)_1fr] md:gap-4 md:pb-5";
 
   return (
     <div
