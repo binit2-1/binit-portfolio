@@ -1,0 +1,32 @@
+---
+title: The Shape of Small Tools
+subtitle: Why useful software often begins as one narrow ritual that gets repeated enough to deserve a surface.
+summary: Why useful software often starts as a narrow ritual.
+date: 2026-05-05
+thumbnail:
+label: SMALL TOOLS
+---
+
+## Tools begin as rituals
+
+A small tool is usually born when a person repeats the same little sequence enough times to notice the friction.
+
+The first version does not need to explain the whole worldview. It only needs to make one repeated move feel obvious.
+
+```ts
+const ritual = ["collect", "compare", "decide", "ship"];
+
+const nextStep = ritual.find((step) => !done.has(step));
+```
+
+## Narrow is not weak
+
+Narrow tools are easier to trust because their boundaries are legible. You know where they help, and you know where they stop.
+
+- Name the action plainly.
+- Keep controls close to the thing they affect.
+- Make the saved output easy to inspect.
+
+## Expansion should be earned
+
+The best second feature is not the loudest adjacent idea. It is the next thing the first feature makes newly possible.

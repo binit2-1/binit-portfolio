@@ -25,13 +25,13 @@ export function WorkProjectHeading({ label, activeIndex }: WorkProjectHeadingPro
       data-work-project-heading="true"
       className="relative flex h-full w-full items-end justify-end pb-3 pr-1 transition-opacity duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] md:pb-4 md:pr-2"
     >
-      <AnimatePresence mode="wait" initial={false}>
+      <AnimatePresence mode="wait">
         <motion.div
           key={`${activeIndex}-${label}`}
           initial={{ opacity: 0, y: direction > 0 ? -28 : 28, filter: "blur(14px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           exit={{ opacity: 0, y: direction > 0 ? 28 : -28, filter: "blur(14px)" }}
-          transition={{ duration: 0.85, ease: EASE }}
+          transition={{ duration: 0.52, ease: EASE }}
           className="absolute right-0 bottom-0 text-right font-oblique text-xl tracking-tight text-foreground sm:text-2xl md:text-3xl"
           aria-live="polite"
         >

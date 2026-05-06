@@ -1,6 +1,7 @@
 "use client";
 
 import Lenis from "lenis";
+import { usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
 import "lenis/dist/lenis.css";
@@ -16,13 +17,15 @@ export function useLenisInstance(): Lenis | null {
  * `prefers-reduced-motion` — native scrolling avoids mobile rubber-banding,
  * wrong scroll limits, and “whole page” overscroll glitches common with JS scroll.
  */
-function shouldUseLenis(): boolean {
+function shouldUseLenis(pathname: string): boolean {
   // Production reliability first: native scroll avoids Chromium-specific lockups
   // reported only on deployed builds.
-  if (process.env.NODE_ENV === "production") return false;
   if (typeof window === "undefined") return false;
   if (window.matchMedia("(pointer: coarse)").matches) return false;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+  const isWritingArticle = /^\/writings\/[^/]+/.test(pathname);
+  if (isWritingArticle) return true;
+  if (process.env.NODE_ENV === "production") return false;
   // Temporary fallback: Chromium has shown intermittent scroll lock with our
   // current layout/mask stack; prefer native scrolling there for reliability.
   const ua = window.navigator.userAgent;
@@ -32,9 +35,10 @@ function shouldUseLenis(): boolean {
 
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   const [lenis, setLenis] = useState<Lenis | null>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (!shouldUseLenis()) return;
+    if (!shouldUseLenis(pathname)) return;
 
     const instance = new Lenis({
       autoRaf: true,
@@ -51,7 +55,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
         setLenis(null);
       });
     };
-  }, []);
+  }, [pathname]);
 
   return <LenisContext.Provider value={lenis}>{children}</LenisContext.Provider>;
 }

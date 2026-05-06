@@ -1,14 +1,26 @@
 import type { Metadata } from "next";
+import { getWritingPreviews } from "@/lib/writings";
+import { WritingsPageContent } from "./writings-page-content";
 
 export const metadata: Metadata = { title: "Writings" };
 
 export default function WritingsPage() {
+  const writings = getWritingPreviews();
+
   return (
-    <section className="mx-auto flex min-h-[62vh] max-w-2xl flex-col justify-center gap-5 pt-28">
-      <h1 className="text-4xl font-semibold tracking-tight">Writings</h1>
-      <p className="text-base leading-7 text-muted-foreground">
-        Essays and notes on engineering, product thinking, and interface craft are coming here soon.
-      </p>
-    </section>
+    <>
+      <WritingsPageContent writings={writings} />
+
+      <div
+        className="pointer-events-none fixed inset-x-0"
+        style={{ top: "var(--about-fixed-line-top, 20vh)", zIndex: 80 }}
+        aria-hidden
+      >
+        <div
+          className="w-full bg-[#FF5800]"
+          style={{ height: "1px", transform: "scaleY(0.5)", transformOrigin: "center" }}
+        />
+      </div>
+    </>
   );
 }

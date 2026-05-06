@@ -10,6 +10,8 @@
   --font-oblique: var(--font-helvetica-oblique), ui-sans-serif, system-ui, sans-serif;
   /* Whole-site horizontal cap (layout shell): 196.5 character widths, never wider than viewport. */
   --site-max-width: min(100%, 196.5ch);
+  /* Shared writing column: matches the Work/Writings list left and right edges. */
+  --writing-content-width: 44rem;
   /* Sticky navbar row (py-4 + links + toggle); About mask/belt use the same token. */
   --site-nav-h: 5rem;
   /* Opaque belt under nav on About only (see about-viewport-mask). */
@@ -35,6 +37,22 @@ body[data-work-video-modal-open="true"] [data-site-navbar="true"] {
   pointer-events: none;
   z-index: 0;
   transition-duration: 0ms;
+}
+
+::view-transition-group(writing-thumbnail) {
+  animation-duration: 640ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-old(writing-thumbnail),
+::view-transition-new(writing-thumbnail) {
+  overflow: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(writing-thumbnail) {
+    animation-duration: 1ms;
+  }
 }
 
 /* Mobile: stable viewport height (not 100vh), reduce sideways pan / elastic overscroll. */

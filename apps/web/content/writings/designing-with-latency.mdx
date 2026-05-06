@@ -1,0 +1,50 @@
+---
+title: Designing with Latency
+subtitle: Notes on feedback, wait states, and the tiny promises an interface makes while work is still happening.
+summary: Notes on feedback, wait states, and tiny interface promises.
+date: 2026-05-06
+thumbnail:
+label: LATENCY NOTES
+---
+
+## Interfaces keep promises
+
+Latency is not just a number from the network tab. It is the amount of uncertainty a person has to carry while your product is thinking.
+
+The simplest pattern is to make the interface say what changed, what is still running, and what can be touched next. The user does not need theatre. They need continuity.
+
+```tsx
+type SaveState = "idle" | "saving" | "saved" | "error";
+
+function SaveLabel({ state }: { state: SaveState }) {
+  if (state === "saving") return "Saving";
+  if (state === "saved") return "Saved";
+  if (state === "error") return "Try again";
+
+  return "Save";
+}
+```
+
+## The wait state has a shape
+
+- Reserve the space where the result will appear.
+- Keep the previous useful value visible when possible.
+- Show progress only when it tells the truth.
+
+> A fast interface can still feel careless when it throws away context between states.
+
+The best loading UI is usually not the most animated one. It is the one that keeps the user's mental model intact.
+
+```ts
+const optimisticDraft = {
+  title: draft.title,
+  status: "saving",
+  updatedAt: new Date().toISOString(),
+};
+
+cache.set(draft.id, optimisticDraft);
+```
+
+## Small details compound
+
+When a page saves, routes, streams, or retries, every transition is a chance to either preserve trust or make the user re-check reality.

@@ -58,12 +58,12 @@ function WorkProjectRow({
   return (
     <li
       data-work-index={index}
-      className={`group flex min-h-[44px] cursor-pointer select-none items-center gap-1.5 rounded-xl px-1 py-0.5 text-[16px] leading-6 transition-colors ${
+      className={`group flex min-h-11 cursor-pointer select-none items-center gap-1.5 rounded-xl px-1 py-0.5 text-[16px] leading-6 transition-colors ${
         isActive ? "bg-white/10 text-foreground" : "text-foreground/70 hover:bg-white/3"
       }`}
       onMouseEnter={onMouseEnter}
     >
-      <p className="min-w-0 max-w-120 shrink truncate whitespace-nowrap leading-6">
+      <p className="min-w-0 shrink pl-2.5 truncate whitespace-nowrap leading-6">
         <span className={isActive ? "font-medium text-foreground" : "font-medium text-foreground/90"}>
           {project.title}
         </span>
@@ -158,7 +158,7 @@ export function WorkProjectList({ projects, activeIndex: activeIndexProp, onActi
   return (
     <ul
       ref={listRef}
-      className="mx-auto w-full max-w-4xl space-y-0.5 outline-none"
+      className="mx-auto w-full max-w-(--writing-content-width) space-y-0.5 outline-none"
       tabIndex={0}
       aria-label="Projects list"
     >
