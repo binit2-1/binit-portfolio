@@ -162,17 +162,17 @@ function highlightCodeLine(line: string, lineIndex: number) {
     let className = "text-foreground/80";
 
     if (token.startsWith("//") || token.startsWith("#")) {
-      className = "text-foreground/35";
+      className = "text-foreground/38";
     } else if (token.startsWith('"') || token.startsWith("'") || token.startsWith("`")) {
-      className = "text-foreground/62";
+      className = "text-[#FFB088]";
     } else if (/^\d/.test(token)) {
-      className = "text-foreground/58";
+      className = "text-[#FF9A63]";
     } else if (/^<\/?[A-Za-z]/.test(token)) {
-      className = "text-foreground/88";
+      className = "text-[#FF8A45]";
     } else if (/^[{}()[\].,:;=<>]$/.test(token)) {
-      className = "text-foreground/40";
+      className = "text-[#FF5800]/45";
     } else {
-      className = "text-foreground/78";
+      className = "text-[#FF7A2F]";
     }
 
     nodes.push(

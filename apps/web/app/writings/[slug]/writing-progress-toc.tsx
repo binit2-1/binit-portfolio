@@ -12,6 +12,8 @@ type WritingProgressTocProps = {
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const ACTIVE_LINE_RATIO = 0.75;
+const CLOSED_HEIGHT = 52;
+const OPEN_HEIGHT = 430;
 
 type WritingSectionActiveEvent = CustomEvent<{ id: string }>;
 
@@ -102,9 +104,11 @@ export function WritingProgressToc({ title, sections }: WritingProgressTocProps)
   return (
     <div className="pointer-events-none fixed bottom-5 left-1/2 z-90 flex w-full -translate-x-1/2 justify-center px-4">
       <motion.div
-        layout
-        transition={{ layout: { duration: 0.42, ease: EASE } }}
-        className={`pointer-events-auto overflow-hidden border border-border/70 bg-background/84 text-foreground shadow-[0_18px_70px_rgba(0,0,0,0.2)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#181818]/88 ${
+        animate={{
+          height: isOpen ? OPEN_HEIGHT : CLOSED_HEIGHT,
+        }}
+        transition={{ duration: 0.46, ease: EASE }}
+        className={`pointer-events-auto relative overflow-hidden border border-border/70 bg-background/84 text-foreground shadow-[0_18px_70px_rgba(0,0,0,0.2)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#181818]/88 ${
           isOpen
             ? "w-[min(calc(100vw-2rem),35rem)] rounded-[1.75rem]"
             : "w-[min(calc(100vw-3rem),21.75rem)] rounded-full"
@@ -118,11 +122,12 @@ export function WritingProgressToc({ title, sections }: WritingProgressTocProps)
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, ease: EASE }}
+              className="absolute inset-x-0 top-0 bottom-13"
             >
               <div className="px-7 pt-5 pb-2">
                 <p className="text-sm font-medium tracking-[0.08em] text-muted-foreground uppercase">Table of contents</p>
               </div>
-              <nav className="max-h-[43vh] overflow-y-auto px-4 pb-4" aria-label="Table of contents">
+              <nav className="h-[calc(100%-3.25rem)] overflow-y-auto px-4 pb-4" aria-label="Table of contents">
               {sections.map((section, index) => (
                 <button
                   key={section.id}
@@ -152,7 +157,7 @@ export function WritingProgressToc({ title, sections }: WritingProgressTocProps)
 
       <button
         type="button"
-        className={`group flex h-13 w-full items-center gap-3 px-4 text-foreground transition-colors hover:bg-foreground/4 ${
+        className={`group absolute inset-x-0 bottom-0 flex h-13 w-full items-center gap-3 px-4 text-foreground transition-colors hover:bg-foreground/4 ${
           isOpen ? "border-t border-border/60 dark:border-white/8" : ""
         }`}
         aria-expanded={isOpen}
