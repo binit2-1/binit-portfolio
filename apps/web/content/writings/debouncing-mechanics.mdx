@@ -1,0 +1,203 @@
+---
+title: "The Mechanics of Debouncing"
+subtitle: "From JavaScript fundamentals to React implementation, a comprehensive guide to mastering debouncing in your applications."
+summary: "A deep dive into debouncing. Learn the underlying JavaScript mechanics, React pitfalls, and how to implement a debounced search bar with the Rick and Morty API."
+date: 2026-05-08
+thumbnail: "/images/writings/debouncing-mechanics/debouncing-thumbnail.png"
+label: "DEBOUNCING"
+---
+
+## Context
+
+Imagine you’re building a real-time search bar. The requirement is simple: as the user types, the UI should update with matching results from an API.
+
+If you stick to a standard `onChange` listener, the execution looks like this:
+
+- User types "L" -> API call sent.
+- User types "a" -> API call sent.
+- User types "p" -> API call sent.
+- User types "t" -> API call sent.
+
+By the time the user finishes typing "Laptop," you’ve fired six redundant network requests in under a second.
+
+![Debouncing search preview](/videos/writings/debouncing-mechanics/not-debounce.webm "Debouncing mechanics") {autoplay loop muted caption=false}
+
+The above video showcases the problem: every keystroke triggers an API call, leading to a flood of requests that can overwhelm your backend and degrade user experience.
+
+
+### The Problem
+
+- **Server strain:** You are DoS-ing your own backend with 5x-10x more traffic than necessary.
+- **Race conditions:** If the response for "L" arrives after the response for "Laptop," your UI can flicker and display stale data.
+- **Client lag:** Constant re-renders and network streams make the interface feel heavy, especially on mobile.
+
+### The Solution: Debouncing
+
+Debouncing is a technique that ensures a function is only executed after a certain period of inactivity. In our search bar example, we want to wait until the user has stopped typing for, say, 300 milliseconds before making the API call.
+This way, if the user types "Laptop" quickly, we only make one API call after they finish typing, rather than one for each keystroke.
+
+### How Giants Do It
+
+Let us see how it works through an example from [Flipkart](https://www.flipkart.com/).
+![Flipkart debounced search](/videos/writings/debouncing-mechanics/flipkart-debounced.webm "Flipkart debounced search") {autoplay loop muted caption=false}
+
+See how the search results only update after the user finishes typing? That’s debouncing in action. Flipkart waits for a pause in typing before sending the API request, ensuring a smoother user experience and reducing unnecessary server load.
+
+## Mental Model
+When you create a debounced function, it typically uses `setTimeout` to delay the execution of the API call. The key is that each time the user types, you clear the previous timeout and set a new one. This way, only the last keystroke will trigger the API call after the specified delay.
+Here's a simple implementation of a debounce function:
+
+```js
+function debounce(func, delay) {
+  let timeoutId;
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+}
+```
+In this implementation, `timeoutId` is a variable that holds the identifier of the current timeout. Each time the returned function is called, it clears the previous timeout (if it exists) and sets a new one. The API call will only execute after the user has stopped typing for the specified delay.
+### React Pitfall: Creating a New Debounced Function on Every Render
+In React, if you create a debounced function directly inside your component body, it can be recreated on every render. That means the `timeoutId` can reset, and the debouncing logic may not behave the way you expect.
+
+You can solve that with a stable ref-backed debounce utility, but for a search input the simplest pattern is usually a `useEffect` tied to the query value. The effect schedules the API call, and its cleanup cancels the old timer whenever the user types again.
+
+## Let's make a debounced search bar together!
+
+Here we will be using the [Rick and Morty API](https://rickandmortyapi.com/documentation) to create a simple search bar that fetches character data based on user input. We will implement debouncing to optimize the API calls.
+
+### Create A React Project
+First, let's set up a new React project using [Vite](https://vitejs.dev/).
+
+```bash 
+npm create vite@latest
+```
+
+I will be using tailwind, that is completely optional, you can use plain CSS or any other styling method you prefer.
+Also I will be using `useEffect` and `useState` hooks to manage the state and side effects in our component.
+
+### Implementing the Debounced Search Bar
+
+Now, let's create a `SearchBar` component that implements the debouncing logic.
+
+We define two state variables:
+- `query`: a string type to hold the current value of the input field.
+- `characters`: an empty array to hold the search results from the API.
+
+```jsx
+const [query, setQuery] = useState('');
+const [characters, setCharacters] = useState([]);
+```
+
+Now we create a `useEffect` hook that fetches data whenever `query` changes. The debouncing logic lives inside this effect.
+
+```jsx
+useEffect(() => {
+    if (!query) return setCharacters([]);
+
+    const timer = setTimeout(async () => {
+      const response = await fetch(`https://rickandmortyapi.com/api/character/?name=${query}`);
+      const data = await response.json();
+      setCharacters(data.results);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [query]);
+```
+
+After that we will create the input field and display the search results, with a little bit of styling to make it look nice.
+
+```jsx
+return(
+    <div className = "w-screen h-screen flex flex-col items-center justify-start mt-20">
+      <input
+        type = "text"
+        value = {query}
+        onChange = {(e) => setQuery(e.target.value)}
+        placeholder = "Search for a character"
+        className = "w-full max-w-md p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      />  
+      <div className = "w-full max-w-md mt-8">
+        {characters.slice(0, 5).map((character) => (
+          <div key={character.id} className = "flex items-center space-x-4 mb-4">
+            <img src={character.image} alt={character.name} className = "w-16 h-16 rounded-full" />
+            <div>
+              <h2 className = "text-lg font-semibold">{character.name}</h2>
+              <p className = "text-sm text-gray-500">{character.species}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+```
+
+
+Finally, the code should look like this:
+
+```jsx
+import React, { useState, useEffect } from 'react'
+
+const App = () => {
+  const [query, setQuery] = useState('');
+  const [characters, setCharacters] = useState([]);
+
+  useEffect(() => {
+    if (!query) return setCharacters([]);
+
+    const timer = setTimeout(async () => {
+      const response = await fetch(`https://rickandmortyapi.com/api/character/?name=${query}`);
+      const data = await response.json();
+      setCharacters(data.results || []);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [query]);
+
+
+  return(
+    <div className = "w-screen h-screen flex flex-col items-center justify-start mt-20">
+      <input
+        type = "text"
+        value = {query}
+        onChange = {(e) => setQuery(e.target.value)}
+        placeholder = "Search for a character"
+        className = "w-full max-w-md p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      />  
+      <div className = "w-full max-w-md mt-8">
+        {characters.slice(0, 5).map((character) => (
+          <div key={character.id} className = "flex items-center space-x-4 mb-4">
+            <img src={character.image} alt={character.name} className = "w-16 h-16 rounded-full" />
+            <div>
+              <h2 className = "text-lg font-semibold">{character.name}</h2>
+              <p className = "text-sm text-gray-500">{character.species}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+} 
+
+export default App;
+```
+
+This is how it looks like now
+![Implemented debounced search](/videos/writings/debouncing-mechanics/debounce-react.webm "Implemented debounced search") {autoplay loop muted caption=false}
+
+You can see that the search results only update after the user finishes typing, and we are not making unnecessary API calls for every keystroke. This is the power of debouncing in action.
+
+The timer starts after each input change and counts down from 300ms. If the user types again before the timer finishes, the cleanup function cancels the old timer and starts a fresh one. If the timer reaches the end, we make the API call for the latest query.
+
+![Debounced search timer](/videos/writings/debouncing-mechanics/debounce-with-timer.webm "Debounced search timer") {autoplay loop muted caption=false}
+
+
+## Wrapping Up: The Value of Patience
+
+And there you have it! By adding just a few lines of cleanup logic with `useEffect`, we've protected our backend and created a buttery-smooth user experience. We are no longer spamming our API on every single keystroke.
+
+But what happens when our app grows? Copy-pasting this exact `useEffect` block for every search bar, filter, and form input is a recipe for messy code. 
+
+In the next post, we will level up our React architecture by extracting this logic into a clean, highly reusable custom `useDebounce` hook. Stay tuned.

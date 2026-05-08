@@ -1,5 +1,8 @@
+import Image from "next/image";
 import type { ReactNode } from "react";
 import { createHeadingIdFactory } from "@/lib/writing-headings";
+import { WritingCopyButton } from "./writing-copy-button";
+import { WritingVideoPlayer, type WritingVideoSource } from "./writing-video-player";
 
 type MarkdownBlock =
   | { type: "heading"; depth: 2 | 3 | 4; text: string }
@@ -7,12 +10,64 @@ type MarkdownBlock =
   | { type: "code"; language: string; code: string }
   | { type: "list"; items: string[] }
   | { type: "quote"; text: string }
+  | {
+      type: "media";
+      kind: "image" | "video";
+      src: string;
+      alt: string;
+      title?: string;
+      attrs: Record<string, string>;
+    }
   | { type: "rule" };
 
-const blockStartPattern = /^(#{2,4}\s|```|-\s|>\s|---\s*$)/;
+const blockStartPattern = /^(#{2,4}\s|```|-\s|>\s|---\s*$|!\[[^\]]*\]\()/;
 const codeTokenPattern =
   /(\/\/.*$|#.*$|"[^"]*"|'[^']*'|`[^`]*`|\b(?:async|await|break|case|class|const|continue|default|else|export|false|for|from|function|if|import|interface|let|new|null|return|string|true|type|undefined|while)\b|\b\d+(?:\.\d+)?\b|<\/?[A-Za-z][^>\s]*|[{}()[\].,:;=<>])/g;
+const shellTokenPattern =
+  /(#.*$|"[^"]*"|'[^']*'|`[^`]*`|\$\([^)]+\)|\$\w+|--?[\w-]+|&&|\|\||[|;=]|[@A-Za-z0-9_./-]+(?:@[\w.-]+)?|\S+)/g;
 const inlineTokenPattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g;
+const mediaBlockPattern = /^!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]+)")?\)\s*(?:\{([^}]*)\})?\s*$/;
+const mediaOptionsCommentPattern = /^(?:\{\/\*|<!--)\s*media:?\s*([\s\S]*?)\s*(?:\*\/\}|-->)\s*$/;
+const videoExtensionPattern = /\.(mp4|webm|ogv|ogg|mov|m4v)(?:[?#].*)?$/i;
+const imageExtensionPattern = /\.(avif|gif|jpe?g|png|svg|webp)(?:[?#].*)?$/i;
+
+function parseMediaAttributes(source?: string): Record<string, string> {
+  if (!source) return {};
+
+  const attrs: Record<string, string> = {};
+  const attributePattern = /([A-Za-z][\w-]*)(?:=(?:"([^"]*)"|'([^']*)'|([^\s]+)))?/g;
+
+  for (const match of source.matchAll(attributePattern)) {
+    attrs[match[1]] = match[2] ?? match[3] ?? match[4] ?? "true";
+  }
+
+  return attrs;
+}
+
+function getMediaAttribute(attrs: Record<string, string>, ...keys: string[]) {
+  for (const key of keys) {
+    const exactValue = attrs[key];
+    if (exactValue !== undefined) return exactValue;
+  }
+
+  const normalizedKeys = keys.map((key) => key.toLowerCase());
+  const match = Object.entries(attrs).find(([key]) => normalizedKeys.includes(key.toLowerCase()));
+
+  return match?.[1];
+}
+
+function isVideoSource(src: string, attrs: Record<string, string>) {
+  const explicitType = getMediaAttribute(attrs, "type")?.toLowerCase();
+
+  if (explicitType === "video") return true;
+  if (explicitType === "image") return false;
+
+  return videoExtensionPattern.test(src);
+}
+
+function isSupportedMediaSource(src: string) {
+  return videoExtensionPattern.test(src) || imageExtensionPattern.test(src);
+}
 
 function parseBlocks(content: string): MarkdownBlock[] {
   const lines = content.replace(/\r\n/g, "\n").split("\n");
@@ -48,6 +103,31 @@ function parseBlocks(content: string): MarkdownBlock[] {
 
     if (/^---\s*$/.test(line)) {
       blocks.push({ type: "rule" });
+      index += 1;
+      continue;
+    }
+
+    const media = line.match(mediaBlockPattern);
+    if (media && isSupportedMediaSource(media[2])) {
+      const nextLine = lines[index + 1]?.trim();
+      const mediaOptionsComment = nextLine?.match(mediaOptionsCommentPattern);
+      const attrs = parseMediaAttributes(
+        [media[4], mediaOptionsComment?.[1]].filter(Boolean).join(" "),
+      );
+
+      blocks.push({
+        type: "media",
+        kind: isVideoSource(media[2], attrs) ? "video" : "image",
+        src: media[2],
+        alt: media[1].trim(),
+        title: media[3]?.trim(),
+        attrs,
+      });
+      index += mediaOptionsComment ? 2 : 1;
+      continue;
+    }
+
+    if (mediaOptionsCommentPattern.test(line.trim())) {
       index += 1;
       continue;
     }
@@ -90,6 +170,11 @@ function parseBlocks(content: string): MarkdownBlock[] {
     const paragraphLines: string[] = [];
     while (index < lines.length && lines[index].trim() && !blockStartPattern.test(lines[index])) {
       paragraphLines.push(lines[index].trim());
+      index += 1;
+    }
+
+    if (paragraphLines.length === 0) {
+      paragraphLines.push(line.trim());
       index += 1;
     }
 
@@ -149,7 +234,158 @@ function renderInline(text: string) {
   return nodes;
 }
 
-function highlightCodeLine(line: string, lineIndex: number) {
+function getMediaCaption(alt: string, title?: string, attrs?: Record<string, string>) {
+  const caption = attrs ? getMediaAttribute(attrs, "caption") : undefined;
+
+  if (caption && ["false", "0", "no", "off"].includes(caption.toLowerCase())) {
+    return "";
+  }
+
+  return caption ?? title ?? alt;
+}
+
+function isTruthyAttribute(
+  attrs: Record<string, string>,
+  key: string,
+  defaultValue = false,
+) {
+  const value = getMediaAttribute(attrs, key);
+
+  if (value === undefined) return defaultValue;
+
+  return !["false", "0", "no", "off"].includes(value.toLowerCase());
+}
+
+function isFullWidthMedia(attrs: Record<string, string>) {
+  return (
+    isTruthyAttribute(attrs, "fullWidth") ||
+    isTruthyAttribute(attrs, "fullwidth") ||
+    isTruthyAttribute(attrs, "full-width")
+  );
+}
+
+function getVideoType(src: string) {
+  const normalizedSrc = src.split(/[?#]/)[0].toLowerCase();
+
+  if (normalizedSrc.endsWith(".webm")) return "video/webm";
+  if (normalizedSrc.endsWith(".ogv") || normalizedSrc.endsWith(".ogg")) return "video/ogg";
+  if (normalizedSrc.endsWith(".mov")) return "video/quicktime";
+
+  return "video/mp4";
+}
+
+function addVideoSource(
+  sources: WritingVideoSource[],
+  seenSources: Set<string>,
+  src: string | undefined,
+  media?: string,
+) {
+  if (!src) return;
+
+  const key = `${media || "default"}:${src}`;
+  if (seenSources.has(key)) return;
+
+  sources.push({
+    src,
+    type: getVideoType(src),
+    media,
+  });
+  seenSources.add(key);
+}
+
+function getVideoSources(src: string, attrs: Record<string, string>) {
+  const sources: WritingVideoSource[] = [];
+  const seenSources = new Set<string>();
+  const mobileMedia = "(max-width: 640px)";
+  const mobileWebm = getMediaAttribute(attrs, "mobileWebm", "mobile-webm");
+  const mobileSrc = getMediaAttribute(attrs, "mobile", "mobileSrc", "mobile-src");
+  const mobileFallback = getMediaAttribute(
+    attrs,
+    "mobileMp4",
+    "mobile-mp4",
+    "mobileFallback",
+    "mobile-fallback",
+  );
+  const webm = getMediaAttribute(attrs, "webm");
+  const fallback = getMediaAttribute(attrs, "fallback", "mp4");
+
+  addVideoSource(sources, seenSources, mobileWebm, mobileMedia);
+  addVideoSource(sources, seenSources, mobileSrc, mobileMedia);
+  addVideoSource(sources, seenSources, mobileFallback, mobileMedia);
+  addVideoSource(sources, seenSources, webm);
+  addVideoSource(sources, seenSources, src);
+  addVideoSource(sources, seenSources, fallback);
+
+  return sources;
+}
+
+function getImageLoadingStrategy(src: string) {
+  const normalizedSrc = src.split(/[?#]/)[0].toLowerCase();
+
+  return {
+    shouldUseNativeImage:
+      normalizedSrc.endsWith(".gif") ||
+      normalizedSrc.endsWith(".svg") ||
+      src.startsWith("http://") ||
+      src.startsWith("https://"),
+    shouldSkipOptimization: normalizedSrc.endsWith(".gif") || normalizedSrc.endsWith(".svg"),
+  };
+}
+
+function isShellLanguage(language: string) {
+  return ["bash", "sh", "shell", "zsh", "terminal", "console"].includes(language.toLowerCase());
+}
+
+function getShellTokenClassName(token: string, tokenIndex: number) {
+  if (token.startsWith("#")) return "text-foreground/38";
+  if (token.startsWith('"') || token.startsWith("'") || token.startsWith("`")) return "text-[#FFB088]";
+  if (token.startsWith("$")) return "text-[#FFB088]";
+  if (token.startsWith("-")) return "text-[#FF9A63]";
+  if (/^(?:&&|\|\||[|;=])$/.test(token)) return "text-[#FF5800]/55";
+  if (/^(?:npm|pnpm|yarn|bun|deno|npx|node|git|vite)$/.test(token)) return "text-[#FF7A2F]";
+  if (tokenIndex === 1 && /^(?:create|install|add|run|init|dev|build|dlx|exec)$/.test(token)) {
+    return "text-[#FF9A63]";
+  }
+  if (token.includes("@")) return "text-[#FFB088]";
+
+  return "text-foreground/80";
+}
+
+function highlightShellLine(line: string, lineIndex: number) {
+  const nodes: ReactNode[] = [];
+  let lastIndex = 0;
+  let tokenIndex = 0;
+
+  for (const match of line.matchAll(shellTokenPattern)) {
+    if (match.index > lastIndex) {
+      nodes.push(line.slice(lastIndex, match.index));
+    }
+
+    const token = match[0];
+    const className = getShellTokenClassName(token, tokenIndex);
+
+    nodes.push(
+      <span key={`${lineIndex}-${match.index}-${token}`} className={className}>
+        {token}
+      </span>,
+    );
+
+    lastIndex = match.index + token.length;
+    tokenIndex += 1;
+  }
+
+  if (lastIndex < line.length) {
+    nodes.push(line.slice(lastIndex));
+  }
+
+  return nodes;
+}
+
+function highlightCodeLine(line: string, lineIndex: number, language: string) {
+  if (isShellLanguage(language)) {
+    return highlightShellLine(line, lineIndex);
+  }
+
   const nodes: ReactNode[] = [];
   let lastIndex = 0;
 
@@ -195,16 +431,117 @@ function CodeBlock({ language, code }: { language: string; code: string }) {
   const lines = code.split("\n");
 
   return (
-    <figure className="my-7 overflow-hidden rounded-md border border-border/55 bg-foreground/[0.04] shadow-[0_16px_50px_rgba(0,0,0,0.10)] dark:border-white/8 dark:bg-white/[0.045]">
-      <pre className="overflow-x-auto px-5 py-5 text-[13px] leading-6 sm:px-6">
+    <figure className="relative my-7 overflow-hidden rounded-md border border-border/55 bg-foreground/4 shadow-[0_16px_50px_rgba(0,0,0,0.10)] dark:border-white/8 dark:bg-white/4.5">
+      <WritingCopyButton value={code} />
+      <pre className="overflow-x-auto px-5 py-5 pr-14 text-[13px] leading-6 sm:px-6 sm:pr-16">
         <code className="font-mono" data-language={language}>
           {lines.map((line, lineIndex) => (
             <span key={lineIndex} className="block min-w-0 whitespace-pre">
-              {highlightCodeLine(line, lineIndex)}
+              {highlightCodeLine(line, lineIndex, language)}
             </span>
           ))}
         </code>
       </pre>
+    </figure>
+  );
+}
+
+function WritingImageBlock({
+  src,
+  alt,
+  title,
+  attrs,
+}: {
+  src: string;
+  alt: string;
+  title?: string;
+  attrs: Record<string, string>;
+}) {
+  const caption = getMediaCaption(alt, title, attrs);
+  const { shouldUseNativeImage, shouldSkipOptimization } = getImageLoadingStrategy(src);
+  const isFullWidth = isFullWidthMedia(attrs);
+  const containerClassName = isFullWidth
+    ? "relative w-full overflow-hidden rounded-md border border-border/55 bg-foreground/[0.035] shadow-[0_16px_50px_rgba(0,0,0,0.10)] dark:border-white/8 dark:bg-white/[0.045]"
+    : "relative aspect-video overflow-hidden rounded-md border border-border/55 bg-foreground/[0.035] shadow-[0_16px_50px_rgba(0,0,0,0.10)] dark:border-white/8 dark:bg-white/[0.045]";
+  const imageClassName = isFullWidth ? "h-auto w-full" : "h-full w-full object-contain";
+  const imageSizes = isFullWidth ? "100vw" : "(min-width: 768px) 44rem, calc(100vw - 2rem)";
+
+  return (
+    <figure className="my-7">
+      <div className={containerClassName}>
+        {shouldUseNativeImage ? (
+          // eslint-disable-next-line @next/next/no-img-element -- GIF/SVG/remote article media should preserve source behavior.
+          <img
+            src={src}
+            alt={alt}
+            loading="lazy"
+            decoding="async"
+            className={imageClassName}
+          />
+        ) : isFullWidth ? (
+          <Image
+            src={src}
+            alt={alt}
+            width={1600}
+            height={900}
+            sizes={imageSizes}
+            className={imageClassName}
+            unoptimized={shouldSkipOptimization}
+          />
+        ) : (
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes={imageSizes}
+            className="object-contain"
+            unoptimized={shouldSkipOptimization}
+          />
+        )}
+      </div>
+      {caption ? (
+        <figcaption className="mt-2 text-center text-xs leading-5 text-muted-foreground">
+          {renderInline(caption)}
+        </figcaption>
+      ) : null}
+    </figure>
+  );
+}
+
+function WritingVideoBlock({
+  src,
+  alt,
+  title,
+  attrs,
+}: {
+  src: string;
+  alt: string;
+  title?: string;
+  attrs: Record<string, string>;
+}) {
+  const poster = getMediaAttribute(attrs, "poster");
+  const autoPlay = isTruthyAttribute(attrs, "autoplay") || isTruthyAttribute(attrs, "autoPlay");
+  const loop = isTruthyAttribute(attrs, "loop");
+  const muted = autoPlay || isTruthyAttribute(attrs, "muted", autoPlay);
+  const caption = getMediaCaption(alt, title, attrs);
+  const sources = getVideoSources(src, attrs);
+  const figureClassName = isFullWidthMedia(attrs) ? "my-7 sm:-mx-4 lg:-mx-6" : "my-7";
+
+  return (
+    <figure className={figureClassName}>
+      <WritingVideoPlayer
+        sources={sources}
+        alt={alt}
+        poster={poster}
+        autoPlay={autoPlay}
+        loop={loop}
+        muted={muted}
+      />
+      {caption ? (
+        <figcaption className="mt-2 text-center text-xs leading-5 text-muted-foreground">
+          {renderInline(caption)}
+        </figcaption>
+      ) : null}
     </figure>
   );
 }
@@ -245,6 +582,30 @@ export function WritingMdxContent({ content }: { content: string }) {
 
         if (block.type === "code") {
           return <CodeBlock key={index} language={block.language} code={block.code} />;
+        }
+
+        if (block.type === "media") {
+          if (block.kind === "video") {
+            return (
+              <WritingVideoBlock
+                key={index}
+                src={block.src}
+                alt={block.alt}
+                title={block.title}
+                attrs={block.attrs}
+              />
+            );
+          }
+
+          return (
+            <WritingImageBlock
+              key={index}
+              src={block.src}
+              alt={block.alt}
+              title={block.title}
+              attrs={block.attrs}
+            />
+          );
         }
 
         if (block.type === "list") {

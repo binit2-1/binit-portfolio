@@ -22,6 +22,8 @@ export function WritingProgressToc({ title, sections }: WritingProgressTocProps)
   const [progressPercent, setProgressPercent] = useState(0);
   const [activeId, setActiveId] = useState(sections[0]?.id || "top");
   const frameRef = useRef<number | null>(null);
+  const tocListRef = useRef<HTMLElement | null>(null);
+  const touchYRef = useRef<number | null>(null);
   const lenis = useLenisInstance();
   const { scrollYProgress } = useScroll();
   const clampedProgress = useTransform(scrollYProgress, (value) => Math.min(Math.max(value, 0), 1));
@@ -48,6 +50,47 @@ export function WritingProgressToc({ title, sections }: WritingProgressTocProps)
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const tocList = tocListRef.current;
+    if (!tocList) return;
+
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      tocList.scrollTop += event.deltaY;
+    };
+
+    const onTouchStart = (event: TouchEvent) => {
+      touchYRef.current = event.touches[0]?.clientY ?? null;
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      const nextY = event.touches[0]?.clientY;
+      const previousY = touchYRef.current;
+      if (nextY === undefined || previousY === null) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      tocList.scrollTop += previousY - nextY;
+      touchYRef.current = nextY;
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: false, capture: true });
+    window.addEventListener("touchstart", onTouchStart, { passive: true, capture: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: false, capture: true });
+
+    return () => {
+      window.removeEventListener("wheel", onWheel, { capture: true });
+      window.removeEventListener("touchstart", onTouchStart, { capture: true });
+      window.removeEventListener("touchmove", onTouchMove, { capture: true });
+      touchYRef.current = null;
+    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -115,7 +158,16 @@ export function WritingProgressToc({ title, sections }: WritingProgressTocProps)
   const activeLabel = activeSection?.title || title;
 
   return (
-    <div className="pointer-events-none fixed bottom-5 left-1/2 z-90 flex w-full -translate-x-1/2 justify-center px-4">
+    <>
+    {isOpen ? (
+      <button
+        type="button"
+        aria-label="Close table of contents"
+        className="fixed inset-0 z-80 cursor-default bg-transparent"
+        onClick={() => setIsOpen(false)}
+      />
+    ) : null}
+    <div className="pointer-events-none fixed bottom-[clamp(2.5rem,7vh,4.5rem)] left-1/2 z-90 flex w-full -translate-x-1/2 justify-center px-4">
       <motion.div
         animate={{
           height: isOpen ? OPEN_HEIGHT : CLOSED_HEIGHT,
@@ -140,29 +192,33 @@ export function WritingProgressToc({ title, sections }: WritingProgressTocProps)
               <div className="px-7 pt-5 pb-2">
                 <p className="text-sm font-medium tracking-[0.08em] text-muted-foreground uppercase">Table of contents</p>
               </div>
-              <nav className="h-[calc(100%-3.25rem)] overflow-y-auto px-4 pb-4" aria-label="Table of contents">
-              {sections.map((section, index) => (
-                <button
-                  key={section.id}
-                  type="button"
-                  className={`relative flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-base text-muted-foreground transition-colors hover:bg-foreground/7 hover:text-foreground dark:hover:bg-white/8 ${
-                    section.depth > 2 ? "pl-8 text-sm" : ""
-                  } ${
-                    section.id === activeId
-                      ? "bg-foreground/10 text-foreground dark:bg-white/14"
-                      : ""
-                  }`}
-                  onClick={() => scrollToSection(section.id)}
-                >
-                  <span className="min-w-0 truncate">
-                    {index > 0 ? `${index}. ` : ""}
-                    {section.title}
-                  </span>
-                  {section.id === activeId ? (
-                    <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-foreground" />
-                  ) : null}
-                </button>
-              ))}
+              <nav
+                ref={tocListRef}
+                data-lenis-prevent
+                className="h-[calc(100%-3.25rem)] overflow-y-auto overscroll-contain px-4 pb-4"
+                aria-label="Table of contents"
+              >
+                {sections.map((section) => (
+                  <button
+                    key={section.id}
+                    type="button"
+                    className={`relative flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-base text-muted-foreground transition-colors hover:bg-foreground/7 hover:text-foreground dark:hover:bg-white/8 ${
+                      section.depth > 2 ? "pl-8 text-sm" : ""
+                    } ${
+                      section.id === activeId
+                        ? "bg-foreground/10 text-foreground dark:bg-white/14"
+                        : ""
+                    }`}
+                    onClick={() => scrollToSection(section.id)}
+                  >
+                    <span className="min-w-0 truncate">
+                      {section.title}
+                    </span>
+                    {section.id === activeId ? (
+                      <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-foreground" />
+                    ) : null}
+                  </button>
+                ))}
               </nav>
             </motion.div>
           ) : null}
@@ -186,6 +242,7 @@ export function WritingProgressToc({ title, sections }: WritingProgressTocProps)
       </button>
       </motion.div>
     </div>
+    </>
   );
 }
 

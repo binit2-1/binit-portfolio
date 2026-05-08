@@ -9,6 +9,7 @@ import { ProgressiveBlur } from "./progressive-blur";
 import { WritingMdxContent } from "./writing-mdx-content";
 import { WritingProgressToc } from "./writing-progress-toc";
 import { WritingSectionDot } from "./writing-section-dot";
+import { WritingShareButton } from "./writing-share-button";
 
 export async function generateStaticParams() {
   return getAllWritings().map((p) => ({ slug: p.slug }));
@@ -23,7 +24,7 @@ export async function generateMetadata({
   try {
     const { frontmatter } = getWritingBySlug(slug);
     const description = frontmatter.summary || frontmatter.subtitle;
-    const image = frontmatter.thumbnail || siteImages.logo;
+    const image = absoluteUrl(frontmatter.thumbnail || siteImages.logo);
 
     return {
       title: frontmatter.title,
@@ -52,7 +53,12 @@ export async function generateMetadata({
         card: frontmatter.thumbnail ? "summary_large_image" : "summary",
         title: frontmatter.title,
         description,
-        images: [image],
+        images: [
+          {
+            url: image,
+            alt: frontmatter.title,
+          },
+        ],
         creator: "@BinitGupta21",
       },
     };
@@ -135,13 +141,17 @@ export default async function WritingPage({
       >
         <WritingSectionDot />
 
-        <nav className="mb-8 flex items-center gap-4 text-sm text-muted-foreground" aria-label="Writing navigation">
+        <nav className="mb-8 flex items-center justify-between gap-3 text-sm text-muted-foreground" aria-label="Writing navigation">
           <Link
             href="/writings"
-            className="rounded-sm transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="rounded-sm px-0 py-1.5 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Back
           </Link>
+          <WritingShareButton
+            title={frontmatter.title}
+            shareUrl={absoluteUrl(`/writings/${slug}`)}
+          />
         </nav>
 
         <header>
@@ -175,7 +185,7 @@ export default async function WritingPage({
 
         {(previousWriting || nextWriting) ? (
           <nav
-            className="mt-14 grid gap-3 border-t border-border pt-5 text-sm text-muted-foreground sm:grid-cols-2"
+            className="mt-14 grid grid-cols-2 gap-3 border-t border-border pt-5 text-[11px] text-muted-foreground sm:text-sm"
             aria-label="Adjacent writings"
           >
             {previousWriting ? (
@@ -184,8 +194,8 @@ export default async function WritingPage({
                 className="group min-w-0 rounded-sm text-left transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 aria-label={`Previous blog: ${previousWriting.frontmatter.title}`}
               >
-                <span className="block text-xs uppercase tracking-[0.12em] text-muted-foreground/70">Previous blog</span>
-                <span className="mt-1 block truncate text-foreground/85 group-hover:text-foreground">
+                <span className="block text-[9px] uppercase tracking-[0.1em] text-muted-foreground/70 sm:text-xs sm:tracking-[0.12em]">Previous blog</span>
+                <span className="mt-1 block truncate text-[11px] text-foreground/85 group-hover:text-foreground sm:text-sm">
                   {previousWriting.frontmatter.title}
                 </span>
               </Link>
@@ -195,11 +205,11 @@ export default async function WritingPage({
             {nextWriting ? (
               <Link
                 href={`/writings/${nextWriting.slug}`}
-                className="group min-w-0 rounded-sm text-left transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-right"
+                className="group min-w-0 rounded-sm text-right transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 aria-label={`Next blog: ${nextWriting.frontmatter.title}`}
               >
-                <span className="block text-xs uppercase tracking-[0.12em] text-muted-foreground/70">Next blog</span>
-                <span className="mt-1 block truncate text-foreground/85 group-hover:text-foreground">
+                <span className="block text-[9px] uppercase tracking-[0.1em] text-muted-foreground/70 sm:text-xs sm:tracking-[0.12em]">Next blog</span>
+                <span className="mt-1 block truncate text-[11px] text-foreground/85 group-hover:text-foreground sm:text-sm">
                   {nextWriting.frontmatter.title}
                 </span>
               </Link>
