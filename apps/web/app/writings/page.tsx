@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, siteImages } from "@/lib/site";
 import { getWritingPreviews } from "@/lib/writings";
 import { WritingsPageContent } from "./writings-page-content";
 
@@ -15,6 +15,21 @@ export const metadata: Metadata = {
     title: "Writings by Binit Gupta",
     description,
     url: "/writings",
+    images: [
+      {
+        url: siteImages.og,
+        width: 1200,
+        height: 675,
+        alt: "Writings by Binit Gupta",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Writings by Binit Gupta",
+    description,
+    images: [siteImages.og],
+    creator: "@BinitGupta21",
   },
 };
 

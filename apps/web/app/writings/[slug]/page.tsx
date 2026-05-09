@@ -24,7 +24,7 @@ export async function generateMetadata({
   try {
     const { frontmatter } = getWritingBySlug(slug);
     const description = frontmatter.summary || frontmatter.subtitle;
-    const image = absoluteUrl(frontmatter.thumbnail || siteImages.logo);
+    const image = absoluteUrl(frontmatter.thumbnail || siteImages.og);
 
     return {
       title: frontmatter.title,
@@ -43,14 +43,14 @@ export async function generateMetadata({
         images: [
           {
             url: image,
-            width: frontmatter.thumbnail ? 1200 : 512,
-            height: frontmatter.thumbnail ? 630 : 512,
+            width: 1200,
+            height: frontmatter.thumbnail ? 630 : 675,
             alt: frontmatter.title,
           },
         ],
       },
       twitter: {
-        card: frontmatter.thumbnail ? "summary_large_image" : "summary",
+        card: "summary_large_image",
         title: frontmatter.title,
         description,
         images: [
@@ -111,7 +111,7 @@ export default async function WritingPage({
     description: frontmatter.summary || frontmatter.subtitle,
     datePublished: frontmatter.date || undefined,
     dateModified: frontmatter.date || undefined,
-    image: absoluteUrl(frontmatter.thumbnail || siteImages.logo),
+    image: absoluteUrl(frontmatter.thumbnail || siteImages.og),
     url: absoluteUrl(`/writings/${slug}`),
     author: {
       "@type": "Person",

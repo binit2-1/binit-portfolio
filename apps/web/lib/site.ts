@@ -36,6 +36,7 @@ export function absoluteUrl(path = "/") {
 
 export const siteImages = {
   logo: "/images/logo/logo.png",
+  og: "/images/logo/og-image.png",
   icon: "/icon.png",
   appleIcon: "/apple-icon.png",
 };

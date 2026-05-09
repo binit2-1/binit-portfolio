@@ -45,19 +45,19 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: [
       {
-        url: siteImages.logo,
-        width: 512,
-        height: 512,
+        url: siteImages.og,
+        width: 1200,
+        height: 675,
         alt: SITE_NAME,
       },
     ],
     locale: "en_US",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: [siteImages.logo],
+    images: [siteImages.og],
     creator: "@BinitGupta21",
   },
   robots: {

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, siteImages } from "@/lib/site";
 import { WorkPageContent } from "./work-page-content";
 import { WorkOrangeLine } from "./work-orange-line";
 import { WORK_PROJECTS } from "./work-projects";
@@ -16,6 +16,21 @@ export const metadata: Metadata = {
     title: "Work by Binit Gupta",
     description,
     url: "/work",
+    images: [
+      {
+        url: siteImages.og,
+        width: 1200,
+        height: 675,
+        alt: "Work by Binit Gupta",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Work by Binit Gupta",
+    description,
+    images: [siteImages.og],
+    creator: "@BinitGupta21",
   },
 };
 
