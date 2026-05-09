@@ -20,13 +20,12 @@ export const SITE_AUTHOR = {
   sameAs: [SOCIAL_LINKS.github, SOCIAL_LINKS.linkedin, SOCIAL_LINKS.peerlist, SOCIAL_LINKS.x],
 };
 
-export function getSiteUrl() {
-  const envUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "") ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
+export const SITE_URL = "https://binitt.dev";
 
-  return (envUrl || "http://localhost:3000").replace(/\/$/, "");
+export function getSiteUrl() {
+  const envUrl = process.env.NEXT_PUBLIC_SITE_URL || SITE_URL;
+
+  return envUrl.replace(/\/$/, "");
 }
 
 export function absoluteUrl(path = "/") {
