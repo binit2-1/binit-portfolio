@@ -123,6 +123,37 @@
     filter: none;
     color: #ff5800;
   }
+
+  .stack-tech-token {
+    max-width: 1.75em;
+    transition:
+      max-width 300ms ease,
+      background-color 300ms ease,
+      border-color 300ms ease,
+      color 300ms ease;
+  }
+
+  .stack-tech-token-label {
+    opacity: 0;
+    transition: opacity 150ms ease;
+  }
+
+  .stack-tech-token:hover {
+    max-width: 9em;
+    border-color: color-mix(in oklab, var(--foreground) 35%, transparent);
+    background-color: color-mix(in oklab, var(--foreground) 5.5%, transparent);
+    color: var(--foreground);
+  }
+
+  .stack-tech-token:hover .stack-tech-token-label {
+    opacity: 1;
+  }
+
+  .dark .stack-tech-token:hover {
+    border-color: rgb(255 255 255 / 32%);
+    background-color: rgb(255 255 255 / 7.5%);
+    color: #fff;
+  }
 }
 
 /* About page: snap-scroll is handled by GSAP ScrollTrigger in use-snap-scroll.ts.
