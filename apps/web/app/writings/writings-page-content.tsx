@@ -22,18 +22,12 @@ function WritingTransitionLink({
   className,
   ariaLabel,
   onIntent,
-  onFirstClick,
-  requireSecondClick = false,
-  isArmed = false,
 }: {
   href: string;
   children: React.ReactNode;
   className?: string;
   ariaLabel?: string;
   onIntent?: () => void;
-  onFirstClick?: () => void;
-  requireSecondClick?: boolean;
-  isArmed?: boolean;
 }) {
   const router = useRouter();
 
@@ -46,13 +40,6 @@ function WritingTransitionLink({
       event.altKey ||
       event.button !== 0
     ) {
-      return;
-    }
-
-    if (requireSecondClick && !isArmed) {
-      event.preventDefault();
-      onIntent?.();
-      onFirstClick?.();
       return;
     }
 
@@ -118,13 +105,9 @@ function WritingHeading({ label, activeIndex }: { label: string; activeIndex: nu
 function WritingsSpotlight({
   writings,
   activeIndex,
-  isArmed,
-  onFirstClick,
 }: {
   writings: WritingPreview[];
   activeIndex: number;
-  isArmed: boolean;
-  onFirstClick: () => void;
 }) {
   if (writings.length === 0) return null;
 
@@ -146,9 +129,6 @@ function WritingsSpotlight({
             href={currentWriting.href}
             ariaLabel={`Open ${currentWriting.title}`}
             className="pointer-events-auto relative z-10 block"
-            requireSecondClick
-            isArmed={isArmed}
-            onFirstClick={onFirstClick}
           >
             <WritingThumbnail
               title={currentWriting.title}
@@ -174,16 +154,12 @@ function WritingsSpotlight({
 function WritingRow({
   writing,
   isActive,
-  isArmed,
   onIntent,
-  onFirstClick,
   index,
 }: {
   writing: WritingPreview;
   isActive: boolean;
-  isArmed: boolean;
   onIntent: () => void;
-  onFirstClick: () => void;
   index: number;
 }) {
   return (
@@ -192,9 +168,6 @@ function WritingRow({
         href={writing.href}
         ariaLabel={`Open ${writing.title}`}
         onIntent={onIntent}
-        onFirstClick={onFirstClick}
-        requireSecondClick
-        isArmed={isArmed}
         className={`group flex min-h-11 cursor-pointer select-none items-center gap-1.5 rounded-xl border px-1 py-0.5 text-[16px] leading-6 transition-[background-color,border-color,color,box-shadow] duration-200 ${
           isActive
             ? "border-foreground/12 bg-foreground/7 text-foreground shadow-[0_12px_32px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-white/10 dark:shadow-none"
@@ -218,7 +191,6 @@ function WritingRow({
 
 export function WritingsPageContent({ writings }: { writings: WritingPreview[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [armedIndex, setArmedIndex] = useState<number | null>(null);
   const listRef = useRef<HTMLUListElement | null>(null);
   const activeIndexRef = useRef(0);
   const maxIndex = Math.max(0, writings.length - 1);
@@ -232,7 +204,6 @@ export function WritingsPageContent({ writings }: { writings: WritingPreview[] }
     (nextIndex: number) => {
       const clamped = Math.max(0, Math.min(nextIndex, maxIndex));
       setActiveIndex(clamped);
-      setArmedIndex((current) => (current === clamped ? current : null));
       const target = listRef.current?.querySelector<HTMLLIElement>(`[data-writing-index="${clamped}"]`);
       target?.scrollIntoView({ block: "nearest", behavior: "smooth" });
     },
@@ -282,8 +253,6 @@ export function WritingsPageContent({ writings }: { writings: WritingPreview[] }
       <WritingsSpotlight
         writings={writings}
         activeIndex={safeActiveIndex}
-        isArmed={armedIndex === safeActiveIndex}
-        onFirstClick={() => setArmedIndex(safeActiveIndex)}
       />
 
       <section
@@ -303,9 +272,7 @@ export function WritingsPageContent({ writings }: { writings: WritingPreview[] }
               writing={writing}
               index={index}
               isActive={index === safeActiveIndex}
-              isArmed={index === armedIndex}
               onIntent={() => commitActiveIndex(index)}
-              onFirstClick={() => setArmedIndex(index)}
             />
           ))}
         </ul>
