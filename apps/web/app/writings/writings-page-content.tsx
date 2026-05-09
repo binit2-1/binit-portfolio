@@ -220,8 +220,13 @@ export function WritingsPageContent({ writings }: { writings: WritingPreview[] }
   const [activeIndex, setActiveIndex] = useState(0);
   const [armedIndex, setArmedIndex] = useState<number | null>(null);
   const listRef = useRef<HTMLUListElement | null>(null);
+  const activeIndexRef = useRef(0);
   const maxIndex = Math.max(0, writings.length - 1);
   const safeActiveIndex = Math.max(0, Math.min(activeIndex, maxIndex));
+
+  useEffect(() => {
+    activeIndexRef.current = safeActiveIndex;
+  }, [safeActiveIndex]);
 
   const commitActiveIndex = useCallback(
     (nextIndex: number) => {
@@ -233,6 +238,44 @@ export function WritingsPageContent({ writings }: { writings: WritingPreview[] }
     },
     [maxIndex],
   );
+
+  const moveActiveBy = useCallback(
+    (delta: number) => {
+      if (writings.length === 0) return;
+      commitActiveIndex(activeIndexRef.current + delta);
+    },
+    [commitActiveIndex, writings.length],
+  );
+
+  useEffect(() => {
+    const onDocumentKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.repeat) {
+        return;
+      }
+
+      const target = event.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if (event.key === "ArrowDown" || event.key === "ArrowRight") {
+        event.preventDefault();
+        moveActiveBy(1);
+      } else if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
+        event.preventDefault();
+        moveActiveBy(-1);
+      }
+    };
+
+    document.addEventListener("keydown", onDocumentKeyDown, { capture: true });
+    return () => document.removeEventListener("keydown", onDocumentKeyDown, { capture: true });
+  }, [moveActiveBy]);
 
   return (
     <>
@@ -251,6 +294,7 @@ export function WritingsPageContent({ writings }: { writings: WritingPreview[] }
         <ul
           ref={listRef}
           className="mx-auto w-full max-w-(--writing-content-width) space-y-0.5 outline-none"
+          tabIndex={0}
           aria-label="Writings list"
         >
           {writings.map((writing, index) => (

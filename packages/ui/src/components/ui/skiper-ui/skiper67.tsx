@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useSpring } from "framer-motion";
+import { AnimatePresence, motion, useIsPresent, useSpring } from "framer-motion";
 import { Play } from "lucide-react";
 import {
   MediaControlBar,
@@ -14,7 +14,7 @@ import {
   MediaVolumeRange,
 } from "media-chrome/react";
 import type { ComponentProps } from "react";
-import React, { type CSSProperties, useEffect, useRef, useState } from "react";
+import React, { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { cn } from "@repo/ui/lib/utils";
@@ -128,6 +128,7 @@ export type Skiper67Props = {
   type?: string;
   poster?: string;
   className?: string;
+  openSignal?: number;
 };
 
 const DEFAULT_SKIPER_VIDEO = "/showreel/skiper-ui-showreel.mp4";
@@ -189,9 +190,10 @@ function getYouTubeThumbnailUrl(videoId: string) {
 
 const MODAL_EXIT_DURATION_MS = 1000;
 
-export const Skiper67 = ({ src, mobileSrc, type, poster, className }: Skiper67Props) => {
+export const Skiper67 = ({ src, mobileSrc, type, poster, className, openSignal }: Skiper67Props) => {
   const [showVideoPopOver, setShowVideoPopOver] = useState(false);
   const [preferLightweightMedia, setPreferLightweightMedia] = useState(true);
+  const lastOpenSignalRef = useRef(0);
   const resolvedSrc = src?.trim() || DEFAULT_SKIPER_VIDEO;
   const resolvedMobileSrc = mobileSrc?.trim();
   const resolvedType = type?.trim() || "video/mp4";
@@ -222,14 +224,14 @@ export const Skiper67 = ({ src, mobileSrc, type, poster, className }: Skiper67Pr
     y.set(e.clientY - bounds.top);
   };
 
-  const openVideoPopOver = () => {
+  const openVideoPopOver = useCallback(() => {
     document.body.setAttribute("data-work-video-modal-open", "true");
     setShowVideoPopOver(true);
-  };
+  }, []);
 
-  const closeVideoPopOver = () => {
+  const closeVideoPopOver = useCallback(() => {
     setShowVideoPopOver(false);
-  };
+  }, []);
 
   const handlePreviewKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== "Enter" && event.key !== " ") return;
@@ -248,6 +250,20 @@ export const Skiper67 = ({ src, mobileSrc, type, poster, className }: Skiper67Pr
     mediaQuery.addEventListener("change", syncPreference);
 
     return () => mediaQuery.removeEventListener("change", syncPreference);
+  }, []);
+
+  useEffect(() => {
+    const signal = openSignal ?? 0;
+    if (!signal || signal === lastOpenSignalRef.current) return;
+
+    lastOpenSignalRef.current = signal;
+    openVideoPopOver();
+  }, [openSignal, openVideoPopOver]);
+
+  useEffect(() => {
+    return () => {
+      document.body.removeAttribute("data-work-video-modal-open");
+    };
   }, []);
 
   useEffect(() => {
@@ -347,6 +363,7 @@ const VideoPopOver = ({
 }) => {
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+  const isPresent = useIsPresent();
 
   useEffect(() => {
     setPortalContainer(document.body);
@@ -383,11 +400,46 @@ const VideoPopOver = ({
     "relative h-full w-full overflow-hidden bg-black shadow-[0_20px_60px_rgba(0,0,0,0.45)]";
   const mediaClassName = "h-full w-full object-contain";
 
+  const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const modalRoot = event.currentTarget.closest("[data-work-video-modal='true']") as HTMLElement | null;
+    let workIndex: number | null = null;
+
+    if (modalRoot) {
+      const previousPointerEvents = modalRoot.style.pointerEvents;
+      modalRoot.style.pointerEvents = "none";
+
+      const underlyingElement = document.elementFromPoint(event.clientX, event.clientY) as HTMLElement | null;
+      const projectRow = underlyingElement?.closest("[data-work-index]") as HTMLElement | null;
+      const parsedIndex = Number(projectRow?.dataset.workIndex);
+
+      modalRoot.style.pointerEvents = previousPointerEvents;
+
+      if (Number.isFinite(parsedIndex)) {
+        workIndex = parsedIndex;
+      }
+    }
+
+    closeVideoPopOver();
+
+    if (workIndex !== null) {
+      window.setTimeout(() => {
+        document.dispatchEvent(
+          new CustomEvent("work-project-click-through", {
+            detail: { index: workIndex },
+          }),
+        );
+      }, 0);
+    }
+  };
+
   if (!portalContainer) return null;
 
   return createPortal(
     <div
-      className="fixed inset-0 z-1000 isolate flex items-center justify-center p-4 sm:p-6"
+      className={cn(
+        "fixed inset-0 z-1000 isolate flex items-center justify-center p-4 sm:p-6",
+        isPresent ? "pointer-events-auto" : "pointer-events-none",
+      )}
       data-work-video-modal="true"
     >
       <motion.div
@@ -396,7 +448,7 @@ const VideoPopOver = ({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
         className="absolute inset-0 h-full w-full bg-background/28 backdrop-blur-xl"
-        onClick={closeVideoPopOver}
+        onClick={handleBackdropClick}
       ></motion.div>
       <div
         className={modalShellClassName}

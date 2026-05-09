@@ -9,7 +9,10 @@ type WorkProjectListProps = {
   projects: WorkProject[];
   activeIndex?: number;
   onActiveIndexChange?: (index: number) => void;
+  onProjectOpen?: () => void;
 };
+
+type WorkProjectClickThroughEvent = CustomEvent<{ index: number }>;
 
 function ProjectActionLink({
   href,
@@ -47,23 +50,49 @@ function ProjectActionLink({
 function WorkProjectRow({
   project,
   isActive,
+  isArmed,
   onMouseEnter,
+  onPress,
   index,
 }: {
   project: WorkProject;
   isActive: boolean;
+  isArmed: boolean;
   onMouseEnter: () => void;
+  onPress: () => void;
   index: number;
 }) {
+  const shouldIgnoreRowIntent = (target: EventTarget | null) =>
+    target instanceof HTMLElement && Boolean(target.closest("a, button"));
+
+  const handleClick = (event: React.MouseEvent<HTMLLIElement>) => {
+    if (shouldIgnoreRowIntent(event.target)) return;
+    onPress();
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLLIElement>) => {
+    if (shouldIgnoreRowIntent(event.target)) return;
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    onPress();
+  };
+
   return (
     <li
       data-work-index={index}
+      role="button"
+      tabIndex={0}
+      aria-current={isActive ? "true" : undefined}
+      aria-label={`${isArmed ? "Open video for" : "Select"} ${project.title}`}
       className={`group flex min-h-11 cursor-pointer select-none items-center gap-1.5 rounded-xl border px-1 py-0.5 text-[16px] leading-6 transition-[background-color,border-color,color,box-shadow] duration-200 ${
         isActive
           ? "border-foreground/12 bg-foreground/7 text-foreground shadow-[0_12px_32px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-white/10 dark:shadow-none"
           : "border-transparent text-foreground/70 hover:border-foreground/10 hover:bg-foreground/5 hover:text-foreground dark:hover:border-white/8 dark:hover:bg-white/5"
       }`}
       onMouseEnter={onMouseEnter}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
     >
       <p className="min-w-0 shrink pl-2.5 truncate whitespace-nowrap leading-6">
         <span className={isActive ? "font-medium text-foreground" : "font-medium text-foreground/90"}>
@@ -84,10 +113,17 @@ function WorkProjectRow({
   );
 }
 
-export function WorkProjectList({ projects, activeIndex: activeIndexProp, onActiveIndexChange }: WorkProjectListProps) {
+export function WorkProjectList({
+  projects,
+  activeIndex: activeIndexProp,
+  onActiveIndexChange,
+  onProjectOpen,
+}: WorkProjectListProps) {
   const [internalActiveIndex, setInternalActiveIndex] = useState(0);
+  const [armedIndex, setArmedIndex] = useState<number | null>(null);
   const listRef = useRef<HTMLUListElement | null>(null);
   const activeIndexRef = useRef(0);
+  const armedIndexRef = useRef<number | null>(null);
   const isControlled = typeof activeIndexProp === "number";
   const maxIndex = Math.max(0, projects.length - 1);
   const activeIndex = projects.length === 0 ? -1 : Math.max(0, Math.min(activeIndexProp ?? internalActiveIndex, maxIndex));
@@ -98,9 +134,13 @@ export function WorkProjectList({ projects, activeIndex: activeIndexProp, onActi
     }
   }, [activeIndex]);
 
+  useEffect(() => {
+    armedIndexRef.current = armedIndex;
+  }, [armedIndex]);
+
   const commitActiveIndex = useCallback(
     (nextIndex: number) => {
-      if (projects.length === 0) return;
+      if (projects.length === 0) return null;
 
       const clamped = Math.max(0, Math.min(nextIndex, maxIndex));
 
@@ -109,10 +149,46 @@ export function WorkProjectList({ projects, activeIndex: activeIndexProp, onActi
       }
 
       onActiveIndexChange?.(clamped);
+      setArmedIndex((current) => (current === clamped ? current : null));
       const target = listRef.current?.querySelector<HTMLLIElement>(`[data-work-index="${clamped}"]`);
       target?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+
+      return clamped;
     },
     [isControlled, maxIndex, onActiveIndexChange, projects.length],
+  );
+
+  const armProject = useCallback(
+    (nextIndex: number) => {
+      const clamped = commitActiveIndex(nextIndex);
+      if (clamped === null) return;
+
+      setArmedIndex(clamped);
+    },
+    [commitActiveIndex],
+  );
+
+  const openProject = useCallback(
+    (nextIndex: number) => {
+      const clamped = commitActiveIndex(nextIndex);
+      if (clamped === null) return;
+
+      setArmedIndex(clamped);
+      onProjectOpen?.();
+    },
+    [commitActiveIndex, onProjectOpen],
+  );
+
+  const pressProject = useCallback(
+    (nextIndex: number) => {
+      if (armedIndexRef.current === nextIndex && activeIndexRef.current === nextIndex) {
+        openProject(nextIndex);
+        return;
+      }
+
+      armProject(nextIndex);
+    },
+    [armProject, openProject],
   );
 
   const moveActiveBy = useCallback(
@@ -122,6 +198,18 @@ export function WorkProjectList({ projects, activeIndex: activeIndexProp, onActi
     },
     [commitActiveIndex, projects.length],
   );
+
+  useEffect(() => {
+    const onProjectClickThrough = (event: Event) => {
+      const nextIndex = (event as WorkProjectClickThroughEvent).detail?.index;
+      if (!Number.isFinite(nextIndex)) return;
+
+      armProject(nextIndex);
+    };
+
+    document.addEventListener("work-project-click-through", onProjectClickThrough);
+    return () => document.removeEventListener("work-project-click-through", onProjectClickThrough);
+  }, [armProject]);
 
   useEffect(() => {
     const onDocumentKeyDown = (event: KeyboardEvent) => {
@@ -170,7 +258,9 @@ export function WorkProjectList({ projects, activeIndex: activeIndexProp, onActi
           project={project}
           index={index}
           isActive={index === activeIndex}
+          isArmed={index === armedIndex}
           onMouseEnter={() => commitActiveIndex(index)}
+          onPress={() => pressProject(index)}
         />
       ))}
     </ul>

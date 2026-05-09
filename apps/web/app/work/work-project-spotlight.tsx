@@ -7,9 +7,10 @@ import { WorkProjectVideoPlayer } from "./work-project-video-player";
 type WorkProjectSpotlightProps = {
   projects: WorkProject[];
   activeIndex: number;
+  openSignal?: number;
 };
 
-export function WorkProjectSpotlight({ projects, activeIndex }: WorkProjectSpotlightProps) {
+export function WorkProjectSpotlight({ projects, activeIndex, openSignal }: WorkProjectSpotlightProps) {
   if (projects.length === 0) return null;
 
   const currentProject = projects[Math.max(0, Math.min(activeIndex, projects.length - 1))];
@@ -27,7 +28,7 @@ export function WorkProjectSpotlight({ projects, activeIndex }: WorkProjectSpotl
       <div className="absolute inset-0 z-[100]">
         <div className={spotlightGridClassName}>
           <div className="pointer-events-auto relative z-10">
-            <WorkProjectVideoPlayer video={currentProject.video} />
+            <WorkProjectVideoPlayer video={currentProject.video} openSignal={openSignal} />
           </div>
           <div aria-hidden />
         </div>

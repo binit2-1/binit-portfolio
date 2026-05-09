@@ -7,6 +7,7 @@ import type { WorkProjectVideoSource } from "./work-project-types";
 type WorkProjectVideoPlayerProps = {
   video?: WorkProjectVideoSource;
   className?: string;
+  openSignal?: number;
 };
 
 function normalizeVideo(video?: WorkProjectVideoSource) {
@@ -21,7 +22,7 @@ function normalizeVideo(video?: WorkProjectVideoSource) {
   };
 }
 
-export function WorkProjectVideoPlayer({ video, className }: WorkProjectVideoPlayerProps) {
+export function WorkProjectVideoPlayer({ video, className, openSignal }: WorkProjectVideoPlayerProps) {
   const source = normalizeVideo(video);
   const wrapperClassName = "w-full max-w-[12rem] self-end md:max-w-[13rem]";
 
@@ -33,6 +34,7 @@ export function WorkProjectVideoPlayer({ video, className }: WorkProjectVideoPla
         mobileSrc={source.mobileSrc}
         type={source.type}
         poster={source.poster}
+        openSignal={openSignal}
       />
     </div>
   );

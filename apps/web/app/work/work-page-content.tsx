@@ -12,6 +12,7 @@ type WorkPageContentProps = {
 
 export function WorkPageContent({ projects, isScrollable }: WorkPageContentProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [videoOpenSignal, setVideoOpenSignal] = useState(0);
   const maxIndex = Math.max(0, projects.length - 1);
   const safeActiveIndex = projects.length === 0 ? -1 : Math.max(0, Math.min(activeIndex, maxIndex));
 
@@ -23,9 +24,13 @@ export function WorkPageContent({ projects, isScrollable }: WorkPageContentProps
     [maxIndex, projects.length],
   );
 
+  const handleProjectOpen = useCallback(() => {
+    setVideoOpenSignal((current) => current + 1);
+  }, []);
+
   return (
     <>
-      <WorkProjectSpotlight projects={projects} activeIndex={safeActiveIndex} />
+      <WorkProjectSpotlight projects={projects} activeIndex={safeActiveIndex} openSignal={videoOpenSignal} />
 
       <section
         className={`mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6 ${isScrollable ? "h-dvh overflow-y-auto" : "h-auto overflow-visible"}`}
@@ -36,6 +41,7 @@ export function WorkPageContent({ projects, isScrollable }: WorkPageContentProps
           projects={projects}
           activeIndex={safeActiveIndex}
           onActiveIndexChange={handleActiveIndexChange}
+          onProjectOpen={handleProjectOpen}
         />
       </section>
     </>
