@@ -20,7 +20,8 @@ If you stick to a standard `onChange` listener, the execution looks like this:
 
 By the time the user finishes typing "Laptop," you’ve fired six redundant network requests in under a second.
 
-![Debouncing search preview](/videos/writings/debouncing-mechanics/not-debounce.webm "Debouncing mechanics") {autoplay loop muted caption=false}
+![Debouncing search preview](/videos/writings/debouncing-mechanics/not-debounce.webm "Debouncing mechanics")
+<!-- media: autoplay loop muted caption=false -->
 
 The above video showcases the problem: every keystroke triggers an API call, leading to a flood of requests that can overwhelm your backend and degrade user experience.
 
@@ -39,7 +40,8 @@ This way, if the user types "Laptop" quickly, we only make one API call after th
 ### How Giants Do It
 
 Let us see how it works through an example from [Flipkart](https://www.flipkart.com/).
-![Flipkart debounced search](/videos/writings/debouncing-mechanics/flipkart-debounced.webm "Flipkart debounced search") {autoplay loop muted caption=false}
+![Flipkart debounced search](/videos/writings/debouncing-mechanics/flipkart-debounced.webm "Flipkart debounced search")
+<!-- media: autoplay loop muted caption=false -->
 
 See how the search results only update after the user finishes typing? That’s debouncing in action. Flipkart waits for a pause in typing before sending the API request, ensuring a smoother user experience and reducing unnecessary server load.
 
@@ -185,13 +187,15 @@ export default App;
 ```
 
 This is how it looks like now
-![Implemented debounced search](/videos/writings/debouncing-mechanics/debounce-react.webm "Implemented debounced search") {autoplay loop muted caption=false}
+![Implemented debounced search](/videos/writings/debouncing-mechanics/debounce-react.webm "Implemented debounced search")
+<!-- media: autoplay loop muted caption=false -->
 
 You can see that the search results only update after the user finishes typing, and we are not making unnecessary API calls for every keystroke. This is the power of debouncing in action.
 
 The timer starts after each input change and counts down from 300ms. If the user types again before the timer finishes, the cleanup function cancels the old timer and starts a fresh one. If the timer reaches the end, we make the API call for the latest query.
 
-![Debounced search timer](/videos/writings/debouncing-mechanics/debounce-with-timer.webm "Debounced search timer") {autoplay loop muted caption=false}
+![Debounced search timer](/videos/writings/debouncing-mechanics/debounce-with-timer.webm "Debounced search timer")
+<!-- media: autoplay loop muted caption=false -->
 
 
 ## Wrapping Up: The Value of Patience

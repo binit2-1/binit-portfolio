@@ -1,0 +1,530 @@
+---
+title: "Auth in Next.js + Go made easier"
+subtitle: "Set up secure authentication in your Next.js + Go app in 5 minutes using Authingo."
+summary: "A practical guide to building authentication the right way with Authingo. Learn how to wire a Go backend, PostgreSQL sessions, HttpOnly cookies, and a Next.js frontend with the Authingo React SDK."
+date: 2026-05-13
+thumbnail: "/images/writings/auth-with-authingo/authingo.png"
+label: "AUTHENTICATION"
+---
+
+## Context
+
+Authentication is a critical component of any web application, but it can be complex and time-consuming to implement correctly. In this guide, we will walk through how to set up secure authentication in a Next.js + Go application using [Authingo](https://authingo.binitt.dev/), a powerful authentication solution that simplifies the process.
+
+## How Authingo makes authentication easier for Next.js + Go apps
+
+- Go backend owns auth
+- PostgreSQL stores users and sessions
+- Browser only gets HttpOnly cookies
+- React/Next.js app gets a clean SDK for state and actions
+
+
+## What are we building?
+
+In this guide, we will build a simple authentication flow that includes:
+
+- Next.js frontend
+- Go backend
+- PostgreSQL database
+- Sign up
+- Sign in
+- Check session
+- Protect a /api/me route
+- Sign out
+
+## Setup
+
+In this guide we will be following the [Authingo Docs](https://authingo.binitt.dev/docs)
+
+### Initialize a new project
+
+I will be creating a new Next.js project, but you can use an existing one as well. Most React projects follow similar steps.
+
+```bash
+npx create-next-app@latest <project-name>
+```
+
+### Create a Server directory in the root of your project
+
+```bash
+mkdir server
+cd server
+```
+
+### Initialize a new Go module
+
+```bash
+go mod init <module-name>
+```
+
+### Install Authingo Go SDK, PostgreSQL driver, and godotenv
+
+We will be following the [docs](https://authingo.binitt.dev/docs/get-started/installation) to install the Go SDK. Run the following command in your terminal:
+
+```bash
+go get github.com/binit2-1/authingo
+go get github.com/binit2-1/authingo/adapters/postgres
+go get github.com/jackc/pgx/v5/stdlib
+go get github.com/joho/godotenv
+```
+
+Since we will be using PostgreSQL as our DB, we installed the pgx driver as well. We also installed `godotenv` because `main.go` loads the `.env` file.
+
+### Set up PostgreSQL
+
+First of all we need to have a PostgreSQL database up and running. You can use any PostgreSQL service or run it locally using Docker.
+I will set up a docker compose file to run PostgreSQL locally.
+
+Create a `docker-compose.yml` file in the root of your project with the following content:
+
+```yaml 
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: authingo_user
+      POSTGRES_PASSWORD: authingo_password
+      POSTGRES_DB: authingo_db 
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:
+```
+Check if any other service is running on port 5432, if yes just down the service and run the following command to start the PostgreSQL container:
+
+```bash
+docker compose up -d
+```
+
+### Create a .env file in the server directory
+Create a `.env` file in the `server` directory with the following content:
+
+```env
+DATABASE_URL=<connection_string>
+```
+
+Replace `<connection_string>` with the connection string for your PostgreSQL database. For example, if you are running PostgreSQL locally with the credentials we set in the docker compose file, your connection string would look like this:
+
+```env
+DATABASE_URL=postgres://authingo_user:authingo_password@localhost:5432/authingo_db?sslmode=disable
+```
+
+### Create a main.go file in the server directory
+
+Source: [Authingo Docs](https://authingo.binitt.dev/docs/get-started/installation)
+
+```go
+package main
+
+import (
+	"context"
+	"database/sql"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/binit2-1/authingo"
+	"github.com/binit2-1/authingo/adapters/postgres"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/joho/godotenv"
+)
+
+func main() {
+	godotenv.Load()
+	db, err := sql.Open("pgx", os.Getenv("DATABASE_URL"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := db.PingContext(ctx); err != nil {
+		log.Fatal(err)
+	}
+
+	auth := authingo.New(authingo.Options{
+		Store: postgres.NewAdapter(db),
+	})
+
+	mux := http.NewServeMux()
+	mux.Handle("/api/auth/", http.StripPrefix("/api/auth", auth.Handler()))
+
+	log.Println("listening on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", mux))
+}
+
+
+```
+
+At this point, our Go server knows how to connect to PostgreSQL and mount the Authingo routes, but the database still does not have the required `users` and `sessions` tables.
+
+### Set up CORS
+
+Since the Next.js app will call the Go backend from `http://localhost:3000`, we need to allow that origin and include credentials for HttpOnly cookies.
+
+Source: [Authingo Docs - CORS](https://authingo.binitt.dev/docs/authentication/server)
+
+Add the following middleware in `main.go`:
+
+```go
+func cors(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Authingo-Client")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+```
+
+Then wrap your mux with the CORS middleware:
+
+```go
+log.Fatal(http.ListenAndServe(":8080", cors(mux)))
+```
+
+Authingo provides a local helper called `postgres.ApplySchema(ctx, db)`, but for this guide we will use the production-friendly approach: creating an explicit migration.
+
+### Set up database migrations
+
+Source: [Authingo Docs - Databases](https://authingo.binitt.dev/docs/databases/postgres-adapter)
+
+
+Create a `migrations` directory in the `server` directory and create a new file called `000001_create_authingo_tables.up.sql` with the following content:
+
+```sql
+CREATE TABLE IF NOT EXISTS users (
+    id VARCHAR(255) PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    email_verified BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+    id VARCHAR(255) PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token VARCHAR(255) UNIQUE NOT NULL,
+    refresh_token VARCHAR(255) UNIQUE NOT NULL,
+    refresh_expires_at TIMESTAMPTZ NOT NULL,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
+CREATE INDEX IF NOT EXISTS idx_sessions_refresh_token ON sessions(refresh_token);
+CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions(expires_at);
+CREATE INDEX IF NOT EXISTS idx_sessions_refresh_expires_at ON sessions(refresh_expires_at);
+```
+After creating the file, you can use any migration tool to run the migration. I will be using golang-migrate for this.
+
+You can directly run the migration using the following command:
+
+```bash
+migrate -path ./migrations -database "postgres://authingo_user:authingo_password@localhost:5432/authingo_db?sslmode=disable" up
+```
+
+using the golang-migrate tool.
+
+### Start the Go server
+
+```bash
+go run main.go
+```
+
+At this point, our Go server is up and running with Authingo and PostgreSQL. We can now move on to setting up the Next.js frontend to interact with our Go backend for authentication.
+
+### Set up Next.js frontend
+
+Source: [Authingo Docs - React SDK](https://authingo.binitt.dev/docs/authentication/react-sdk)
+
+First, we need to install the Authingo React SDK in our Next.js project. Run the following command in your terminal:
+
+```bash
+npm install @authingo/react
+```
+
+After that we set up two simple pages in our Next.js app: `dashboard/page.tsx` and the `/page.tsx`
+- `dashboard/page.tsx` will be a protected page that only authenticated users can access.
+- `/page.tsx` will be the landing page where users can sign up or sign in.
+
+I won't be showing you the UI just the logic to wire up the frontend with the backend using the Authingo React SDK. You can style the pages as you like.
+
+### Landing page(`app/page.tsx`)
+
+Core focus here is how to wire up the Authingo sign in and sign up functions with the React SDK. We will create two simple forms for sign up and sign in, and use the Authingo React SDK to handle the authentication logic.
+
+If you want you can create a different route for sign up and sign in, I have taken different forms in different routes.
+
+### Frontend setup
+
+You are left with three essential steps.
+
+
+- create a providers.tsx file in the root of your app directory to set up the Authingo provider
+
+```tsx
+"use client";
+
+import { AuthProvider } from "@authingo/react";
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthProvider baseURL="http://localhost:8080/api/auth">
+      {children}
+    </AuthProvider>
+  );
+}
+```
+
+- wrap your app with the Authingo provider to make the authentication state and actions available throughout your app
+
+```tsx
+import { Providers } from "./providers";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  );
+}
+```
+
+- create a `lib` folder in the project root and add `auth-client.ts` in `lib/auth-client.ts` to create a custom client that will use the Authingo React SDK to provide authentication state and actions to our components
+
+```ts
+import { createAuthClient } from "@authingo/react";
+
+export const authClient = createAuthClient({
+  baseURL: "http://localhost:8080/api/auth",
+});
+
+export const { signIn, signUp, signOut, useSession } = authClient;
+```
+
+The client exposes:
+
+
+| Method | Calls | Input |
+| --- | --- | --- |
+| `authClient.signIn.email()` | `POST /sign-in` | `{ email, password }` |
+| `authClient.signUp.email()` | `POST /sign-up` | `{ email, password, name }` |
+| `authClient.signOut()` | `POST /sign-out` | none |
+| `authClient.useSession()` | `GET /session` | none |
+
+
+### Sign In Form
+
+In the sign in form code file you can use this `useSignInWithEmail` hook:
+
+```tsx
+"use client";
+
+import { authClient } from "@/lib/auth-client";
+import { useAuth } from "@authingo/react";
+
+type SignInInput = {
+  email: string;
+  password: string;
+};
+
+export function useSignInWithEmail() {
+  const { checkSession } = useAuth();
+
+  return async function signInWithEmail(input: SignInInput) {
+    const result = await authClient.signIn.email(input);
+
+    if (!result.error) {
+      await checkSession();
+    }
+
+    return result;
+  };
+}
+```
+
+### Sign Up Form
+
+In the sign up form code file you can use this `useSignUpWithEmail` hook:
+
+```tsx
+"use client";
+
+import { authClient } from "@/lib/auth-client";
+import { useAuth } from "@authingo/react";
+
+type SignUpInput = {
+  email: string;
+  password: string;
+  name: string;
+};
+
+export function useSignUpWithEmail() {
+  const { checkSession } = useAuth();
+
+  return async function signUpWithEmail(input: SignUpInput) {
+    const result = await authClient.signUp.email(input);
+
+    if (!result.error) {
+      await checkSession();
+    }
+
+    return result;
+  };
+}
+```
+You can also use
+
+```tsx 
+const { isLoading, error, checkSession } = useAuth();
+```
+to get the authentication state and actions in your components. Error and loading states are handled by the React SDK, so you can use them to show error messages or loading indicators in your UI.
+
+```tsx
+const { user } =  useAuth();
+```
+
+These two are also there to get the current authenticated user and to sign out the user respectively.
+
+After all of these are done, you are ready to sign up for your account.
+
+Now in dashboard we will render the User name using 
+
+```tsx
+const {user} = useAuth();
+```
+
+so that after we sign In we can see the user name in the dashboard.
+
+we can just add this line wherever we want to show the user name in our app.
+
+```tsx
+<p>Welcome, {user?.name}!</p>
+```
+
+something like this. and it will appear.
+
+### Logout
+
+To sign Out the user, you can use the `signOut` method from the Authingo React SDK. You can create a simple logout button in the dashboard page that calls the `handleLogout` function when clicked.
+
+import the `authClient` and `useRouter` from Next.js in your dashboard page:
+
+```tsx
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+```
+
+
+Make handleLogout function to log out the user and redirect to the landing page:
+
+```tsx
+const handleLogout = async () => {
+  await authClient.signOut();
+  router.push("/");
+};
+```
+
+### Protecting routes
+
+Now we make the dashboard page protected, so that only authenticated users can access it. We will use the useAuth hook to read the current user and loading state from the Authingo React SDK to check if the user is authenticated, and if not we will redirect them to the landing page.
+
+```tsx
+import {useEffect} from "react";
+import { authClient } from "../lib/auth-client";
+import { useAuth } from "@authingo/react";
+import { useRouter } from "next/navigation";
+```
+
+then we check if the user is authenticated in a `useEffect` hook and redirect if not:
+
+```tsx
+const router = useRouter(); 
+const {user, isLoading} = useAuth();
+
+useEffect(() => {
+  if (!isLoading && !user) {
+    router.push("/");
+  }
+}, [user, isLoading, router]);
+```
+
+and your dashboard page is now protected! Only authenticated users will be able to access it, and unauthenticated users will be redirected to the landing page.
+
+### Protecting API routes
+
+
+Protecting API routes is simple with Authingo. For this guide, we will protect a `/api/me` route that returns the current authenticated user's information.
+
+Authingo checks the HttpOnly session cookie sent by the browser. If the session is valid, the request continues and the user is added to the request context. If the session cookie is missing, invalid, or expired, Authingo returns a `401 Unauthorized` response.
+
+in `main.go`:
+
+These packages should be imported at the top of the file:
+
+```go
+import (
+	"encoding/json"
+	"net/http"
+
+	"github.com/binit2-1/authingo"
+)
+```
+
+then add the following handler for the `/api/me` route:
+
+```go 
+mux.Handle("/api/me", auth.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value(authingo.UserContextKey).(*authingo.User)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]any{
+		"user": user,
+	})
+})))
+```
+
+Here, `auth.RequireAuth(...)` wraps the `/api/me` handler. Before our handler runs, Authingo checks the session cookie and verifies the session from PostgreSQL. Once the session is valid, we can read the authenticated user from the request context.
+
+Now, if you try to access `/api/me` from the browser or using a tool like Postman without being authenticated, you will get a `401 Unauthorized` response. But if you are signed in and have a valid session cookie, you will get a JSON response with the user's information.
+
+I will showcase this using Curl and a cookie jar file that stores the session cookie after signing in.
+
+
+### Videos
+
+Here are two quick demos of the complete flow.
+
+The first video shows the frontend flow: signing up, signing in, entering the protected dashboard, refreshing the page, and signing out.
+
+![Authingo frontend authentication flow](/videos/writings/auth-with-authingo/authingo-test-sign-in.webm "Authingo frontend authentication flow")
+<!-- media: autoplay loop muted caption=false -->
+
+The second video tests the protected `/api/me` route with curl. We first call the route without a session and get `401 Unauthorized`, then sign in with curl, store the session cookie in a cookie jar, call `/api/me` successfully, sign out, and confirm the route is protected again.
+
+![Authingo curl protected route test](/videos/writings/auth-with-authingo/curl-reqs.webm "Authingo curl protected route test")
+<!-- media: autoplay loop muted caption=false -->
+
+## Conclusion
+
+Voila your authentication system is ready in your Next.js + Go app with Authingo! You have a secure authentication flow with a Go backend, PostgreSQL sessions, HttpOnly cookies, and a Next.js frontend using the Authingo React SDK.
