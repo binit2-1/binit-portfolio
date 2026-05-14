@@ -9,6 +9,7 @@ type MarkdownBlock =
   | { type: "paragraph"; text: string }
   | { type: "code"; language: string; code: string }
   | { type: "list"; items: string[] }
+  | { type: "table"; headers: string[]; rows: string[][] }
   | { type: "quote"; text: string }
   | {
       type: "media";
@@ -20,7 +21,7 @@ type MarkdownBlock =
     }
   | { type: "rule" };
 
-const blockStartPattern = /^(#{2,4}\s|```|-\s|>\s|---\s*$|!\[[^\]]*\]\()/;
+const blockStartPattern = /^(?:#{2,4}\s|```|-\s|>\s|---\s*$|!\[[^\]]*\]\(|\|)/;
 const codeTokenPattern =
   /(\/\/.*$|#.*$|"[^"]*"|'[^']*'|`[^`]*`|\b(?:async|await|break|case|class|const|continue|default|else|export|false|for|from|function|if|import|interface|let|new|null|return|string|true|type|undefined|while)\b|\b\d+(?:\.\d+)?\b|<\/?[A-Za-z][^>\s]*|[{}()[\].,:;=<>])/g;
 const shellTokenPattern =
@@ -67,6 +68,50 @@ function isVideoSource(src: string, attrs: Record<string, string>) {
 
 function isSupportedMediaSource(src: string) {
   return videoExtensionPattern.test(src) || imageExtensionPattern.test(src);
+}
+
+function splitTableRow(line: string) {
+  const trimmed = line.trim().replace(/^\|/, "").replace(/\|$/, "");
+  const cells: string[] = [];
+  let cell = "";
+  let inCode = false;
+
+  for (let index = 0; index < trimmed.length; index += 1) {
+    const char = trimmed[index];
+    const nextChar = trimmed[index + 1];
+
+    if (char === "\\" && nextChar === "|") {
+      cell += "|";
+      index += 1;
+      continue;
+    }
+
+    if (char === "`") {
+      inCode = !inCode;
+      cell += char;
+      continue;
+    }
+
+    if (char === "|" && !inCode) {
+      cells.push(cell.trim());
+      cell = "";
+      continue;
+    }
+
+    cell += char;
+  }
+
+  cells.push(cell.trim());
+
+  return cells;
+}
+
+function isTableDivider(line: string) {
+  if (!line.includes("|")) return false;
+
+  const cells = splitTableRow(line);
+
+  return cells.length > 0 && cells.every((cell) => /^:?-{3,}:?$/.test(cell.trim()));
 }
 
 function parseBlocks(content: string): MarkdownBlock[] {
@@ -140,6 +185,21 @@ function parseBlocks(content: string): MarkdownBlock[] {
         text: heading[2].trim(),
       });
       index += 1;
+      continue;
+    }
+
+    const nextLine = lines[index + 1];
+    if (line.includes("|") && nextLine?.includes("|") && isTableDivider(nextLine)) {
+      const headers = splitTableRow(line);
+      const rows: string[][] = [];
+      index += 2;
+
+      while (index < lines.length && lines[index].trim() && lines[index].includes("|")) {
+        rows.push(splitTableRow(lines[index]));
+        index += 1;
+      }
+
+      blocks.push({ type: "table", headers, rows });
       continue;
     }
 
@@ -446,6 +506,42 @@ function CodeBlock({ language, code }: { language: string; code: string }) {
   );
 }
 
+function WritingTableBlock({ headers, rows }: { headers: string[]; rows: string[][] }) {
+  return (
+    <div className="my-7 overflow-x-auto rounded-md border border-border/55 bg-foreground/[0.025] dark:border-white/8 dark:bg-white/[0.035]">
+      <table className="min-w-[34rem] w-full border-collapse text-left text-sm leading-6">
+        <thead>
+          <tr className="border-b border-border/55 bg-foreground/[0.035] dark:border-white/8 dark:bg-white/[0.045]">
+            {headers.map((header, headerIndex) => (
+              <th
+                key={`${header}-${headerIndex}`}
+                scope="col"
+                className="px-4 py-3 font-medium text-foreground"
+              >
+                {renderInline(header)}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, rowIndex) => (
+            <tr
+              key={rowIndex}
+              className="border-b border-border/45 last:border-b-0 dark:border-white/8"
+            >
+              {headers.map((_, cellIndex) => (
+                <td key={cellIndex} className="px-4 py-3 align-top text-foreground/76">
+                  {renderInline(row[cellIndex] ?? "")}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function WritingImageBlock({
   src,
   alt,
@@ -582,6 +678,10 @@ export function WritingMdxContent({ content }: { content: string }) {
 
         if (block.type === "code") {
           return <CodeBlock key={index} language={block.language} code={block.code} />;
+        }
+
+        if (block.type === "table") {
+          return <WritingTableBlock key={index} headers={block.headers} rows={block.rows} />;
         }
 
         if (block.type === "media") {
