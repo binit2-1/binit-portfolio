@@ -35,6 +35,17 @@ interface GithubContributionData {
   totalContributions: number;
 }
 
+interface GithubContributionsApiResponse {
+  contributions: Array<{
+    date: string;
+    count: number;
+    level: 0 | 1 | 2 | 3 | 4;
+  }>;
+  total: {
+    lastYear: number;
+  };
+}
+
 export interface GithubCalendarProps {
   username: string;
   variant?: "default" | "city-lights" | "minimal";
@@ -117,6 +128,29 @@ function legacyLevelClass(
   return schemas[schema][level];
 }
 
+function normalizeContributions(response: GithubContributionsApiResponse): GithubContributionData {
+  const levelNames: ContributionDay["contributionLevel"][] = [
+    "NONE",
+    "FIRST_QUARTILE",
+    "SECOND_QUARTILE",
+    "THIRD_QUARTILE",
+    "FOURTH_QUARTILE",
+  ];
+  const days = response.contributions.map((day) => ({
+    color: "",
+    contributionCount: day.count,
+    contributionLevel: levelNames[day.level],
+    date: day.date,
+  }));
+
+  return {
+    contributions: Array.from({ length: Math.ceil(days.length / 7) }, (_, index) =>
+      days.slice(index * 7, index * 7 + 7),
+    ),
+    totalContributions: response.total.lastYear,
+  };
+}
+
 export function GithubCalendar({
   username,
   variant = "default",
@@ -134,12 +168,12 @@ export function GithubCalendar({
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`https://github-contributions-api.deno.dev/${username}.json`);
+        const response = await fetch(`https://github-contributions-api.jogruber.de/v4/${username}?y=last`);
         if (!response.ok) {
           throw new Error("Failed to fetch GitHub data");
         }
-        const jsonData = (await response.json()) as GithubContributionData;
-        setData(jsonData);
+        const jsonData = (await response.json()) as GithubContributionsApiResponse;
+        setData(normalizeContributions(jsonData));
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
