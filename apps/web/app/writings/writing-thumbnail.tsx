@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
+import { cn } from "@repo/ui/lib/utils";
 
 type WritingThumbnailProps = {
   title: string;
@@ -23,7 +24,10 @@ export function WritingThumbnail({
 
   return (
     <div
-      className={`relative aspect-video w-full overflow-hidden rounded-sm border border-white/10 bg-[#171717] shadow-[0_10px_40px_rgba(0,0,0,0.32)] ${className}`}
+      className={cn(
+        "relative aspect-video w-full overflow-hidden rounded-sm border border-white/10 bg-[#171717] shadow-[0_10px_40px_rgba(0,0,0,0.32)]",
+        className,
+      )}
       style={style}
     >
       {hasThumbnail ? (

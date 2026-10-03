@@ -1,7 +1,9 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { CodeBlock } from "@/components/code-block";
+import { CodeBlockCommand } from "@/components/code-block-command";
+import { convertNpmCommand, isPackageManagerCommand } from "@/lib/package-managers";
 import { createHeadingIdFactory } from "@/lib/writing-headings";
-import { WritingCopyButton } from "./writing-copy-button";
 import { WritingVideoPlayer, type WritingVideoSource } from "./writing-video-player";
 
 type MarkdownBlock =
@@ -22,10 +24,6 @@ type MarkdownBlock =
   | { type: "rule" };
 
 const blockStartPattern = /^(?:#{2,4}\s|```|-\s|>\s|---\s*$|!\[[^\]]*\]\(|\|)/;
-const codeTokenPattern =
-  /(\/\/.*$|#.*$|"[^"]*"|'[^']*'|`[^`]*`|\b(?:async|await|break|case|class|const|continue|default|else|export|false|for|from|function|if|import|interface|let|new|null|return|string|true|type|undefined|while)\b|\b\d+(?:\.\d+)?\b|<\/?[A-Za-z][^>\s]*|[{}()[\].,:;=<>])/g;
-const shellTokenPattern =
-  /(#.*$|"[^"]*"|'[^']*'|`[^`]*`|\$\([^)]+\)|\$\w+|--?[\w-]+|&&|\|\||[|;=]|[@A-Za-z0-9_./-]+(?:@[\w.-]+)?|\S+)/g;
 const inlineTokenPattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g;
 const mediaBlockPattern = /^!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]+)")?\)\s*(?:\{([^}]*)\})?\s*$/;
 const mediaOptionsCommentPattern = /^(?:\{\/\*|<!--)\s*media:?\s*([\s\S]*?)\s*(?:\*\/\}|-->)\s*$/;
@@ -257,7 +255,7 @@ function renderInline(text: string) {
 
     if (token.startsWith("`")) {
       nodes.push(
-        <code key={`${token}-${match.index}`} className="rounded bg-foreground/8 px-1.5 py-0.5 font-mono text-[0.9em] text-foreground/85">
+        <code key={`${token}-${match.index}`} className="rounded-md bg-code px-1.5 py-0.5 font-mono text-[0.875em] text-foreground inset-ring-1 inset-ring-border">
           {token.slice(1, -1)}
         </code>,
       );
@@ -274,7 +272,7 @@ function renderInline(text: string) {
           <a
             key={`${token}-${match.index}`}
             href={link[2]}
-            className="text-foreground underline decoration-foreground/25 underline-offset-4 transition-colors hover:decoration-foreground/55"
+            className="text-foreground underline decoration-muted-foreground/50 decoration-dotted underline-offset-4 transition-colors hover:decoration-foreground"
             target={link[2].startsWith("http") ? "_blank" : undefined}
             rel={link[2].startsWith("http") ? "noreferrer" : undefined}
           >
@@ -392,126 +390,12 @@ function getImageLoadingStrategy(src: string) {
   };
 }
 
-function isShellLanguage(language: string) {
-  return ["bash", "sh", "shell", "zsh", "terminal", "console"].includes(language.toLowerCase());
-}
-
-function getShellTokenClassName(token: string, tokenIndex: number) {
-  if (token.startsWith("#")) return "text-foreground/38";
-  if (token.startsWith('"') || token.startsWith("'") || token.startsWith("`")) return "text-[#FFB088]";
-  if (token.startsWith("$")) return "text-[#FFB088]";
-  if (token.startsWith("-")) return "text-[#FF9A63]";
-  if (/^(?:&&|\|\||[|;=])$/.test(token)) return "text-[#FF5800]/55";
-  if (/^(?:npm|pnpm|yarn|bun|deno|npx|node|git|vite)$/.test(token)) return "text-[#FF7A2F]";
-  if (tokenIndex === 1 && /^(?:create|install|add|run|init|dev|build|dlx|exec)$/.test(token)) {
-    return "text-[#FF9A63]";
-  }
-  if (token.includes("@")) return "text-[#FFB088]";
-
-  return "text-foreground/80";
-}
-
-function highlightShellLine(line: string, lineIndex: number) {
-  const nodes: ReactNode[] = [];
-  let lastIndex = 0;
-  let tokenIndex = 0;
-
-  for (const match of line.matchAll(shellTokenPattern)) {
-    if (match.index > lastIndex) {
-      nodes.push(line.slice(lastIndex, match.index));
-    }
-
-    const token = match[0];
-    const className = getShellTokenClassName(token, tokenIndex);
-
-    nodes.push(
-      <span key={`${lineIndex}-${match.index}-${token}`} className={className}>
-        {token}
-      </span>,
-    );
-
-    lastIndex = match.index + token.length;
-    tokenIndex += 1;
-  }
-
-  if (lastIndex < line.length) {
-    nodes.push(line.slice(lastIndex));
-  }
-
-  return nodes;
-}
-
-function highlightCodeLine(line: string, lineIndex: number, language: string) {
-  if (isShellLanguage(language)) {
-    return highlightShellLine(line, lineIndex);
-  }
-
-  const nodes: ReactNode[] = [];
-  let lastIndex = 0;
-
-  for (const match of line.matchAll(codeTokenPattern)) {
-    if (match.index > lastIndex) {
-      nodes.push(line.slice(lastIndex, match.index));
-    }
-
-    const token = match[0];
-    let className = "text-foreground/80";
-
-    if (token.startsWith("//") || token.startsWith("#")) {
-      className = "text-foreground/38";
-    } else if (token.startsWith('"') || token.startsWith("'") || token.startsWith("`")) {
-      className = "text-[#FFB088]";
-    } else if (/^\d/.test(token)) {
-      className = "text-[#FF9A63]";
-    } else if (/^<\/?[A-Za-z]/.test(token)) {
-      className = "text-[#FF8A45]";
-    } else if (/^[{}()[\].,:;=<>]$/.test(token)) {
-      className = "text-[#FF5800]/45";
-    } else {
-      className = "text-[#FF7A2F]";
-    }
-
-    nodes.push(
-      <span key={`${lineIndex}-${match.index}-${token}`} className={className}>
-        {token}
-      </span>,
-    );
-
-    lastIndex = match.index + token.length;
-  }
-
-  if (lastIndex < line.length) {
-    nodes.push(line.slice(lastIndex));
-  }
-
-  return nodes;
-}
-
-function CodeBlock({ language, code }: { language: string; code: string }) {
-  const lines = code.split("\n");
-
-  return (
-    <figure className="relative my-7 overflow-hidden rounded-md border border-border/55 bg-foreground/4 shadow-[0_16px_50px_rgba(0,0,0,0.10)] dark:border-white/8 dark:bg-white/4.5">
-      <WritingCopyButton value={code} />
-      <pre className="overflow-x-auto px-5 py-5 pr-14 text-[13px] leading-6 sm:px-6 sm:pr-16">
-        <code className="font-mono" data-language={language}>
-          {lines.map((line, lineIndex) => (
-            <span key={lineIndex} className="block min-w-0 whitespace-pre">
-              {highlightCodeLine(line, lineIndex, language)}
-            </span>
-          ))}
-        </code>
-      </pre>
-    </figure>
-  );
-}
-
 function WritingTableBlock({ headers, rows }: { headers: string[]; rows: string[][] }) {
   return (
-    <div className="my-7 overflow-x-auto rounded-md border border-border/55 bg-foreground/[0.025] dark:border-white/8 dark:bg-white/[0.035]">
+    <div className="my-6 overflow-x-auto rounded-xl inset-ring-1 inset-ring-border">
       <table className="min-w-[34rem] w-full border-collapse text-left text-sm leading-6">
         <thead>
-          <tr className="border-b border-border/55 bg-foreground/[0.035] dark:border-white/8 dark:bg-white/[0.045]">
+          <tr className="border-b border-border bg-code">
             {headers.map((header, headerIndex) => (
               <th
                 key={`${header}-${headerIndex}`}
@@ -527,10 +411,10 @@ function WritingTableBlock({ headers, rows }: { headers: string[]; rows: string[
           {rows.map((row, rowIndex) => (
             <tr
               key={rowIndex}
-              className="border-b border-border/45 last:border-b-0 dark:border-white/8"
+              className="border-b border-border last:border-b-0"
             >
               {headers.map((_, cellIndex) => (
-                <td key={cellIndex} className="px-4 py-3 align-top text-foreground/76">
+                <td key={cellIndex} className="px-4 py-3 align-top">
                   {renderInline(row[cellIndex] ?? "")}
                 </td>
               ))}
@@ -557,13 +441,13 @@ function WritingImageBlock({
   const { shouldUseNativeImage, shouldSkipOptimization } = getImageLoadingStrategy(src);
   const isFullWidth = isFullWidthMedia(attrs);
   const containerClassName = isFullWidth
-    ? "relative w-full overflow-hidden rounded-md border border-border/55 bg-foreground/[0.035] shadow-[0_16px_50px_rgba(0,0,0,0.10)] dark:border-white/8 dark:bg-white/[0.045]"
-    : "relative aspect-video overflow-hidden rounded-md border border-border/55 bg-foreground/[0.035] shadow-[0_16px_50px_rgba(0,0,0,0.10)] dark:border-white/8 dark:bg-white/[0.045]";
+    ? "relative w-full overflow-hidden rounded-xl border border-border bg-code"
+    : "relative aspect-video overflow-hidden rounded-xl border border-border bg-code";
   const imageClassName = isFullWidth ? "h-auto w-full" : "h-full w-full object-contain";
   const imageSizes = isFullWidth ? "100vw" : "(min-width: 768px) 44rem, calc(100vw - 2rem)";
 
   return (
-    <figure className="my-7">
+    <figure className="my-6">
       <div className={containerClassName}>
         {shouldUseNativeImage ? (
           // eslint-disable-next-line @next/next/no-img-element -- GIF/SVG/remote article media should preserve source behavior.
@@ -621,7 +505,7 @@ function WritingVideoBlock({
   const muted = autoPlay || isTruthyAttribute(attrs, "muted", autoPlay);
   const caption = getMediaCaption(alt, title, attrs);
   const sources = getVideoSources(src, attrs);
-  const figureClassName = isFullWidthMedia(attrs) ? "my-7 sm:-mx-4 lg:-mx-6" : "my-7";
+  const figureClassName = isFullWidthMedia(attrs) ? "my-6 sm:-mx-4 lg:-mx-6" : "my-6";
 
   return (
     <figure className={figureClassName}>
@@ -647,14 +531,14 @@ export function WritingMdxContent({ content }: { content: string }) {
   const getHeadingId = createHeadingIdFactory();
 
   return (
-    <div className="mt-9 text-[15px] leading-7 text-foreground/78 sm:text-base sm:leading-8">
+    <div className="mt-10 text-base leading-[1.65] text-muted-foreground">
       {blocks.map((block, index) => {
         if (block.type === "heading") {
           const HeadingTag = `h${block.depth}` as "h2" | "h3" | "h4";
           const className =
             block.depth === 2
-              ? "mt-11 mb-3 font-display text-2xl leading-tight text-foreground"
-              : "mt-8 mb-2 font-sans text-lg font-medium leading-tight text-foreground";
+              ? "mt-12 mb-4 scroll-mt-24 border-b border-border pb-2 text-[1.375rem] leading-8 tracking-[-0.025em] text-foreground sm:text-2xl"
+              : "mt-9 mb-2 scroll-mt-24 text-lg leading-snug tracking-[-0.015em] text-foreground";
           const id = getHeadingId(block.text);
           const sectionHeadingProps = {
             "data-writing-section-heading": "true",
@@ -677,6 +561,9 @@ export function WritingMdxContent({ content }: { content: string }) {
         }
 
         if (block.type === "code") {
+          if (isPackageManagerCommand(block.code)) {
+            return <CodeBlockCommand key={index} {...convertNpmCommand(block.code)} />;
+          }
           return <CodeBlock key={index} language={block.language} code={block.code} />;
         }
 
@@ -710,9 +597,9 @@ export function WritingMdxContent({ content }: { content: string }) {
 
         if (block.type === "list") {
           return (
-            <ul key={index} className="my-5 space-y-2 pl-5">
+            <ul key={index} className="my-5 space-y-1.5 pl-5">
               {block.items.map((item) => (
-                <li key={item} className="list-disc marker:text-foreground/45">
+                <li key={item} className="list-disc pl-1 marker:text-muted-foreground/60">
                   {renderInline(item)}
                 </li>
               ))}
@@ -722,13 +609,18 @@ export function WritingMdxContent({ content }: { content: string }) {
 
         if (block.type === "quote") {
           return (
-            <blockquote key={index} className="my-6 border-l border-border pl-4 text-foreground/72">
+            <blockquote key={index} className="my-6 border-l-2 border-border pl-4 text-muted-foreground">
               {renderInline(block.text)}
             </blockquote>
           );
         }
 
-        return <hr key={index} className="my-8 border-0 border-t border-white/10" />;
+        return (
+          <hr
+            key={index}
+            className="my-10 h-px border-0 bg-[linear-gradient(to_right,var(--muted-foreground)_50%,transparent_0)] bg-size-[4px_1px] opacity-40"
+          />
+        );
       })}
     </div>
   );

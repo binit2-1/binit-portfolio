@@ -93,7 +93,7 @@ export function WritingShareButton({ title, shareUrl }: WritingShareButtonProps)
     <>
       <button
         type="button"
-        className="inline-flex items-center gap-1.5 rounded-sm border border-border/60 px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/25 hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         onClick={openDialog}
@@ -107,17 +107,17 @@ export function WritingShareButton({ title, shareUrl }: WritingShareButtonProps)
           role="dialog"
           aria-modal="true"
           aria-labelledby="writing-share-title"
-          className="fixed inset-0 z-1000 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-md"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 px-4 py-6 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
         >
           <div
-            className="relative w-full max-w-md rounded-md border border-border/70 bg-background/96 p-4 text-foreground shadow-[0_24px_90px_rgba(0,0,0,0.34)] backdrop-blur-2xl dark:border-white/12 dark:bg-[#111111]/96"
+            className="relative w-full max-w-md rounded-xl border border-border bg-background p-5 text-foreground shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <button
               type="button"
               aria-label="Close share dialog"
-              className="absolute right-3 top-3 grid size-8 place-items-center rounded-full border border-border/60 bg-foreground/5 text-muted-foreground transition-colors hover:bg-foreground/10 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="absolute top-4 right-4 rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
               onClick={() => setIsOpen(false)}
             >
               <X className="size-4" aria-hidden="true" />
@@ -141,17 +141,17 @@ export function WritingShareButton({ title, shareUrl }: WritingShareButtonProps)
                   id="writing-share-url"
                   readOnly
                   value={currentUrl}
-                  className="min-w-0 flex-1 rounded-md border border-border/70 bg-foreground/[0.035] px-3 py-2 text-sm text-foreground outline-none selection:bg-[#FF5800]/25 dark:border-white/12 dark:bg-white/5"
+                  className="h-9 min-w-0 flex-1 rounded-lg border border-border bg-transparent px-3 text-sm text-foreground outline-none focus-visible:border-foreground/40"
                   onFocus={(event) => event.currentTarget.select()}
                 />
                 <button
                   type="button"
-                  className="grid size-9 shrink-0 place-items-center rounded-md border border-border/70 bg-foreground/[0.035] text-muted-foreground transition-colors hover:bg-foreground/8 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/12 dark:bg-white/5"
+                  className="grid size-9 shrink-0 place-items-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                   aria-label={copied ? "Copied link" : "Copy link"}
                   onClick={copyLink}
                 >
                   {copied ? (
-                    <Check className="size-4 text-[#FF5800]" aria-hidden="true" />
+                    <Check className="size-4 text-foreground" aria-hidden="true" />
                   ) : (
                     <Copy className="size-4" aria-hidden="true" />
                   )}
@@ -164,7 +164,7 @@ export function WritingShareButton({ title, shareUrl }: WritingShareButtonProps)
               <div className="mt-2 flex flex-wrap gap-2">
                 <button
                   type="button"
-                  className="inline-flex h-9 items-center gap-2 rounded-md border border-border/70 bg-foreground/[0.035] px-3 text-sm font-medium text-foreground transition-colors hover:bg-foreground/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/12 dark:bg-white/5"
+                  className="inline-flex h-9 items-center gap-2 rounded-lg border border-border px-3 text-sm text-foreground transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                   onClick={() => openIntent(xShareUrl)}
                 >
                   <span className="text-base font-semibold leading-none" aria-hidden="true">
@@ -174,7 +174,7 @@ export function WritingShareButton({ title, shareUrl }: WritingShareButtonProps)
                 </button>
                 <button
                   type="button"
-                  className="inline-flex h-9 items-center gap-2 rounded-md border border-border/70 bg-foreground/[0.035] px-3 text-sm font-medium text-foreground transition-colors hover:bg-foreground/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/12 dark:bg-white/5"
+                  className="inline-flex h-9 items-center gap-2 rounded-lg border border-border px-3 text-sm text-foreground transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                   onClick={() => openIntent(linkedInShareUrl)}
                 >
                   <span

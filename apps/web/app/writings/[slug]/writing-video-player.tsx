@@ -82,7 +82,7 @@ export function WritingVideoPlayer({
         type="button"
         aria-label={alt ? `Open video larger: ${alt}` : "Open video larger"}
         onClick={() => setIsExpanded(true)}
-        className="group relative block aspect-video w-full overflow-hidden rounded-md border border-border/55 bg-black text-left shadow-[0_16px_50px_rgba(0,0,0,0.14)] transition-transform duration-300 hover:scale-[1.006] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5800] focus-visible:ring-offset-2 focus-visible:ring-offset-background dark:border-white/8"
+        className="group relative block aspect-video w-full overflow-hidden rounded-xl border border-border bg-black text-left transition-transform duration-300 hover:scale-[1.006] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <video
           autoPlay={autoPlay}
@@ -114,7 +114,7 @@ export function WritingVideoPlayer({
             type="button"
             aria-label="Close video"
             onClick={() => setIsExpanded(false)}
-            className="absolute right-3 top-3 z-10 grid size-9 place-items-center rounded-full border border-border/60 bg-background/85 text-foreground shadow-[0_12px_36px_rgba(0,0,0,0.22)] backdrop-blur-md transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5800]"
+            className="absolute right-3 top-3 z-10 grid size-9 place-items-center rounded-full border border-border/60 bg-background/85 text-foreground shadow-[0_12px_36px_rgba(0,0,0,0.22)] backdrop-blur-md transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <X className="size-4" aria-hidden="true" />
           </button>

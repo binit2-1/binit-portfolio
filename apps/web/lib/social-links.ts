@@ -1,3 +1,5 @@
+export const CONTACT_EMAIL = "binitgupta.1711@gmail.com";
+
 export const SOCIAL_LINKS = {
   peerlist: "https://peerlist.io/binitgupta1711",
   x: "https://x.com/BinitGupta21",

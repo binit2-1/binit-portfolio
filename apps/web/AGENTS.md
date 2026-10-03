@@ -42,6 +42,15 @@ It explains how the project is organized, what each folder does, and how to make
   - Dynamic writing route.
   - Uses `generateStaticParams` and `generateMetadata`.
   - Reads post data via `@/lib/writings`.
+  - Typography is scoped to posts via `.writing-type` (Instrument Sans + JetBrains Mono, see `lib/fonts.ts`).
+  - Navigation: `writing-scroll-indicator.tsx` (tick marks, xl+) and `writing-mobile-toc.tsx` (bottom bar, below xl),
+    both adapted from ui.nexvyn.dev and driven by `use-active-section.ts`.
+  - Don't animate to `height: "auto"` in components that re-render while scrolling: framer-motion restores
+    `window.scrollTo(0, y)` after measuring, which cancels in-flight smooth scrolls.
+- `components/code-block.tsx` / `components/code-block-command.tsx`
+  - Post code blocks: Shiki (github light/dark, server-rendered) with a copy button; shell blocks get a `$` prompt.
+  - Single-line `npm`/`npx` commands render as `CodeBlockCommand` (pnpm/yarn/npm/bun tabs, choice saved in
+    localStorage); conversion lives in `lib/package-managers.ts`.
 - `components/navbar.tsx`
   - Inline top navigation (Home / Work / Writing) with dotted-underline active state.
   - Client component (needs `usePathname`).
@@ -61,6 +70,11 @@ It explains how the project is organized, what each folder does, and how to make
   - Static search index (pages, projects, writings split by heading) fetched by the palette on first open.
 - `components/search/site-search.tsx`
   - Navbar search: `⌘K`/`Ctrl+K` or `/`; every query word must match; magnifying glass on mobile.
+- `components/footer.tsx`
+  - Site footer in the root layout: Email / Hire me / LinkedIn / X / GitHub text links (server component).
+- `components/hire-me.tsx` + `lib/hire.ts` + `app/api/hire/route.ts`
+  - "Hire me" freelance enquiry dialog; the route emails it via Resend.
+  - Env: `RESEND_API_KEY` (required), `HIRE_FROM_EMAIL` (verified sender), `HIRE_TO_EMAIL` (defaults to `CONTACT_EMAIL` in `lib/social-links.ts`).
 - `components/theme-provider.tsx`
   - Thin client wrapper around `next-themes` provider.
 - `lib/writings.ts`

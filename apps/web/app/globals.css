@@ -18,6 +18,10 @@
   --about-mask-belt: 14px;
   /* About fixed rule vertical position. */
   --about-fixed-line-top: 45vh;
+  /* Code block surface (see "CODE BLOCKS" below). */
+  --color-code: var(--code);
+  /* The site's one accent (social hover, writing scroll indicator + progress ring). */
+  --color-brand: #ff5800;
 }
 
 /* ==========================================================================
@@ -78,6 +82,61 @@
   }
 }
 
+/* Writing pages: Instrument Sans + JetBrains Mono, scoped by `.writing-type`
+   (set in app/writings/[slug]/page.tsx together with the two font variables). */
+@layer components {
+  .writing-type,
+  .writing-type .font-sans {
+    font-family: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .writing-type .font-mono,
+  .writing-type code,
+  .writing-type pre {
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  }
+}
+
+/* ==========================================================================
+   CODE BLOCKS: components/code-block.tsx + code-block-command.tsx.
+   Shiki emits both themes as --shiki-light / --shiki-dark; pick one per mode.
+   ========================================================================== */
+:root {
+  --code: oklch(0.985 0 0);
+}
+
+.dark {
+  --code: oklch(0.185 0 0);
+}
+
+@layer components {
+  .code-block-body pre {
+    background: transparent !important;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .code-block-body .line {
+    padding-inline: 1rem;
+  }
+
+  .shiki span {
+    color: var(--shiki-light);
+  }
+
+  .dark .shiki span {
+    color: var(--shiki-dark);
+  }
+
+  /* Shell blocks: a "$ " prompt on each command line, never selected or copied. */
+  .code-block-body[data-shell] .line:not(:empty)::before {
+    content: "$ ";
+    color: var(--muted-foreground);
+    opacity: 0.7;
+    user-select: none;
+  }
+}
+
 /* On mobile, push the orange line & mask higher so text isn't clipped. */
 @media (max-width: 639px) {
   :root {
@@ -126,27 +185,6 @@
       touch-action: pan-y;
     }
 
-    .writing-progressive-blur {
-      -webkit-backdrop-filter: none !important;
-      backdrop-filter: none !important;
-    }
-
-    .writing-progress-toc {
-      -webkit-backdrop-filter: none !important;
-      backdrop-filter: none !important;
-    }
-  }
-
-  @media (max-width: 767px) {
-    .writing-progressive-blur {
-      -webkit-backdrop-filter: none !important;
-      backdrop-filter: none !important;
-    }
-
-    .writing-progress-toc {
-      -webkit-backdrop-filter: none !important;
-      backdrop-filter: none !important;
-    }
   }
 }
 

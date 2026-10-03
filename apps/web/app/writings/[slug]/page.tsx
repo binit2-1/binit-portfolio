@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
+import { ArrowLeftIcon, ArrowRightIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { instrumentSans, jetbrainsMono } from "@/lib/fonts";
 import { absoluteUrl, SITE_AUTHOR, SITE_NAME, siteImages } from "@/lib/site";
 import { getAllWritings, getWritingBySlug } from "@/lib/writings";
 import { getWritingSections } from "@/lib/writing-headings";
 import { WritingThumbnail } from "../writing-thumbnail";
-import { ProgressiveBlur } from "./progressive-blur";
 import { WritingMdxContent } from "./writing-mdx-content";
-import { WritingProgressToc } from "./writing-progress-toc";
-import { WritingSectionDot } from "./writing-section-dot";
 import { WritingShareButton } from "./writing-share-button";
+import { WritingMobileToc } from "./writing-mobile-toc";
+import { WritingScrollIndicator } from "./writing-scroll-indicator";
 
 export async function generateStaticParams() {
   return getAllWritings().map((p) => ({ slug: p.slug }));
@@ -84,18 +85,11 @@ export default async function WritingPage({
   const { frontmatter, content } = post;
   const writings = getAllWritings();
   const currentIndex = writings.findIndex((writing) => writing.slug === slug);
-  const previousWriting =
-    currentIndex >= 0 && writings.length > 1
-      ? writings[(currentIndex - 1 + writings.length) % writings.length]
-      : null;
-  const nextWriting =
-    currentIndex >= 0 && writings.length > 1
-      ? writings[(currentIndex + 1) % writings.length]
-      : null;
-  const sections = [
-    { id: "top", title: frontmatter.title, depth: 1 as const },
-    ...getWritingSections(content),
-  ];
+  // Newest first: "previous" is the older post, "next" the newer one.
+  const previousWriting = currentIndex >= 0 ? (writings[currentIndex + 1] ?? null) : null;
+  const nextWriting = currentIndex > 0 ? writings[currentIndex - 1] : null;
+  const sections = getWritingSections(content).filter((section) => section.depth <= 3);
+  const readingMinutes = Math.max(1, Math.round(content.split(/\s+/).length / 220));
 
   const formattedDate = frontmatter.date
     ? new Date(frontmatter.date).toLocaleDateString("en-US", {
@@ -126,99 +120,94 @@ export default async function WritingPage({
   };
 
   return (
-    <>
+    <div className={`${instrumentSans.variable} ${jetbrainsMono.variable} writing-type`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
-      <ProgressiveBlur position="top" height="130px" blurAmount="5px" />
-      <ProgressiveBlur position="bottom" height="170px" blurAmount="6px" />
 
-      <article
-        id="top"
-        data-writing-article="true"
-        className="relative mx-auto w-full max-w-(--writing-content-width) pb-28 pt-8 sm:pt-10"
-      >
-        <WritingSectionDot />
-
-        <nav className="mb-8 flex items-center justify-between gap-3 text-sm text-muted-foreground" aria-label="Writing navigation">
+      <article id="top">
+        <nav aria-label="Writing navigation" className="flex items-center justify-between gap-3 text-sm">
           <Link
             href="/writings"
-            className="rounded-sm px-0 py-1.5 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="group inline-flex items-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
           >
-            Back
+            <ArrowLeftIcon aria-hidden className="size-3.5 transition-transform group-hover:-translate-x-0.5" />
+            All writing
           </Link>
-          <WritingShareButton
-            title={frontmatter.title}
-            shareUrl={absoluteUrl(`/writings/${slug}`)}
-          />
+          <WritingShareButton title={frontmatter.title} shareUrl={absoluteUrl(`/writings/${slug}`)} />
         </nav>
 
-        <header>
-          <WritingThumbnail
-            title={frontmatter.title}
-            thumbnail={frontmatter.thumbnail}
-            className="rounded-md"
-            viewTransitionName="writing-thumbnail"
-          />
-
-          <div className="mt-7 flex flex-col gap-3">
-            {formattedDate ? (
-              <time className="text-xs font-medium tracking-[0.12em] text-[#FF5800]/85 uppercase">{formattedDate}</time>
-            ) : null}
-            <h1
-              data-writing-section-heading="true"
-              data-writing-section-id="top"
-              className="font-display text-4xl leading-[1.05] tracking-normal text-foreground sm:text-5xl"
-            >
-              {frontmatter.title}
-            </h1>
-            <p className="max-w-2xl font-sans text-base leading-7 text-muted-foreground sm:text-lg">
+        <header className="mt-8">
+          <h1 className="text-[1.625rem] leading-tight font-normal tracking-[-0.025em] text-foreground sm:text-[1.875rem] sm:leading-9">
+            {frontmatter.title}
+          </h1>
+          {(frontmatter.subtitle || frontmatter.summary) && (
+            <p className="mt-3 max-w-[62ch] text-[0.9375rem] leading-relaxed text-muted-foreground sm:text-base">
               {frontmatter.subtitle || frontmatter.summary}
             </p>
-          </div>
-
-          <div className="mt-7 h-px w-full bg-border" aria-hidden />
+          )}
+          <p className="mt-4 text-sm text-muted-foreground">
+            {formattedDate && (
+              <>
+                <time dateTime={frontmatter.date}>{formattedDate}</time>
+                <span aria-hidden> · </span>
+              </>
+            )}
+            {readingMinutes} min read
+          </p>
         </header>
 
-        <WritingMdxContent content={content} />
+        <WritingThumbnail
+          title={frontmatter.title}
+          thumbnail={frontmatter.thumbnail}
+          className="mt-8 rounded-xl border-border bg-code shadow-none"
+          viewTransitionName="writing-thumbnail"
+        />
 
-        {(previousWriting || nextWriting) ? (
-          <nav
-            className="mt-14 grid grid-cols-2 gap-3 border-t border-border pt-5 text-[11px] text-muted-foreground sm:text-sm"
-            aria-label="Adjacent writings"
-          >
-            {previousWriting ? (
-              <Link
-                href={`/writings/${previousWriting.slug}`}
-                className="group min-w-0 rounded-sm text-left transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                aria-label={`Previous blog: ${previousWriting.frontmatter.title}`}
-              >
-                <span className="block text-[9px] uppercase tracking-[0.1em] text-muted-foreground/70 sm:text-xs sm:tracking-[0.12em]">Previous blog</span>
-                <span className="mt-1 block truncate text-[11px] text-foreground/85 group-hover:text-foreground sm:text-sm">
-                  {previousWriting.frontmatter.title}
-                </span>
-              </Link>
-            ) : (
-              <span aria-hidden />
-            )}
-            {nextWriting ? (
-              <Link
-                href={`/writings/${nextWriting.slug}`}
-                className="group min-w-0 rounded-sm text-right transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                aria-label={`Next blog: ${nextWriting.frontmatter.title}`}
-              >
-                <span className="block text-[9px] uppercase tracking-[0.1em] text-muted-foreground/70 sm:text-xs sm:tracking-[0.12em]">Next blog</span>
-                <span className="mt-1 block truncate text-[11px] text-foreground/85 group-hover:text-foreground sm:text-sm">
-                  {nextWriting.frontmatter.title}
-                </span>
-              </Link>
-            ) : null}
+        <WritingMdxContent content={content} />
+        <div data-writing-end aria-hidden />
+
+        {(previousWriting || nextWriting) && (
+          <nav aria-label="More writing" className="mt-14">
+            <hr className="mb-6 h-px border-0 bg-[linear-gradient(to_right,var(--muted-foreground)_50%,transparent_0)] bg-size-[4px_1px] opacity-40 mask-x-from-80%" />
+            <div className="grid grid-cols-2 gap-6 text-sm">
+              {previousWriting ? (
+                <AdjacentLink direction="previous" slug={previousWriting.slug} title={previousWriting.frontmatter.title} />
+              ) : (
+                <span aria-hidden />
+              )}
+              {nextWriting && (
+                <AdjacentLink direction="next" slug={nextWriting.slug} title={nextWriting.frontmatter.title} />
+              )}
+            </div>
           </nav>
-        ) : null}
+        )}
       </article>
 
-      <WritingProgressToc title={frontmatter.title} sections={sections} />
-    </>
+      <WritingScrollIndicator sections={sections} />
+      <WritingMobileToc sections={sections} />
+    </div>
+  );
+}
+
+function AdjacentLink({ direction, slug, title }: { direction: "previous" | "next"; slug: string; title: string }) {
+  const next = direction === "next";
+  const Icon = next ? ArrowRightIcon : ArrowLeftIcon;
+
+  return (
+    <Link
+      href={`/writings/${slug}`}
+      className={`group min-w-0 ${next ? "col-start-2 text-right" : ""}`}
+    >
+      <span className={`flex items-center gap-1 text-muted-foreground ${next ? "justify-end" : ""}`}>
+        {!next && <Icon aria-hidden className="size-3.5 transition-transform group-hover:-translate-x-0.5" />}
+        {next ? "Next" : "Previous"}
+        {next && <Icon aria-hidden className="size-3.5 transition-transform group-hover:translate-x-0.5" />}
+      </span>
+      <span className="mt-1 block truncate text-foreground/85 decoration-current/40 underline-offset-4 transition-colors group-hover:text-foreground group-hover:underline">
+        {title}
+      </span>
+    </Link>
   );
 }

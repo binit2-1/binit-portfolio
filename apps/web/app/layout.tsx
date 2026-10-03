@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono } from "next/font/google";
+import { Footer } from "@/components/footer";
 import { Navbar } from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { basteleur, googleSansFlex, helveticaNeue, helveticaOblique } from "@/lib/fonts";
@@ -131,6 +132,7 @@ export default function RootLayout({
           <div className="mx-auto w-full max-w-[44rem] px-5 pb-16 sm:px-6 sm:pb-24">
             <Navbar />
             <main>{children}</main>
+            <Footer />
           </div>
           {/* Page blur behind a hovered row; tune it under "HOVER FOCUS" in globals.css. */}
           <div aria-hidden className="focus-overlay" />
