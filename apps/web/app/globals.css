@@ -2,28 +2,15 @@
 @import "tw-animate-css";
 @import "@repo/ui/styles/globals.css";
 
-/* Site-wide sans: Google Sans Flex (see lib/fonts.ts). Helvetica/Basteleur remain only for legacy pages. */
-/* Display: Basteleur (Moonlight 400 / Bold 700) — use Tailwind `font-display` + font-normal | font-bold */
+/* Site-wide sans: Google Sans Flex (see lib/fonts.ts). */
 @theme inline {
   --font-sans: var(--font-google-sans-flex), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-basteleur), var(--font-helvetica-neue), ui-sans-serif, sans-serif;
-  --font-oblique: var(--font-helvetica-oblique), ui-sans-serif, system-ui, sans-serif;
-  /* Whole-site horizontal cap (layout shell): 196.5 character widths, never wider than viewport. */
-  --site-max-width: min(100%, 196.5ch);
-  /* Shared writing column: matches the Work/Writings list left and right edges. */
-  --writing-content-width: 44rem;
-  /* Sticky navbar row (py-4 + links + toggle); About mask/belt use the same token. */
-  --site-nav-h: 5rem;
-  /* Opaque belt under nav on About only (see about-viewport-mask). */
-  --about-mask-belt: 14px;
-  /* About fixed rule vertical position. */
-  --about-fixed-line-top: 45vh;
   /* Brand white / black: every `white` / `black` utility (bg-white/5, text-black, ...) uses these. */
   --color-white: #fbfbfa;
   --color-black: #111113;
   /* Code block surface (see "CODE BLOCKS" below). */
   --color-code: var(--code);
-  /* The site's one accent ("Hire me", writing scroll indicator, progress ring, legacy About):
+  /* The site's one accent ("Hire me", writing scroll indicator, progress ring):
      blue in light, off-white in dark. */
   --color-hire: var(--hire);
 }
@@ -203,13 +190,6 @@
   }
 }
 
-/* On mobile, push the orange line & mask higher so text isn't clipped. */
-@media (max-width: 639px) {
-  :root {
-    --about-fixed-line-top: 38vh;
-  }
-}
-
 ::view-transition-group(writing-thumbnail) {
   animation-duration: 640ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
@@ -253,76 +233,3 @@
 
   }
 }
-
-/* Home: when a social link is hovered, dim + blur the rest of the hero (reference: focus spotlight) */
-@layer components {
-  .social-hover-focus > p,
-  .social-hover-focus > h1,
-  .social-hover-focus .social-links > a {
-    transition:
-      opacity 300ms ease,
-      filter 300ms ease,
-      transform 300ms ease,
-      color 300ms ease;
-  }
-
-  .social-hover-focus .social-links > a {
-    color: var(--foreground);
-  }
-
-  .social-hover-focus:has(.social-links a:is(:hover, :focus-visible)) > p,
-  .social-hover-focus:has(.social-links a:is(:hover, :focus-visible)) > h1 {
-    opacity: 0.28;
-    filter: blur(2px);
-  }
-
-  .social-hover-focus:has(.social-links a:is(:hover, :focus-visible))
-    .social-links
-    > a:not(:is(:hover, :focus-visible)) {
-    opacity: 0.28;
-    filter: blur(2px);
-    color: var(--muted-foreground);
-  }
-
-  .social-hover-focus .social-links > a:is(:hover, :focus-visible) {
-    position: relative;
-    z-index: 1;
-    opacity: 1;
-    filter: none;
-    color: var(--hire);
-  }
-
-  .stack-tech-token {
-    max-width: 1.75em;
-    transition:
-      max-width 300ms ease,
-      background-color 300ms ease,
-      border-color 300ms ease,
-      color 300ms ease;
-  }
-
-  .stack-tech-token-label {
-    opacity: 0;
-    transition: opacity 150ms ease;
-  }
-
-  .stack-tech-token:hover {
-    max-width: 9em;
-    border-color: color-mix(in oklab, var(--foreground) 35%, transparent);
-    background-color: color-mix(in oklab, var(--foreground) 5.5%, transparent);
-    color: var(--foreground);
-  }
-
-  .stack-tech-token:hover .stack-tech-token-label {
-    opacity: 1;
-  }
-
-  .dark .stack-tech-token:hover {
-    border-color: rgb(255 255 255 / 32%);
-    background-color: rgb(255 255 255 / 7.5%);
-    color: var(--color-white);
-  }
-}
-
-/* About page: snap-scroll is handled by GSAP ScrollTrigger in use-snap-scroll.ts.
-   No CSS scroll-snap rules needed — GSAP manages all snapping behaviour. */

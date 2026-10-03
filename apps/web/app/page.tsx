@@ -1,14 +1,25 @@
-import type { ReactNode } from "react";
+import type { Metadata } from "next";
 import { AppIcon, type AppIconTone } from "@/components/app-icon";
 import { Linkedin, PeerlistSolid, X } from "@/components/icons";
 import { HireMeNote } from "@/components/hire-me-note";
 import { HoverPreviewList } from "@/components/hover-preview";
+import { Divider, InlineLink } from "@/components/prose";
 import { ProjectRow, SectionHeader, WritingRow } from "@/components/list-rows";
 import { GithubGraph } from "@/components/unlumen-ui/github-graph";
 import { getProjectPreviews, getWritingPreviewMedia } from "@/lib/previews";
+import { pageMetadata } from "@/lib/seo";
+import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 import { FEATURED_PROJECTS } from "@/lib/projects";
 import { SOCIAL_LINKS } from "@/lib/social-links";
 import { getWritingPreviews } from "@/lib/writings";
+
+export const metadata: Metadata = pageMetadata({
+  title: SITE_TITLE,
+  absoluteTitle: true,
+  description: SITE_DESCRIPTION,
+  path: "/",
+  type: "profile",
+});
 
 const GITHUB_USERNAME = "binit2-1";
 const HOME_WRITING_COUNT = 3;
@@ -18,25 +29,6 @@ const SOCIAL_ITEMS: { href: string; label: string; tone: AppIconTone; Icon: type
   { href: SOCIAL_LINKS.peerlist, label: "Peerlist", tone: "green", Icon: PeerlistSolid },
   { href: SOCIAL_LINKS.x, label: "X", tone: "black", Icon: X },
 ];
-
-function InlineLink({ href, children }: { href: string; children: ReactNode }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-foreground underline decoration-muted-foreground/50 decoration-dotted underline-offset-4 transition-colors hover:decoration-foreground"
-    >
-      {children}
-    </a>
-  );
-}
-
-function Divider() {
-  return (
-    <hr className="my-8 h-px border-0 bg-[linear-gradient(to_right,var(--muted-foreground)_50%,transparent_0)] bg-size-[4px_1px] opacity-40 mask-x-from-80% sm:my-10" />
-  );
-}
 
 export default async function HomePage() {
   const writings = getWritingPreviews().slice(0, HOME_WRITING_COUNT);
@@ -71,8 +63,8 @@ export default async function HomePage() {
 
       <div className="mt-6 max-w-[62ch] space-y-4 text-[0.9375rem] leading-relaxed text-muted-foreground sm:text-base">
         <p>
-          I am a <span className="text-foreground">full-stack developer</span> currently studying
-          computer science as an undergraduate.
+          I&apos;m Binit, a <span className="text-foreground">full-stack developer</span> based in
+          Bangalore, currently studying computer science as an undergraduate.
         </p>
         <p>
           I build interfaces with <InlineLink href="https://react.dev">React</InlineLink> and{" "}
@@ -83,7 +75,7 @@ export default async function HomePage() {
         </p>
       </div>
 
-      <div aria-label="GitHub contributions" className="mt-8">
+      <section aria-label="GitHub contributions" className="mt-8">
         <GithubGraph
           account={GITHUB_USERNAME}
           months={12}
@@ -94,7 +86,7 @@ export default async function HomePage() {
           showAccount={false}
           ambientIntensity={0.4}
         />
-      </div>
+      </section>
 
       <Divider />
 

@@ -33,9 +33,18 @@ It explains how the project is organized, what each folder does, and how to make
 - `app/page.tsx`
   - Home route.
 - `app/about/page.tsx`
-  - About route.
-- `app/work/page.tsx`
-  - Work route.
+  - About route (bio, stack, profiles with `rel="me"`, `ProfilePage` JSON-LD).
+- `app/services/page.tsx`
+  - Freelance services, process and FAQ (`Service` + `FAQPage` JSON-LD); "Hire me" opens the dialog.
+- `app/works/page.tsx`
+  - Works route (`/work` 308-redirects here, see `next.config.ts`).
+- `app/not-found.tsx`, `app/manifest.ts`, `app/sitemap.ts`, `app/robots.ts`
+  - 404 page (noindex), web manifest, sitemap (must list real routes only), robots (`/api/` disallowed).
+- `lib/seo.ts` + `components/json-ld.tsx`
+  - `pageMetadata()` builds every page's title / description / canonical / Open Graph / Twitter;
+    Person + WebSite JSON-LD with stable `@id`s (`PERSON_ID`, `WEBSITE_ID`), breadcrumbs, `<JsonLd nodes>`.
+- `components/prose.tsx`
+  - `PageHeader`, `InlineLink`, `Divider` shared by the content pages.
 - `app/writings/page.tsx`
   - Writings index route.
 - `app/writings/[slug]/page.tsx`
@@ -52,7 +61,8 @@ It explains how the project is organized, what each folder does, and how to make
   - Single-line `npm`/`npx` commands render as `CodeBlockCommand` (pnpm/yarn/npm/bun tabs, choice saved in
     localStorage); conversion lives in `lib/package-managers.ts`.
 - `components/navbar.tsx`
-  - Inline top navigation (Home / Work / Writing) with dotted-underline active state.
+  - Inline top navigation (Home / Works / Writings / About / Services) with dotted-underline active state;
+    on phones the links scroll sideways (fade only while cut off).
   - Holds the theme toggle (`AnimatedThemeToggler`) next to search, so it's on every page.
   - Client component (needs `usePathname`).
 - `components/app-icon.tsx`
@@ -124,15 +134,21 @@ It explains how the project is organized, what each folder does, and how to make
 - Ship **server-rendered HTML** for page content, headings, and navigation chrome whenever possible so crawlers and social previews see real text and structure without waiting on JavaScript.
 - Add `"use client"` only when the component truly needs the browser (state, effects, browser APIs, event handlers, or libraries that require the client such as `next-themes`, Framer Motion, or route hooks like `usePathname`).
 - When interactivity is required, split work: keep a **server** parent for layout and SEO-critical copy, and colocate a **small client** child for the interactive island.
+- Every page exports metadata via `pageMetadata()` (lib/seo.ts): titles under 60 chars containing "Binit Gupta",
+  descriptions 120-160 chars, canonical = og:url. One `<h1>` per page, no skipped heading levels.
+- New pages: add them to `app/sitemap.ts`, the navbar if top-level, and `lib/search.ts` pages.
+- Off-site setup lives outside the repo: Google Search Console (set `GOOGLE_SITE_VERIFICATION`), submit
+  `/sitemap.xml`, and link binitt.dev from the GitHub / LinkedIn / X / Peerlist profiles.
 
 ## Navigation and Route Conventions
 
 - Navbar items should match real pages to avoid dead links.
 - Current top-level routes:
   - `/`
+  - `/works`
+  - `/writings` (+ `/writings/[slug]`)
   - `/about`
-  - `/work`
-  - `/writings`
+  - `/services`
 - Add route-level metadata with:
   - `import type { Metadata } from "next";`
   - `export const metadata: Metadata = { ... }`

@@ -1,51 +1,46 @@
 import type { Metadata } from "next";
 import { HoverPreviewList } from "@/components/hover-preview";
+import { PageHeader } from "@/components/prose";
 import { WritingListRow } from "@/components/list-rows";
 import { getWritingPreviewMedia } from "@/lib/previews";
-import { absoluteUrl, siteImages } from "@/lib/site";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbSchema, PERSON_ID, pageMetadata } from "@/lib/seo";
+import { absoluteUrl } from "@/lib/site";
 import { getWritingPreviews } from "@/lib/writings";
 
-const description = "Notes by Binit Gupta on interface design, frontend craft, product work, and building smoother web experiences.";
-
-export const metadata: Metadata = {
-  title: "Writing",
-  description,
-  alternates: {
-    canonical: absoluteUrl("/writings"),
-  },
-  openGraph: {
-    title: "Writings by Binit Gupta",
-    description,
-    url: "/writings",
-    images: [
-      {
-        url: siteImages.og,
-        width: 1200,
-        height: 675,
-        alt: "Writings by Binit Gupta",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Writings by Binit Gupta",
-    description,
-    images: [siteImages.og],
-    creator: "@BinitGupta21",
-  },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Writings",
+  description:
+    "Articles by Binit Gupta on full-stack web development: authentication with Next.js and Go, debouncing in React, and lessons from building real projects.",
+  path: "/writings",
+});
 
 export default function WritingsPage() {
   const writings = getWritingPreviews();
 
   return (
     <>
-      <header>
-        <h1 className="text-3xl leading-tight font-normal tracking-[-0.02em] sm:text-4xl">Writings</h1>
-        <p className="mt-3 max-w-[62ch] text-[0.9375rem] leading-relaxed text-muted-foreground sm:text-base">
-          How I perceive technology and its impact on design and development.
-        </p>
-      </header>
+      <JsonLd
+        nodes={[
+          {
+            "@type": "Blog",
+            "@id": `${absoluteUrl("/writings")}#blog`,
+            url: absoluteUrl("/writings"),
+            name: "Writings by Binit Gupta",
+            author: { "@id": PERSON_ID },
+            blogPost: writings.map((writing) => ({
+              "@type": "BlogPosting",
+              headline: writing.title,
+              description: writing.subtitle,
+              url: absoluteUrl(writing.href),
+              ...(writing.date && { datePublished: writing.date }),
+              author: { "@id": PERSON_ID },
+            })),
+          },
+          breadcrumbSchema([{ name: "Writings", path: "/writings" }]),
+        ]}
+      />
+      <PageHeader title="Writings">How I perceive technology and its impact on design and development.</PageHeader>
 
       <HoverPreviewList media={getWritingPreviewMedia(writings)} className="mt-8">
         <ul aria-label="Writing">

@@ -3,7 +3,9 @@ import { ArrowLeftIcon, ArrowRightIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { instrumentSans, jetbrainsMono } from "@/lib/fonts";
-import { absoluteUrl, SITE_AUTHOR, SITE_NAME, siteImages } from "@/lib/site";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbSchema, pageMetadata, PERSON_ID } from "@/lib/seo";
+import { absoluteUrl, SITE_AUTHOR, siteImages } from "@/lib/site";
 import { getAllWritings, getWritingBySlug } from "@/lib/writings";
 import { getWritingSections } from "@/lib/writing-headings";
 import { WritingThumbnail } from "../writing-thumbnail";
@@ -22,50 +24,40 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  let post;
   try {
-    const { frontmatter } = getWritingBySlug(slug);
-    const description = frontmatter.summary || frontmatter.subtitle;
-    const image = absoluteUrl(frontmatter.thumbnail || siteImages.og);
-
-    return {
-      title: frontmatter.title,
-      description,
-      alternates: {
-        canonical: absoluteUrl(`/writings/${slug}`),
-      },
-      openGraph: {
-        type: "article",
-        title: frontmatter.title,
-        description,
-        url: `/writings/${slug}`,
-        siteName: SITE_NAME,
-        publishedTime: frontmatter.date || undefined,
-        authors: [SITE_AUTHOR.name],
-        images: [
-          {
-            url: image,
-            width: 1200,
-            height: frontmatter.thumbnail ? 630 : 675,
-            alt: frontmatter.title,
-          },
-        ],
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: frontmatter.title,
-        description,
-        images: [
-          {
-            url: image,
-            alt: frontmatter.title,
-          },
-        ],
-        creator: "@BinitGupta21",
-      },
-    };
+    post = getWritingBySlug(slug);
   } catch {
     return {};
   }
+
+  const { frontmatter } = post;
+  const base = pageMetadata({
+    title: frontmatter.title,
+    description: frontmatter.summary || frontmatter.subtitle,
+    path: `/writings/${slug}`,
+    type: "article",
+    images: [
+      {
+        url: frontmatter.thumbnail || siteImages.og,
+        width: 1200,
+        height: frontmatter.thumbnail ? 675 : 630,
+        alt: frontmatter.title,
+      },
+    ],
+  });
+
+  return {
+    ...base,
+    authors: [{ name: SITE_AUTHOR.name, url: absoluteUrl("/about") }],
+    openGraph: {
+      ...base.openGraph,
+      type: "article",
+      publishedTime: frontmatter.date || undefined,
+      authors: [absoluteUrl("/about")],
+      section: frontmatter.label || undefined,
+    },
+  };
 }
 
 export default async function WritingPage({
@@ -98,32 +90,34 @@ export default async function WritingPage({
         day: "numeric",
       })
     : null;
-  const articleJsonLd = {
-    "@context": "https://schema.org",
+  const url = absoluteUrl(`/writings/${slug}`);
+  const articleSchema = {
     "@type": "BlogPosting",
+    "@id": `${url}#article`,
     headline: frontmatter.title,
     description: frontmatter.summary || frontmatter.subtitle,
-    datePublished: frontmatter.date || undefined,
-    dateModified: frontmatter.date || undefined,
+    ...(frontmatter.date && { datePublished: frontmatter.date, dateModified: frontmatter.date }),
     image: absoluteUrl(frontmatter.thumbnail || siteImages.og),
-    url: absoluteUrl(`/writings/${slug}`),
-    author: {
-      "@type": "Person",
-      name: SITE_AUTHOR.name,
-      url: absoluteUrl("/"),
-    },
-    publisher: {
-      "@type": "Person",
-      name: SITE_AUTHOR.name,
-      image: absoluteUrl(siteImages.logo),
-    },
+    url,
+    mainEntityOfPage: url,
+    inLanguage: "en",
+    wordCount: content.split(/\s+/).length,
+    ...(frontmatter.label && { articleSection: frontmatter.label }),
+    author: { "@id": PERSON_ID },
+    publisher: { "@id": PERSON_ID },
+    isPartOf: { "@id": `${absoluteUrl("/writings")}#blog` },
   };
 
   return (
     <div className={`${instrumentSans.variable} ${jetbrainsMono.variable} writing-type`}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      <JsonLd
+        nodes={[
+          articleSchema,
+          breadcrumbSchema([
+            { name: "Writings", path: "/writings" },
+            { name: frontmatter.title, path: `/writings/${slug}` },
+          ]),
+        ]}
       />
 
       <article id="top">
@@ -135,7 +129,7 @@ export default async function WritingPage({
             <ArrowLeftIcon aria-hidden className="size-3.5 transition-transform group-hover:-translate-x-0.5" />
             All writing
           </Link>
-          <WritingShareButton title={frontmatter.title} shareUrl={absoluteUrl(`/writings/${slug}`)} />
+          <WritingShareButton title={frontmatter.title} shareUrl={url} />
         </nav>
 
         <header className="mt-8">
