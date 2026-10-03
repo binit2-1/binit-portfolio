@@ -20,6 +20,64 @@
   --about-fixed-line-top: 45vh;
 }
 
+/* ==========================================================================
+   HOVER FOCUS: blur the page around a hovered project / writing row.
+   >>> TWEAK HERE <<<  These four values are the only knobs.
+   ========================================================================== */
+:root {
+  --focus-blur: 2px; /* blur strength: 0px = off, 1-3px subtle, 6px+ heavy */
+  --focus-dim: 0.15; /* tint over the page, 0 = none, 0.5 = strongly faded */
+  --focus-fade: 250ms; /* how fast the blur fades in and out */
+  --focus-z: 41; /* hovered row + preview card sit above the overlay (z 40) */
+}
+
+@layer components {
+  /* One fixed overlay (rendered in app/layout.tsx) blurs everything behind it. */
+  .focus-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    pointer-events: none;
+    opacity: 0;
+    -webkit-backdrop-filter: blur(var(--focus-blur));
+    backdrop-filter: blur(var(--focus-blur));
+    background: color-mix(in oklab, var(--background) calc(var(--focus-dim) * 100%), transparent);
+    /* Small delay before fading out so crossing between rows doesn't flicker. */
+    transition: opacity var(--focus-fade) ease 60ms;
+  }
+
+  [data-focus-row] {
+    position: relative;
+  }
+
+  /* Mouse hover (real pointers only) and keyboard focus both trigger it. */
+  @media (hover: hover) and (pointer: fine) {
+    body:has([data-focus-row]:hover) .focus-overlay {
+      opacity: 1;
+      transition-delay: 0ms;
+    }
+
+    [data-focus-row]:hover {
+      z-index: var(--focus-z);
+    }
+  }
+
+  body:has([data-focus-row]:has(:focus-visible)) .focus-overlay {
+    opacity: 1;
+    transition-delay: 0ms;
+  }
+
+  [data-focus-row]:has(:focus-visible) {
+    z-index: var(--focus-z);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .focus-overlay {
+      transition: none;
+    }
+  }
+}
+
 /* On mobile, push the orange line & mask higher so text isn't clipped. */
 @media (max-width: 639px) {
   :root {

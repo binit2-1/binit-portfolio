@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+import { HoverPreviewList } from "@/components/hover-preview";
+import { WritingListRow } from "@/components/list-rows";
+import { getWritingPreviewMedia } from "@/lib/previews";
 import { absoluteUrl, siteImages } from "@/lib/site";
 import { getWritingPreviews } from "@/lib/writings";
-import { WritingsPageContent } from "./writings-page-content";
 
 const description = "Notes by Binit Gupta on interface design, frontend craft, product work, and building smoother web experiences.";
 
 export const metadata: Metadata = {
-  title: "Writings",
+  title: "Writing",
   description,
   alternates: {
     canonical: absoluteUrl("/writings"),
@@ -38,18 +40,20 @@ export default function WritingsPage() {
 
   return (
     <>
-      <WritingsPageContent writings={writings} />
+      <header>
+        <h1 className="text-3xl leading-tight font-normal tracking-[-0.02em] sm:text-4xl">Writings</h1>
+        <p className="mt-3 max-w-[62ch] text-[0.9375rem] leading-relaxed text-muted-foreground sm:text-base">
+          How I perceive technology and its impact on design and development.
+        </p>
+      </header>
 
-      <div
-        className="pointer-events-none fixed inset-x-0"
-        style={{ top: "var(--about-fixed-line-top, 20vh)", zIndex: 80 }}
-        aria-hidden
-      >
-        <div
-          className="w-full bg-[#FF5800]"
-          style={{ height: "1px", transform: "scaleY(0.5)", transformOrigin: "center" }}
-        />
-      </div>
+      <HoverPreviewList media={getWritingPreviewMedia(writings)} className="mt-8">
+        <ul aria-label="Writing">
+          {writings.map((writing) => (
+            <WritingListRow key={writing.slug} writing={writing} />
+          ))}
+        </ul>
+      </HoverPreviewList>
     </>
   );
 }

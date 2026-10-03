@@ -50,7 +50,17 @@ It explains how the project is organized, what each folder does, and how to make
 - `components/unlumen-ui/github-graph.tsx`
   - Vendored GitHub contribution graph (shadcn `@unlumen-ui/github-graph`), imports `framer-motion`.
 - `lib/projects.ts`
-  - "Things I made" list on the home page.
+  - All projects (Work page) with links, logo or Phosphor glyph, preview media; `featured` ones show on Home.
+- `lib/previews.ts`
+  - Server-side hover-preview media: video, then image, then the live site's og:image (cached 1 day), then the site OG.
+- `components/hover-preview.tsx`
+  - Client wrapper; rows with `data-preview-id` show media in the left gutter (xl+, real pointer only).
+- `components/list-rows.tsx`
+  - `ProjectRow`, `WritingRow`, `SectionHeader` shared by Home and Work.
+- `lib/search.ts` + `app/api/search/route.ts`
+  - Static search index (pages, projects, writings split by heading) fetched by the palette on first open.
+- `components/search/site-search.tsx`
+  - Navbar search: `⌘K`/`Ctrl+K` or `/`; every query word must match; magnifying glass on mobile.
 - `components/theme-provider.tsx`
   - Thin client wrapper around `next-themes` provider.
 - `lib/writings.ts`

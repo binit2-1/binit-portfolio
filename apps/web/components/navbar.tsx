@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@repo/ui/lib/utils";
+import { SiteSearch } from "@/components/search/site-search";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/work", label: "Work" },
-  { href: "/writings", label: "Writing" },
+  { href: "/works", label: "Works" },
+  { href: "/writings", label: "Writings" },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -18,7 +19,7 @@ export function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Primary" className="pt-8 pb-10 sm:pt-12 sm:pb-14">
+    <nav aria-label="Primary" className="flex items-center justify-between gap-4 pt-6 pb-8 sm:pt-8 sm:pb-10">
       <ul className="flex items-center gap-6 text-[0.9375rem] sm:gap-8 sm:text-base">
         {NAV_LINKS.map(({ href, label }) => {
           const active = isActive(pathname, href);
@@ -41,6 +42,7 @@ export function Navbar() {
           );
         })}
       </ul>
+      <SiteSearch />
     </nav>
   );
 }

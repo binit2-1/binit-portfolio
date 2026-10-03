@@ -132,6 +132,8 @@ export default function RootLayout({
             <Navbar />
             <main>{children}</main>
           </div>
+          {/* Page blur behind a hovered row; tune it under "HOVER FOCUS" in globals.css. */}
+          <div aria-hidden className="focus-overlay" />
         </ThemeProvider>
       </body>
     </html>
