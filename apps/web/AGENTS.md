@@ -25,7 +25,8 @@ It explains how the project is organized, what each folder does, and how to make
 
 - `app/layout.tsx`
   - Global shell for every route.
-  - Loads fonts, global CSS, the navbar, and wraps tree with theme provider.
+  - Loads fonts (Google Sans Flex via `lib/fonts.ts`), global CSS, the navbar, and wraps tree with theme provider.
+  - Single centered `max-w-2xl` column (v2 redesign, Figma "Portfolio-Design").
 - `app/globals.css`
   - CSS entrypoint for Next app.
   - Imports `tailwindcss`, `tw-animate-css`, and shared tokens from `@repo/ui/styles/globals.css`.
@@ -42,8 +43,14 @@ It explains how the project is organized, what each folder does, and how to make
   - Uses `generateStaticParams` and `generateMetadata`.
   - Reads post data via `@/lib/writings`.
 - `components/navbar.tsx`
-  - Top navigation with active route highlighting.
-  - Client component; uses Skiper `ThemeToggleButton` from `packages/ui` (see `skiper-ui/skiper26.tsx`).
+  - Inline top navigation (Home / Work / Writing) with dotted-underline active state.
+  - Client component (needs `usePathname`).
+- `components/app-icon.tsx`
+  - Glossy app-style icon tile (`tone` prop: blue, purple, green, orange, red, black).
+- `components/unlumen-ui/github-graph.tsx`
+  - Vendored GitHub contribution graph (shadcn `@unlumen-ui/github-graph`), imports `framer-motion`.
+- `lib/projects.ts`
+  - "Things I made" list on the home page.
 - `components/theme-provider.tsx`
   - Thin client wrapper around `next-themes` provider.
 - `lib/writings.ts`

@@ -2,10 +2,10 @@
 @import "tw-animate-css";
 @import "@repo/ui/styles/globals.css";
 
-/* Site-wide sans: Helvetica Neue (see app/layout.tsx + app/fonts/) */
+/* Site-wide sans: Google Sans Flex (see lib/fonts.ts). Helvetica/Basteleur remain only for legacy pages. */
 /* Display: Basteleur (Moonlight 400 / Bold 700) — use Tailwind `font-display` + font-normal | font-bold */
 @theme inline {
-  --font-sans: var(--font-helvetica-neue), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-google-sans-flex), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-basteleur), var(--font-helvetica-neue), ui-sans-serif, sans-serif;
   --font-oblique: var(--font-helvetica-oblique), ui-sans-serif, system-ui, sans-serif;
   /* Whole-site horizontal cap (layout shell): 196.5 character widths, never wider than viewport. */
@@ -55,6 +55,12 @@
   body {
     max-width: 100%;
     overflow-x: hidden;
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+    border-radius: 2px;
   }
 
   @media (pointer: coarse) {

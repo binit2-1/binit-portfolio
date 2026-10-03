@@ -6,36 +6,41 @@ import { cn } from "@repo/ui/lib/utils";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
   { href: "/work", label: "Work" },
-  { href: "/writings", label: "Writings" },
+  { href: "/writings", label: "Writing" },
 ];
+
+function isActive(pathname: string, href: string) {
+  return href === "/" ? pathname === "/" : pathname.startsWith(href);
+}
 
 export function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav
-      data-site-navbar="true"
-      className="fixed inset-x-0 top-0 z-50 w-full border-b border-border/40 bg-background/85 backdrop-blur-md transition-opacity duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] supports-[backdrop-filter]:bg-background/70"
-    >
-      <div className="mx-auto flex w-full max-w-(--site-max-width) min-w-0 items-center justify-center px-4 py-4 sm:px-6">
-        <ul className="flex min-w-0 flex-wrap items-center justify-center gap-x-3 gap-y-2 sm:gap-x-6 md:gap-x-8">
-          {NAV_LINKS.map(({ href, label }) => (
+    <nav aria-label="Primary" className="pt-8 pb-10 sm:pt-12 sm:pb-14">
+      <ul className="flex items-center gap-6 text-[0.9375rem] sm:gap-8 sm:text-base">
+        {NAV_LINKS.map(({ href, label }) => {
+          const active = isActive(pathname, href);
+
+          return (
             <li key={href}>
               <Link
                 href={href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
-                  "whitespace-nowrap text-xs font-normal transition-colors hover:text-foreground sm:text-sm",
-                  pathname === href ? "text-foreground" : "text-muted-foreground",
+                  "underline-offset-[6px] transition-colors hover:text-foreground",
+                  active
+                    ? "text-foreground underline decoration-muted-foreground/60 decoration-dotted"
+                    : "text-muted-foreground",
                 )}
               >
                 {label}
               </Link>
             </li>
-          ))}
-        </ul>
-      </div>
+          );
+        })}
+      </ul>
     </nav>
   );
 }

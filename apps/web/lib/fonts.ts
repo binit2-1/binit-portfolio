@@ -1,4 +1,13 @@
+import { Google_Sans_Flex } from "next/font/google";
 import localFont from "next/font/local";
+
+/** Site-wide sans (v2 redesign). Variable font, so any weight 100–1000 works. */
+export const googleSansFlex = Google_Sans_Flex({
+  subsets: ["latin"],
+  weight: "variable",
+  variable: "--font-google-sans-flex",
+  display: "swap",
+});
 
 export const helveticaNeue = localFont({
   src: [
