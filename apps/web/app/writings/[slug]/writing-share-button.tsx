@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, Share2, X } from "lucide-react";
+import { CheckIcon, CopyIcon, ShareNetworkIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect, useMemo, useState } from "react";
 
 type WritingShareButtonProps = {
@@ -98,7 +98,7 @@ export function WritingShareButton({ title, shareUrl }: WritingShareButtonProps)
         aria-expanded={isOpen}
         onClick={openDialog}
       >
-        <Share2 className="size-3.5" aria-hidden="true" />
+        <ShareNetworkIcon className="size-3.5" aria-hidden="true" />
         Share
       </button>
 
@@ -120,7 +120,7 @@ export function WritingShareButton({ title, shareUrl }: WritingShareButtonProps)
               className="absolute top-4 right-4 rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
               onClick={() => setIsOpen(false)}
             >
-              <X className="size-4" aria-hidden="true" />
+              <XIcon className="size-4" aria-hidden="true" />
             </button>
 
             <div className="pr-10">
@@ -151,9 +151,9 @@ export function WritingShareButton({ title, shareUrl }: WritingShareButtonProps)
                   onClick={copyLink}
                 >
                   {copied ? (
-                    <Check className="size-4 text-foreground" aria-hidden="true" />
+                    <CheckIcon className="size-4 text-foreground" aria-hidden="true" />
                   ) : (
-                    <Copy className="size-4" aria-hidden="true" />
+                    <CopyIcon className="size-4" aria-hidden="true" />
                   )}
                 </button>
               </div>

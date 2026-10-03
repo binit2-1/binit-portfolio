@@ -1,6 +1,6 @@
 "use client";
 
-import { Maximize2, X } from "lucide-react";
+import { CornersOutIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 
 export type WritingVideoSource = {
@@ -98,7 +98,7 @@ export function WritingVideoPlayer({
           <VideoSources sources={sources} />
         </video>
         <span className="pointer-events-none absolute right-2 top-2 grid size-8 place-items-center rounded-full border border-white/20 bg-black/45 text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)] backdrop-blur-md transition-colors group-hover:bg-black/65">
-          <Maximize2 className="size-3.5" aria-hidden="true" />
+          <CornersOutIcon className="size-3.5" aria-hidden="true" />
         </span>
       </button>
 
@@ -116,7 +116,7 @@ export function WritingVideoPlayer({
             onClick={() => setIsExpanded(false)}
             className="absolute right-3 top-3 z-10 grid size-9 place-items-center rounded-full border border-border/60 bg-background/85 text-foreground shadow-[0_12px_36px_rgba(0,0,0,0.22)] backdrop-blur-md transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <X className="size-4" aria-hidden="true" />
+            <XIcon className="size-4" aria-hidden="true" />
           </button>
 
           <div

@@ -17,8 +17,6 @@ const PAGES: SearchEntry[] = [
   { type: "page", title: "Home", href: "/", body: "Binit Gupta full-stack developer portfolio" },
   { type: "page", title: "Works", href: "/works", body: "Projects things I made" },
   { type: "page", title: "Writings", href: "/writings", body: "Articles blog posts writing" },
-  { type: "page", title: "About", href: "/about", body: "About Binit Gupta stack profiles contact" },
-  { type: "page", title: "Services", href: "/services", body: "Freelance hire landing pages websites web apps" },
 ];
 
 /** Markdown to searchable prose: code blocks, links, images and markup removed. */

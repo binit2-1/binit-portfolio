@@ -49,12 +49,12 @@ export async function generateMetadata({
 
   return {
     ...base,
-    authors: [{ name: SITE_AUTHOR.name, url: absoluteUrl("/about") }],
+    authors: [{ name: SITE_AUTHOR.name, url: absoluteUrl("/") }],
     openGraph: {
       ...base.openGraph,
       type: "article",
       publishedTime: frontmatter.date || undefined,
-      authors: [absoluteUrl("/about")],
+      authors: [absoluteUrl("/")],
       section: frontmatter.label || undefined,
     },
   };

@@ -32,19 +32,15 @@ It explains how the project is organized, what each folder does, and how to make
   - Imports `tailwindcss`, `tw-animate-css`, and shared tokens from `@repo/ui/styles/globals.css`.
 - `app/page.tsx`
   - Home route.
-- `app/about/page.tsx`
-  - About route (bio, stack, profiles with `rel="me"`, `ProfilePage` JSON-LD).
-- `app/services/page.tsx`
-  - Freelance services, process and FAQ (`Service` + `FAQPage` JSON-LD); "Hire me" opens the dialog.
 - `app/works/page.tsx`
-  - Works route (`/work` 308-redirects here, see `next.config.ts`).
+  - Works route (v1's `/work` 308-redirects here and `/about` to Home, see `next.config.ts`).
 - `app/not-found.tsx`, `app/manifest.ts`, `app/sitemap.ts`, `app/robots.ts`
   - 404 page (noindex), web manifest, sitemap (must list real routes only), robots (`/api/` disallowed).
 - `lib/seo.ts` + `components/json-ld.tsx`
   - `pageMetadata()` builds every page's title / description / canonical / Open Graph / Twitter;
     Person + WebSite JSON-LD with stable `@id`s (`PERSON_ID`, `WEBSITE_ID`), breadcrumbs, `<JsonLd nodes>`.
 - `components/prose.tsx`
-  - `PageHeader`, `InlineLink`, `Divider` shared by the content pages.
+  - `PageHeader`, `InlineLink`, `Divider` shared by Home, Works, Writings and the 404 page.
 - `app/writings/page.tsx`
   - Writings index route.
 - `app/writings/[slug]/page.tsx`
@@ -61,8 +57,7 @@ It explains how the project is organized, what each folder does, and how to make
   - Single-line `npm`/`npx` commands render as `CodeBlockCommand` (pnpm/yarn/npm/bun tabs, choice saved in
     localStorage); conversion lives in `lib/package-managers.ts`.
 - `components/navbar.tsx`
-  - Inline top navigation (Home / Works / Writings / About / Services) with dotted-underline active state;
-    on phones the links scroll sideways (fade only while cut off).
+  - Inline top navigation (Home / Works / Writings) with dotted-underline active state.
   - Holds the theme toggle (`AnimatedThemeToggler`) next to search, so it's on every page.
   - Client component (needs `usePathname`).
 - `components/app-icon.tsx`
@@ -147,8 +142,6 @@ It explains how the project is organized, what each folder does, and how to make
   - `/`
   - `/works`
   - `/writings` (+ `/writings/[slug]`)
-  - `/about`
-  - `/services`
 - Add route-level metadata with:
   - `import type { Metadata } from "next";`
   - `export const metadata: Metadata = { ... }`
