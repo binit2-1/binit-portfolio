@@ -5,16 +5,16 @@ import * as React from "react";
 import { cn } from "@repo/ui/lib/utils";
 
 /** Peak activity — lower levels are lighter tints of the same hue. */
-const ACCENT = "#FF5800";
+const ACCENT = "var(--hire)";
 
 const LEVEL_BG: Record<
   "NONE" | "FIRST_QUARTILE" | "SECOND_QUARTILE" | "THIRD_QUARTILE" | "FOURTH_QUARTILE",
   string
 > = {
   NONE: "transparent",
-  FIRST_QUARTILE: "#FFE8DC",
-  SECOND_QUARTILE: "#FFC299",
-  THIRD_QUARTILE: "#FF8F40",
+  FIRST_QUARTILE: "color-mix(in oklab, var(--hire) 18%, transparent)",
+  SECOND_QUARTILE: "color-mix(in oklab, var(--hire) 40%, transparent)",
+  THIRD_QUARTILE: "color-mix(in oklab, var(--hire) 70%, transparent)",
   FOURTH_QUARTILE: ACCENT,
 };
 
@@ -213,7 +213,6 @@ export function GithubCalendar({
   }
 
   const weeks = data?.contributions ?? [];
-  const useBrandOrange = colorSchema === "orange";
   const shapeClass = getShapeClass(shape);
 
   return (
@@ -250,7 +249,7 @@ export function GithubCalendar({
                       ? {
                           boxShadow: `0 0 ${
                             day.contributionCount > 3 ? glowIntensity * 1.5 : glowIntensity
-                          }px ${useBrandOrange ? ACCENT : "#f97316"}`,
+                          }px ${ACCENT}`,
                         }
                       : undefined),
                   }}

@@ -246,7 +246,7 @@ export function SiteSearch() {
         type="button"
         onClick={openSearch}
         aria-label="Search"
-        className="-mr-1.5 rounded-lg p-1.5 text-muted-foreground transition-colors hover:text-foreground sm:hidden"
+        className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:text-foreground sm:hidden"
       >
         <MagnifyingGlassIcon className="size-5" />
       </button>

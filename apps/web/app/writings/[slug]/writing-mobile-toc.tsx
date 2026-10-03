@@ -132,7 +132,7 @@ export function WritingMobileToc({ sections }: { sections: WritingSection[] }) {
                 fill="none"
                 strokeWidth="2"
                 strokeLinecap="round"
-                className="stroke-brand"
+                className="stroke-hire"
                 style={{ pathLength: scrollYProgress }}
               />
             </svg>

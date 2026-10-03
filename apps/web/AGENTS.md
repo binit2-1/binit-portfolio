@@ -53,11 +53,15 @@ It explains how the project is organized, what each folder does, and how to make
     localStorage); conversion lives in `lib/package-managers.ts`.
 - `components/navbar.tsx`
   - Inline top navigation (Home / Work / Writing) with dotted-underline active state.
+  - Holds the theme toggle (`AnimatedThemeToggler`) next to search, so it's on every page.
   - Client component (needs `usePathname`).
 - `components/app-icon.tsx`
-  - Glossy app-style icon tile (`tone` prop: blue, purple, green, orange, red, black).
+  - Glossy app-style icon tile (`tone` prop: blue, purple, green, orange, red, black). Each tone tints its soft drop shadow.
+- Site logo / favicon: `app/icon.png`, `app/apple-icon.png`, `app/favicon.ico`, `public/images/logo/logo.png`
+  (rendered from the "b." logo SVG, cropped to the tile).
 - `components/unlumen-ui/github-graph.tsx`
   - Vendored GitHub contribution graph (shadcn `@unlumen-ui/github-graph`), imports `framer-motion`.
+  - `compactMonths`: shown instead of `months` when the full range doesn't fit (Home: 12 months, 6 on phones).
 - `lib/projects.ts`
   - All projects (Work page) with links, logo or Phosphor glyph, preview media; `featured` ones show on Home.
 - `lib/previews.ts`
@@ -111,6 +115,8 @@ It explains how the project is organized, what each folder does, and how to make
   3. `@import "@repo/ui/styles/globals.css";`
 - If a CSS import is referenced in `apps/web`, dependency must exist in `apps/web/package.json` too.
 - Dark mode is class-based (`next-themes` + `attribute="class"`).
+- No pure white / black: `#fbfbfa` and `#111113` are the theme's white and black (tokens in
+  `packages/ui/src/styles/globals.css`), and Tailwind's `white` / `black` are remapped to them in `app/globals.css`.
 
 ## Rendering and SEO
 

@@ -7,7 +7,7 @@ import React, { useCallback, useEffect } from "react";
 
 import { useLenisInstance } from "@/components/lenis-provider";
 
-const ACCENT = "#FF5800";
+const ACCENT = "var(--hire)";
 const BARS = 40;
 
 /** In dark mode, higher floors so inactive bars stay visibly light (whiteish) on near-black backgrounds. */
@@ -162,7 +162,7 @@ const ScrollIndicatorBars = ({
         />
       ))}
       <motion.div
-        className="absolute bottom-0 left-1/2 h-14 w-px -translate-x-1/2 shadow-[0_0_8px_rgba(255,88,0,0.45)]"
+        className="absolute bottom-0 left-1/2 h-14 w-px -translate-x-1/2 shadow-[0_0_8px_color-mix(in_oklab,var(--hire)_45%,transparent)]"
         style={{
           left: useTransform(left, (value) => `${value}%`),
           backgroundColor: ACCENT,

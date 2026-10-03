@@ -10,7 +10,7 @@ import { CONTACT_EMAIL } from "@/lib/social-links";
 type Status = "idle" | "sending" | "sent" | "error";
 
 const fieldClass =
-  "w-full rounded-lg border border-border bg-transparent px-3 text-[0.9375rem] text-foreground outline-none transition-colors placeholder:text-muted-foreground/80 hover:border-foreground/20 focus-visible:border-foreground/40 focus-visible:ring-2 focus-visible:ring-ring/40 aria-invalid:border-destructive/70";
+  "w-full rounded-lg border border-border bg-transparent px-3 text-sm sm:text-[0.9375rem] text-foreground outline-none transition-colors placeholder:text-muted-foreground/80 hover:border-foreground/20 focus-visible:border-foreground/40 focus-visible:ring-2 focus-visible:ring-ring/40 aria-invalid:border-destructive/70";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([tabindex="-1"]), textarea:not([disabled])';
 
@@ -154,7 +154,7 @@ export function HireMeDialog() {
               aria-labelledby={titleId}
               aria-describedby={descriptionId}
               onKeyDown={onKeyDown}
-              className="relative max-h-[92dvh] w-full max-w-lg overflow-y-auto overscroll-contain rounded-t-xl border border-border bg-background shadow-2xl sm:rounded-xl"
+              className="relative max-h-[92dvh] w-full overflow-y-auto sm:max-w-md lg:max-w-lg overscroll-contain rounded-t-xl border border-border bg-background shadow-2xl sm:rounded-xl"
               initial={{ opacity: 0, scale: reducedMotion ? 1 : 0.97, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: reducedMotion ? 1 : 0.97, y: 12 }}
@@ -164,7 +164,7 @@ export function HireMeDialog() {
                 type="button"
                 onClick={closeDialog}
                 aria-label="Close"
-                className="absolute top-4 right-4 rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="absolute top-3 right-3 rounded-lg p-1.5 sm:top-4 sm:right-4 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
               >
                 <XIcon className="size-4" />
               </button>
@@ -191,16 +191,16 @@ export function HireMeDialog() {
                   </button>
                 </div>
               ) : (
-                <form noValidate onSubmit={submit} className="px-5 pt-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6 sm:pb-6">
-                  <h2 id={titleId} className="pr-10 text-xl tracking-[-0.01em] text-foreground">
+                <form noValidate onSubmit={submit} className="px-4 pt-5 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-5 sm:pt-6 sm:pb-5 [@media(max-height:760px)]:pt-4">
+                  <h2 id={titleId} className="pr-10 text-lg tracking-[-0.01em] text-foreground sm:text-xl">
                     Tell me about your project
                   </h2>
-                  <p id={descriptionId} className="mt-1.5 max-w-[46ch] text-[0.9375rem] leading-relaxed text-muted-foreground">
+                  <p id={descriptionId} className="mt-1 max-w-[46ch] text-[0.8125rem] leading-relaxed text-muted-foreground sm:text-[0.9375rem]">
                     I take on freelance builds, from landing pages to full-stack apps. This lands straight
                     in my inbox.
                   </p>
 
-                  <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                  <div className="mt-4 grid grid-cols-2 gap-x-2.5 gap-y-3 max-[340px]:grid-cols-1 sm:mt-5 sm:gap-4 [@media(max-height:760px)]:mt-4">
                     <Field label="Name" error={errors.name}>
                       {(props) => (
                         <input
@@ -211,7 +211,7 @@ export function HireMeDialog() {
                           maxLength={HIRE_LIMITS.name}
                           value={name}
                           onChange={(event) => setName(event.target.value)}
-                          className={cn(fieldClass, "h-10")}
+                          className={cn(fieldClass, "h-9 sm:h-10")}
                         />
                       )}
                     </Field>
@@ -226,7 +226,7 @@ export function HireMeDialog() {
                           maxLength={HIRE_LIMITS.email}
                           value={from}
                           onChange={(event) => setFrom(event.target.value)}
-                          className={cn(fieldClass, "h-10")}
+                          className={cn(fieldClass, "h-9 sm:h-10")}
                         />
                       )}
                     </Field>
@@ -246,7 +246,7 @@ export function HireMeDialog() {
                     onChange={(option) => setBudget(option === budget ? null : option)}
                   />
 
-                  <div className="mt-5">
+                  <div className="mt-3.5 sm:mt-5 [@media(max-height:760px)]:mt-4">
                     <Field
                       label="Project details"
                       error={errors.message}
@@ -256,11 +256,11 @@ export function HireMeDialog() {
                         <textarea
                           {...props}
                           name="message"
-                          rows={5}
+                          rows={4}
                           maxLength={HIRE_LIMITS.message}
                           value={message}
                           onChange={(event) => setMessage(event.target.value)}
-                          className={cn(fieldClass, "min-h-28 resize-y py-2.5 leading-relaxed")}
+                          className={cn(fieldClass, "min-h-20 resize-y py-2 leading-relaxed sm:min-h-28 [@media(max-height:760px)]:min-h-20")}
                         />
                       )}
                     </Field>
@@ -287,7 +287,7 @@ export function HireMeDialog() {
                     </p>
                   )}
 
-                  <div className="mt-6 flex items-center justify-between gap-4">
+                  <div className="mt-4 flex items-center justify-between gap-4 sm:mt-6 [@media(max-height:760px)]:mt-4">
                     <a
                       href={`mailto:${email}`}
                       className="min-w-0 truncate text-sm text-muted-foreground underline decoration-muted-foreground/50 decoration-dotted underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground"
@@ -297,7 +297,7 @@ export function HireMeDialog() {
                     <button
                       type="submit"
                       disabled={status === "sending"}
-                      className="h-10 shrink-0 rounded-lg bg-foreground px-4 text-sm font-medium text-background transition-[opacity,transform] hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
+                      className="h-9 shrink-0 rounded-lg bg-foreground px-4 text-sm font-medium sm:h-10 text-background transition-[opacity,transform] hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
                     >
                       {status === "sending" ? "Sending…" : "Send message"}
                     </button>
@@ -333,18 +333,18 @@ function Field({
   const describedBy = [error && `${id}-error`, hint && `${id}-hint`].filter(Boolean).join(" ");
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm text-foreground">
+    <div className="flex min-w-0 flex-col gap-1 sm:gap-1.5">
+      <label htmlFor={id} className="text-[0.8125rem] text-foreground sm:text-sm">
         {label}
       </label>
       {children({ id, "aria-invalid": Boolean(error), "aria-describedby": describedBy || undefined })}
       {error ? (
-        <p id={`${id}-error`} className="text-[0.8125rem] text-destructive">
+        <p id={`${id}-error`} className="text-xs text-destructive sm:text-[0.8125rem]">
           {error}
         </p>
       ) : (
         hint && (
-          <p id={`${id}-hint`} className="text-[0.8125rem] text-muted-foreground">
+          <p id={`${id}-hint`} className="text-xs text-muted-foreground sm:text-[0.8125rem]">
             {hint}
           </p>
         )
@@ -367,12 +367,14 @@ function ChoiceGroup<T extends string>({
   onChange: (option: T) => void;
 }) {
   return (
-    <fieldset className="mt-5">
-      <legend className="text-sm text-foreground">
+    <fieldset className="mt-3.5 min-w-0 sm:mt-5 [@media(max-height:760px)]:mt-4">
+      <legend className="text-[0.8125rem] text-foreground sm:text-sm">
         {label}
         {hint && <span className="text-muted-foreground"> ({hint})</span>}
       </legend>
-      <div className="mt-2 flex flex-wrap gap-2">
+      {/* Phones: one row that scrolls sideways (bleeds to the sheet edges, fades on the right);
+          wraps from sm up. */}
+      <div className="-mx-4 mt-1.5 flex gap-1.5 overflow-x-auto overscroll-x-contain px-4 pr-8 [scrollbar-width:none] mask-r-from-[calc(100%-2rem)] sm:mx-0 sm:mt-2 sm:flex-wrap sm:gap-2 sm:overflow-visible sm:px-0 sm:mask-none [&::-webkit-scrollbar]:hidden">
         {options.map((option) => {
           const selected = option === value;
           return (
@@ -382,7 +384,7 @@ function ChoiceGroup<T extends string>({
               aria-pressed={selected}
               onClick={() => onChange(option)}
               className={cn(
-                "h-8 rounded-lg border px-3 text-sm transition-colors active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:outline-none",
+                "h-7 shrink-0 rounded-lg border px-2.5 text-[0.8125rem] whitespace-nowrap transition-colors sm:h-8 sm:px-3 sm:text-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:outline-none",
                 selected
                   ? "border-foreground/40 bg-muted text-foreground"
                   : "border-border text-muted-foreground hover:border-foreground/20 hover:text-foreground",

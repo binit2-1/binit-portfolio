@@ -134,7 +134,7 @@ export function AboutPageContent() {
         aria-hidden
       >
         <div
-          className="w-full bg-[#FF5800]"
+          className="w-full bg-hire"
           style={{ height: "1px", transform: "scaleY(0.5)", transformOrigin: "center" }}
         />
       </div>

@@ -25,7 +25,7 @@ export function WritingThumbnail({
   return (
     <div
       className={cn(
-        "relative aspect-video w-full overflow-hidden rounded-sm border border-white/10 bg-[#171717] shadow-[0_10px_40px_rgba(0,0,0,0.32)]",
+        "relative aspect-video w-full overflow-hidden rounded-sm border border-white/10 bg-black shadow-[0_10px_40px_rgba(0,0,0,0.32)]",
         className,
       )}
       style={style}
@@ -41,9 +41,9 @@ export function WritingThumbnail({
           unoptimized={isRemoteThumbnail}
         />
       ) : (
-        <div className="relative h-full w-full bg-[linear-gradient(135deg,rgba(255,88,0,0.22),transparent_36%),repeating-linear-gradient(0deg,rgba(255,255,255,0.08)_0_1px,transparent_1px_8px),repeating-linear-gradient(90deg,rgba(255,255,255,0.05)_0_1px,transparent_1px_12px)]">
+        <div className="relative h-full w-full bg-[linear-gradient(135deg,color-mix(in_oklab,var(--hire)_22%,transparent),transparent_36%),repeating-linear-gradient(0deg,rgba(255,255,255,0.08)_0_1px,transparent_1px_8px),repeating-linear-gradient(90deg,rgba(255,255,255,0.05)_0_1px,transparent_1px_12px)]">
           <div className="absolute top-3 left-3 flex gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#FF5800]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-hire" />
             <span className="h-1.5 w-1.5 rounded-full bg-white/35" />
             <span className="h-1.5 w-1.5 rounded-full bg-white/20" />
           </div>

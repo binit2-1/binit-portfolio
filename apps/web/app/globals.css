@@ -18,11 +18,13 @@
   --about-mask-belt: 14px;
   /* About fixed rule vertical position. */
   --about-fixed-line-top: 45vh;
+  /* Brand white / black: every `white` / `black` utility (bg-white/5, text-black, ...) uses these. */
+  --color-white: #fbfbfa;
+  --color-black: #111113;
   /* Code block surface (see "CODE BLOCKS" below). */
   --color-code: var(--code);
-  /* The site's one accent (social hover, writing scroll indicator + progress ring). */
-  --color-brand: #ff5800;
-  /* "Hire me" (navbar link + the hand-drawn note on Home): blue in light, off-white in dark. */
+  /* The site's one accent ("Hire me", writing scroll indicator, progress ring, legacy About):
+     blue in light, off-white in dark. */
   --color-hire: var(--hire);
 }
 
@@ -99,8 +101,8 @@
   }
 }
 
-/* "Hire me" note on Home (components/hire-me-note.tsx): a short wiggle every ~7s, pivoting
-   on the arrow tip (7.4% 90.5% of the drawing) so it keeps pointing at the name. */
+/* "Hire me" note on Home (components/hire-me-note.tsx): a short wiggle every ~7s and a single
+   wobble on hover, pivoting on the arrow tip (7.4% 90.5% of the drawing) so it keeps pointing at the name. */
 @keyframes hire-note-wiggle {
   0%,
   86%,
@@ -124,6 +126,22 @@
   }
 }
 
+@keyframes hire-note-wobble {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+  75% {
+    transform: rotate(-2deg);
+  }
+}
+
 @layer components {
   .hire-note {
     transform-origin: 7.4% 90.5%;
@@ -134,9 +152,11 @@
       animation: hire-note-wiggle 7s ease-in-out 1.5s infinite;
     }
 
+    /* Hover / keyboard focus: one wobble, then still until the pointer leaves. Replacing the
+       animation also stops the periodic wiggle meanwhile; it restarts on leave. */
     .hire-note:hover,
     .hire-note:focus-visible {
-      animation-play-state: paused;
+      animation: hire-note-wobble 0.7s ease-in-out 1;
     }
   }
 }
@@ -146,12 +166,12 @@
    Shiki emits both themes as --shiki-light / --shiki-dark; pick one per mode.
    ========================================================================== */
 :root {
-  --code: oklch(0.985 0 0);
+  --code: #f3f3f1; /* a step below the #fbfbfa page */
   --hire: #0015ff;
 }
 
 .dark {
-  --code: oklch(0.185 0 0);
+  --code: #1a1a1d; /* a step above the #111113 page */
   --hire: oklch(0.922 0 0); /* off-white (#e5e5e5), a step softer than --foreground */
 }
 
@@ -269,7 +289,7 @@
     z-index: 1;
     opacity: 1;
     filter: none;
-    color: #ff5800;
+    color: var(--hire);
   }
 
   .stack-tech-token {
@@ -300,7 +320,7 @@
   .dark .stack-tech-token:hover {
     border-color: rgb(255 255 255 / 32%);
     background-color: rgb(255 255 255 / 7.5%);
-    color: #fff;
+    color: var(--color-white);
   }
 }
 

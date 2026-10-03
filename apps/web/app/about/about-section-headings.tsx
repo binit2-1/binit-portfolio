@@ -154,7 +154,7 @@ export function AboutSectionHeadings({ labels, activeIndex }: AboutSectionHeadin
               }}
             >
               {label}
-              <span style={{ color: "#FF5800" }}>.</span>
+              <span style={{ color: "var(--hire)" }}>.</span>
             </div>
           ))}
         </div>
@@ -167,7 +167,7 @@ export function AboutSectionHeadings({ labels, activeIndex }: AboutSectionHeadin
             <div
               key={`dot-${label}`}
               ref={setDotRef(i)}
-              className="absolute left-8 h-4 w-4 rounded-full bg-[#FF5800] sm:left-10 lg:left-8"
+              className="absolute left-8 h-4 w-4 rounded-full bg-hire sm:left-10 lg:left-8"
               style={{
                 bottom: "20px",
                 transform: "translateY(-40px)",

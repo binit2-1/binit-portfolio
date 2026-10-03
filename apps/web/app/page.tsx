@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { AnimatedThemeToggler } from "@repo/ui/components/ruixen/animated-theme-toggler";
 import { AppIcon, type AppIconTone } from "@/components/app-icon";
 import { Linkedin, PeerlistSolid, X } from "@/components/icons";
 import { HireMeNote } from "@/components/hire-me-note";
@@ -47,14 +46,9 @@ export default async function HomePage() {
     <>
       {/* Extra top room on phones for the hand-drawn note above the name. */}
       <header className="mt-4 sm:mt-0">
-        <div className="flex items-center justify-between gap-4">
-          <div className="relative">
-            <h1 className="text-3xl leading-tight font-normal tracking-[-0.02em] sm:text-4xl">
-              Binit Gupta
-            </h1>
-            <HireMeNote />
-          </div>
-          <AnimatedThemeToggler className="-mr-1.5" />
+        <div className="relative w-fit">
+          <h1 className="text-3xl leading-tight font-normal tracking-[-0.02em] sm:text-4xl">Binit Gupta</h1>
+          <HireMeNote />
         </div>
         <ul className="mt-4 flex items-center gap-3">
           {SOCIAL_ITEMS.map(({ href, label, tone, Icon }) => (
@@ -93,6 +87,7 @@ export default async function HomePage() {
         <GithubGraph
           account={GITHUB_USERNAME}
           months={12}
+          compactMonths={6}
           cellSize={10}
           cellGap={2}
           cellRadius={2}

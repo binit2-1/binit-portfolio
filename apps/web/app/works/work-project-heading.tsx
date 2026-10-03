@@ -36,7 +36,7 @@ export function WorkProjectHeading({ label, activeIndex }: WorkProjectHeadingPro
           aria-live="polite"
         >
           {label}
-          <span style={{ color: "#FF5800" }}>.</span>
+          <span style={{ color: "var(--hire)" }}>.</span>
         </motion.div>
       </AnimatePresence>
     </div>

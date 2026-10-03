@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@repo/ui/lib/utils";
+import { AnimatedThemeToggler } from "@repo/ui/components/ruixen/animated-theme-toggler";
 import { SiteSearch } from "@/components/search/site-search";
 
 const NAV_LINKS = [
@@ -42,7 +43,11 @@ export function Navbar() {
           );
         })}
       </ul>
-      <SiteSearch />
+      {/* Theme toggle lives here so it's on every page (next-themes persists the choice). */}
+      <div className="flex items-center gap-1 sm:gap-2">
+        <SiteSearch />
+        <AnimatedThemeToggler className="-mr-1.5" />
+      </div>
     </nav>
   );
 }

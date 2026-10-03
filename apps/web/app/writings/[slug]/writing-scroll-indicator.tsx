@@ -77,7 +77,7 @@ export function WritingScrollIndicator({ sections }: { sections: WritingSection[
                   className={cn(
                     "absolute right-0 h-px transition-colors duration-150 motion-reduce:transition-none",
                     section.depth <= 2 ? "w-4" : "w-3",
-                    active ? "bg-brand" : "bg-foreground/60",
+                    active ? "bg-hire" : "bg-foreground/60",
                   )}
                   style={{ top: y }}
                 />
@@ -89,7 +89,7 @@ export function WritingScrollIndicator({ sections }: { sections: WritingSection[
                     "absolute right-6 block max-w-[calc(50vw-22rem-6rem)] -translate-y-1/2 truncate rounded-md text-right font-mono text-[11px] tracking-wider whitespace-nowrap uppercase",
                     "transition-[opacity,translate,color] focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none motion-reduce:transition-none",
                     open ? "translate-x-0 opacity-100" : "pointer-events-none translate-x-2 opacity-0",
-                    active ? "text-brand" : "text-muted-foreground hover:text-foreground",
+                    active ? "text-hire" : "text-muted-foreground hover:text-foreground",
                   )}
                   style={{ top: y, transitionDelay: open && !reducedMotion ? `${index * 25}ms` : "0ms" }}
                 >
@@ -101,10 +101,10 @@ export function WritingScrollIndicator({ sections }: { sections: WritingSection[
         </ul>
 
         <motion.div aria-hidden className="absolute top-0 right-0 z-10" style={{ y: markerY }}>
-          <div className="h-px w-4 bg-brand" />
+          <div className="h-px w-4 bg-hire" />
           <span
             className={cn(
-              "absolute top-0 right-6 -translate-y-1/2 font-mono text-[10px] text-brand tabular-nums transition-opacity duration-150",
+              "absolute top-0 right-6 -translate-y-1/2 font-mono text-[10px] text-hire tabular-nums transition-opacity duration-150",
               open ? "opacity-0" : "opacity-100",
             )}
           >

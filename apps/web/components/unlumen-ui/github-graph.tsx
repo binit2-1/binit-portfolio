@@ -26,6 +26,8 @@ export interface GithubGraphProps {
   account?: string;
   /** Number of recent calendar months to display. @default 6 */
   months?: number;
+  /** Months to show instead when `months` would not fit the available width (e.g. phones). */
+  compactMonths?: number;
   /** Color treatment for contribution levels. @default "github" */
   variant?: GithubGraphVariant;
   /** Entrance choreography for graph cells. Use "none" to render immediately. @default "wave" */
@@ -328,7 +330,8 @@ function LoadingGraph({
 
 export function GithubGraph({
   account = "shadcn",
-  months = 6,
+  months: fullMonths = 6,
+  compactMonths,
   variant = "github",
   animation = "wave",
   animationSpeed = 1,
@@ -388,18 +391,26 @@ export function GithubGraph({
       (availableWidth + Math.max(0, cellGap)) / Math.max(1, cellSize + cellGap),
     ),
   );
+  // Fall back to `compactMonths` when the full range is wider than the container.
+  const fullRangeWidth =
+    (Math.ceil((fullMonths * 30.44) / 7) + 1) * (cellSize + cellGap) - cellGap;
+  const months =
+    compactMonths !== undefined && availableWidth > 0 && fullRangeWidth > availableWidth
+      ? compactMonths
+      : fullMonths;
 
   React.useLayoutEffect(() => {
-    if (!autoFit || !rootRef.current) return;
+    if ((!autoFit && compactMonths === undefined) || !rootRef.current) return;
 
-    const root = rootRef.current;
+    // Without autoFit the root is `w-fit` (it shrinks to the graph), so measure the parent.
+    const root = autoFit ? rootRef.current : (rootRef.current.parentElement ?? rootRef.current);
     const updateWidth = () => setAvailableWidth(root.clientWidth);
     updateWidth();
 
     const observer = new ResizeObserver(updateWidth);
     observer.observe(root);
     return () => observer.disconnect();
-  }, [autoFit]);
+  }, [autoFit, compactMonths]);
 
   React.useEffect(() => {
     if (data || !normalizedAccount) return;
@@ -448,7 +459,7 @@ export function GithubGraph({
       selectRecentContributions(resource.contributions, months),
     );
   }, [months, resource]);
-  // When the year overflows (phones), start scrolled to the most recent weeks.
+  // If the range still overflows, start scrolled to the most recent weeks.
   React.useLayoutEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollLeft = el.scrollWidth;
@@ -601,7 +612,7 @@ export function GithubGraph({
             "py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
             autoFit
               ? "w-full overflow-hidden"
-              : "overflow-x-auto max-sm:mask-l-from-85%",
+              : "overflow-x-auto",
           )}
         >
           <div
