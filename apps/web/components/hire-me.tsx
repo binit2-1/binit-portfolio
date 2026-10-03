@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { type FormEvent, type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { cn } from "@repo/ui/lib/utils";
 import { BUDGETS, HIRE_LIMITS, type HireErrors, PROJECT_TYPES, validateHire } from "@/lib/hire";
+import { CONTACT_EMAIL } from "@/lib/social-links";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -13,8 +14,29 @@ const fieldClass =
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([tabindex="-1"]), textarea:not([disabled])';
 
-/** Footer "Hire me" link + the freelance enquiry dialog it opens. Posts to /api/hire. */
-export function HireMe({ email, className }: { email: string; className?: string }) {
+const OPEN_EVENT = "hire:open";
+const email = CONTACT_EMAIL;
+
+/** Opens the "Hire me" dialog from anywhere (the dialog is mounted once, in the root layout). */
+export function openHireDialog() {
+  window.dispatchEvent(new Event(OPEN_EVENT));
+}
+
+/** Any "Hire me" trigger: the navbar link, the hand-drawn note on Home. */
+export function HireMeButton({
+  className,
+  children = "Hire me",
+  ...props
+}: Omit<React.ComponentProps<"button">, "onClick" | "type">) {
+  return (
+    <button type="button" onClick={openHireDialog} aria-haspopup="dialog" className={className} {...props}>
+      {children}
+    </button>
+  );
+}
+
+/** Freelance enquiry dialog. Posts to /api/hire. */
+export function HireMeDialog() {
   const reducedMotion = useReducedMotion();
   const dialogRef = useRef<HTMLDivElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
@@ -44,6 +66,12 @@ export function HireMe({ email, className }: { email: string; className?: string
     setOpen(false);
     returnFocusRef.current?.focus();
   };
+
+  // Re-subscribed each render so openDialog sees the current status.
+  useEffect(() => {
+    window.addEventListener(OPEN_EVENT, openDialog);
+    return () => window.removeEventListener(OPEN_EVENT, openDialog);
+  });
 
   // Lock page scroll while the dialog is open.
   useEffect(() => {
@@ -109,15 +137,6 @@ export function HireMe({ email, className }: { email: string; className?: string
 
   return (
     <>
-      <button
-        type="button"
-        onClick={openDialog}
-        aria-haspopup="dialog"
-        className={className}
-      >
-        Hire me
-      </button>
-
       <AnimatePresence>
         {open && (
           <motion.div

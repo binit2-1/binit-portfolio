@@ -1,4 +1,3 @@
-import { HireMe } from "@/components/hire-me";
 import { CONTACT_EMAIL, SOCIAL_LINKS } from "@/lib/social-links";
 
 const linkClass =
@@ -10,7 +9,7 @@ const EXTERNAL_LINKS = [
   { href: SOCIAL_LINKS.github, label: "GitHub" },
 ];
 
-/** Site footer: contact links. "Hire me" is the only client island (opens the enquiry dialog). */
+/** Site footer: contact links. Sits at the bottom of the viewport on short pages (see app/layout.tsx). */
 export function Footer() {
   return (
     <footer className="mt-16 sm:mt-24">
@@ -20,12 +19,6 @@ export function Footer() {
           <a href={`mailto:${CONTACT_EMAIL}`} className={linkClass}>
             Email
           </a>
-        </li>
-        <li>
-          <HireMe
-            email={CONTACT_EMAIL}
-            className="cursor-pointer text-foreground underline decoration-muted-foreground/60 decoration-dotted underline-offset-[6px] transition-colors hover:decoration-foreground"
-          />
         </li>
         {EXTERNAL_LINKS.map(({ href, label }) => (
           <li key={label}>

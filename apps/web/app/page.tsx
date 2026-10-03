@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { AnimatedThemeToggler } from "@repo/ui/components/ruixen/animated-theme-toggler";
 import { AppIcon, type AppIconTone } from "@/components/app-icon";
 import { Linkedin, PeerlistSolid, X } from "@/components/icons";
+import { HireMeNote } from "@/components/hire-me-note";
 import { HoverPreviewList } from "@/components/hover-preview";
 import { ProjectRow, SectionHeader, WritingRow } from "@/components/list-rows";
 import { GithubGraph } from "@/components/unlumen-ui/github-graph";
@@ -44,11 +45,15 @@ export default async function HomePage() {
 
   return (
     <>
-      <header>
+      {/* Extra top room on phones for the hand-drawn note above the name. */}
+      <header className="mt-4 sm:mt-0">
         <div className="flex items-center justify-between gap-4">
-          <h1 className="text-3xl leading-tight font-normal tracking-[-0.02em] sm:text-4xl">
-            Binit Gupta
-          </h1>
+          <div className="relative">
+            <h1 className="text-3xl leading-tight font-normal tracking-[-0.02em] sm:text-4xl">
+              Binit Gupta
+            </h1>
+            <HireMeNote />
+          </div>
           <AnimatedThemeToggler className="-mr-1.5" />
         </div>
         <ul className="mt-4 flex items-center gap-3">

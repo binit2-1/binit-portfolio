@@ -22,6 +22,8 @@
   --color-code: var(--code);
   /* The site's one accent (social hover, writing scroll indicator + progress ring). */
   --color-brand: #ff5800;
+  /* "Hire me" (navbar link + the hand-drawn note on Home): blue in light, off-white in dark. */
+  --color-hire: var(--hire);
 }
 
 /* ==========================================================================
@@ -97,16 +99,60 @@
   }
 }
 
+/* "Hire me" note on Home (components/hire-me-note.tsx): a short wiggle every ~7s, pivoting
+   on the arrow tip (7.4% 90.5% of the drawing) so it keeps pointing at the name. */
+@keyframes hire-note-wiggle {
+  0%,
+  86%,
+  100% {
+    transform: rotate(0deg);
+  }
+  88% {
+    transform: rotate(-5deg);
+  }
+  90% {
+    transform: rotate(4deg);
+  }
+  92% {
+    transform: rotate(-3deg);
+  }
+  94% {
+    transform: rotate(1.5deg);
+  }
+  96% {
+    transform: rotate(0deg);
+  }
+}
+
+@layer components {
+  .hire-note {
+    transform-origin: 7.4% 90.5%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hire-note {
+      animation: hire-note-wiggle 7s ease-in-out 1.5s infinite;
+    }
+
+    .hire-note:hover,
+    .hire-note:focus-visible {
+      animation-play-state: paused;
+    }
+  }
+}
+
 /* ==========================================================================
    CODE BLOCKS: components/code-block.tsx + code-block-command.tsx.
    Shiki emits both themes as --shiki-light / --shiki-dark; pick one per mode.
    ========================================================================== */
 :root {
   --code: oklch(0.985 0 0);
+  --hire: #0015ff;
 }
 
 .dark {
   --code: oklch(0.185 0 0);
+  --hire: oklch(0.922 0 0); /* off-white (#e5e5e5), a step softer than --foreground */
 }
 
 @layer components {

@@ -71,9 +71,13 @@ It explains how the project is organized, what each folder does, and how to make
 - `components/search/site-search.tsx`
   - Navbar search: `⌘K`/`Ctrl+K` or `/`; every query word must match; magnifying glass on mobile.
 - `components/footer.tsx`
-  - Site footer in the root layout: Email / Hire me / LinkedIn / X / GitHub text links (server component).
+  - Site footer: Email / LinkedIn / X / GitHub. The layout column is `min-h-svh flex-col` with `main.flex-1`,
+    so on short pages the footer rests at the bottom of the viewport.
 - `components/hire-me.tsx` + `lib/hire.ts` + `app/api/hire/route.ts`
-  - "Hire me" freelance enquiry dialog; the route emails it via Resend.
+  - `HireMeDialog` (mounted once in the root layout) is the freelance enquiry form; the route emails it via Resend.
+  - Open it with `HireMeButton` or `openHireDialog()`: used by `components/hire-me-note.tsx` (hand-drawn
+    Excalidraw note pointing at the name on Home; wiggle lives in globals.css).
+    Colour: `--hire` (#0015ff light, off-white #e5e5e5 dark).
   - Env: `RESEND_API_KEY` (required), `HIRE_FROM_EMAIL` (verified sender), `HIRE_TO_EMAIL` (defaults to `CONTACT_EMAIL` in `lib/social-links.ts`).
 - `components/theme-provider.tsx`
   - Thin client wrapper around `next-themes` provider.

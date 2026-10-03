@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono } from "next/font/google";
 import { Footer } from "@/components/footer";
+import { HireMeDialog } from "@/components/hire-me";
 import { Navbar } from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { basteleur, googleSansFlex, helveticaNeue, helveticaOblique } from "@/lib/fonts";
@@ -129,11 +130,13 @@ export default function RootLayout({
         />
         <Script defer src="https://cloud.umami.is/script.js" data-website-id="3cf97a47-6679-49e2-a850-be8089109f53"></Script>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <div className="mx-auto w-full max-w-[44rem] px-5 pb-16 sm:px-6 sm:pb-24">
+          {/* Column fills the viewport, so on short pages the footer rests at the bottom. */}
+          <div className="mx-auto flex min-h-svh w-full max-w-[44rem] flex-col px-5 pb-10 sm:px-6 sm:pb-12">
             <Navbar />
-            <main>{children}</main>
+            <main className="flex-1">{children}</main>
             <Footer />
           </div>
+          <HireMeDialog />
           {/* Page blur behind a hovered row; tune it under "HOVER FOCUS" in globals.css. */}
           <div aria-hidden className="focus-overlay" />
         </ThemeProvider>
