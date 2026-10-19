@@ -7,8 +7,9 @@ import { Divider, InlineLink } from "@/components/prose";
 import { ProjectRow, SectionHeader, WritingRow } from "@/components/list-rows";
 import { GithubGraph } from "@/components/unlumen-ui/github-graph";
 import { getProjectPreviews, getWritingPreviewMedia } from "@/lib/previews";
-import { pageMetadata } from "@/lib/seo";
-import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
+import { JsonLd } from "@/components/json-ld";
+import { PERSON_ID, pageMetadata, WEBSITE_ID } from "@/lib/seo";
+import { absoluteUrl, SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 import { FEATURED_PROJECTS } from "@/lib/projects";
 import { SOCIAL_LINKS } from "@/lib/social-links";
 import { getWritingPreviews } from "@/lib/writings";
@@ -36,6 +37,21 @@ export default async function HomePage() {
 
   return (
     <>
+      <JsonLd
+        nodes={[
+          {
+            "@type": "ProfilePage",
+            "@id": `${absoluteUrl("/")}#page`,
+            url: absoluteUrl("/"),
+            name: SITE_TITLE,
+            description: SITE_DESCRIPTION,
+            inLanguage: "en",
+            isPartOf: { "@id": WEBSITE_ID },
+            about: { "@id": PERSON_ID },
+            mainEntity: { "@id": PERSON_ID },
+          },
+        ]}
+      />
       {/* Extra top room on phones for the hand-drawn note above the name. */}
       <header className="mt-4 sm:mt-0">
         <div className="relative w-fit">
@@ -72,6 +88,11 @@ export default async function HomePage() {
           <InlineLink href="https://nodejs.org">Node.js</InlineLink>,{" "}
           <InlineLink href="https://expressjs.com">Express.js</InlineLink>, and manage data with{" "}
           <InlineLink href="https://www.postgresql.org">PostgreSQL</InlineLink>.
+        </p>
+        <p>
+          Browse the <InlineLink href="/works">projects I&apos;ve built</InlineLink> or read my{" "}
+          <InlineLink href="/writings">writing on web development</InlineLink>. I also take on freelance
+          websites and web apps, so say hello if you have one in mind.
         </p>
       </div>
 

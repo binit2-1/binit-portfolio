@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { HoverPreviewList } from "@/components/hover-preview";
-import { PageHeader } from "@/components/prose";
+import { InlineLink, PageHeader } from "@/components/prose";
 import { WritingListRow } from "@/components/list-rows";
 import { getWritingPreviewMedia } from "@/lib/previews";
 import { JsonLd } from "@/components/json-ld";
@@ -40,7 +40,10 @@ export default function WritingsPage() {
           breadcrumbSchema([{ name: "Writings", path: "/writings" }]),
         ]}
       />
-      <PageHeader title="Writings">How I perceive technology and its impact on design and development.</PageHeader>
+      <PageHeader title="Writings">
+        How I perceive technology and its impact on design and development, written while building the{" "}
+        <InlineLink href="/works">projects on my works page</InlineLink>.
+      </PageHeader>
 
       <HoverPreviewList media={getWritingPreviewMedia(writings)} className="mt-8">
         <ul aria-label="Writing">
