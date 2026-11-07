@@ -89,11 +89,6 @@ export default async function HomePage() {
           <InlineLink href="https://expressjs.com">Express.js</InlineLink>, and manage data with{" "}
           <InlineLink href="https://www.postgresql.org">PostgreSQL</InlineLink>.
         </p>
-        <p>
-          Browse the <InlineLink href="/works">projects I&apos;ve built</InlineLink> or read my{" "}
-          <InlineLink href="/writings">writing on web development</InlineLink>. I also take on freelance
-          websites and web apps, so say hello if you have one in mind.
-        </p>
       </div>
 
       <section aria-label="GitHub contributions" className="mt-8">

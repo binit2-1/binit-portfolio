@@ -30,7 +30,7 @@ ${SITE_AUTHOR.givenName} is an undergraduate computer science student who ships 
 
 - [Home](${absoluteUrl("/")}): Who ${SITE_AUTHOR.givenName} is, the stack ${SITE_AUTHOR.givenName} works with, GitHub activity, featured projects and latest writing.
 - [Works](${absoluteUrl("/works")}): Every project ${SITE_AUTHOR.givenName} has built, with live sites and source code.
-- [Writings](${absoluteUrl("/writings")}): Technical articles on authentication, React and web development.
+- [Writings](${absoluteUrl("/writings")}): Technical articles on authentication, rate limiting with Go and Redis, React and web development.
 
 ## Projects
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { HoverPreviewList } from "@/components/hover-preview";
-import { InlineLink, PageHeader } from "@/components/prose";
+import { PageHeader } from "@/components/prose";
 import { ProjectRow } from "@/components/list-rows";
 import { getProjectPreviews } from "@/lib/previews";
 import { primaryProjectUrl, PROJECTS } from "@/lib/projects";
@@ -47,10 +47,7 @@ export default async function WorkPage() {
           breadcrumbSchema([{ name: "Works", path: "/works" }]),
         ]}
       />
-      <PageHeader title="Works">
-        Things I&apos;ve built, from developer tools to hackathon products. See how Authingo works in my{" "}
-        <InlineLink href="/writings/auth-with-authingo">Next.js + Go authentication guide</InlineLink>.
-      </PageHeader>
+      <PageHeader title="Works" />
 
       <HoverPreviewList media={media} className="mt-8">
         <ul aria-label="Projects">

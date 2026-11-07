@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { HoverPreviewList } from "@/components/hover-preview";
-import { InlineLink, PageHeader } from "@/components/prose";
+import { PageHeader } from "@/components/prose";
 import { WritingListRow } from "@/components/list-rows";
 import { getWritingPreviewMedia } from "@/lib/previews";
 import { JsonLd } from "@/components/json-ld";
@@ -11,7 +11,7 @@ import { getWritingPreviews } from "@/lib/writings";
 export const metadata: Metadata = pageMetadata({
   title: "Writings",
   description:
-    "Articles by Binit Gupta on full-stack web development: authentication with Next.js and Go, debouncing in React, and lessons from building real projects.",
+    "Articles by Binit Gupta on full-stack web development: auth with Next.js and Go, rate limiting with Redis, debouncing in React and lessons from real projects.",
   path: "/writings",
 });
 
@@ -40,10 +40,7 @@ export default function WritingsPage() {
           breadcrumbSchema([{ name: "Writings", path: "/writings" }]),
         ]}
       />
-      <PageHeader title="Writings">
-        How I perceive technology and its impact on design and development, written while building the{" "}
-        <InlineLink href="/works">projects on my works page</InlineLink>.
-      </PageHeader>
+      <PageHeader title="Writings" />
 
       <HoverPreviewList media={getWritingPreviewMedia(writings)} className="mt-8">
         <ul aria-label="Writing">
