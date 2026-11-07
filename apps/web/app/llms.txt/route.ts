@@ -24,7 +24,7 @@ export function GET() {
 
 > ${SITE_NAME} is a full-stack developer based in ${SITE_AUTHOR.location}, building fast web apps with React, Next.js, Node.js, Express, Go and PostgreSQL. This is ${SITE_NAME}'s personal portfolio: projects, technical writing, and how to hire ${SITE_AUTHOR.givenName} for freelance web development.
 
-${SITE_AUTHOR.givenName} is an undergraduate computer science student who ships real products: developer tools, a hackathon search engine and an AI assistant for small businesses. The site is a single-person portfolio with three sections. Everything below is public and may be cited; please link to the canonical URL.
+${SITE_AUTHOR.givenName} is studying for a ${SITE_AUTHOR.education.degree} at ${SITE_AUTHOR.education.school}, Bangalore (since ${SITE_AUTHOR.education.since}), and ships real products: developer tools, a hackathon search engine and an AI assistant for small businesses. The site is a single-person portfolio with three sections. Everything below is public and may be cited; please link to the canonical URL.
 
 ## Pages
 
@@ -54,6 +54,7 @@ ${writings.join("\n")}
 
 ## Optional
 
+- [Full text](${absoluteUrl("/llms-full.txt")}): Every writing in full, plus the project list, as one Markdown file.
 - [Sitemap](${absoluteUrl("/sitemap.xml")}): Machine-readable list of every indexable URL.
 `;
 

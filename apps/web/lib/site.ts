@@ -8,6 +8,11 @@ export const SITE_DESCRIPTION =
 export const SITE_KEYWORDS = [
   "Binit",
   "Binit Gupta",
+  "Binit REVA",
+  "Binit Gupta REVA",
+  "Binit Gupta REVA University",
+  "Binit Gupta Bangalore",
+  "binit2-1",
   "Binit portfolio",
   "Binit Gupta portfolio",
   "Binit Gupta developer",
@@ -18,6 +23,10 @@ export const SITE_KEYWORDS = [
   "Next.js developer",
   "React developer",
   "Go developer",
+  "Composter",
+  "Authingo",
+  "Hackersquare",
+  "Munshi",
 ];
 
 export const SITE_AUTHOR = {
@@ -26,9 +35,15 @@ export const SITE_AUTHOR = {
   familyName: "Gupta",
   jobTitle: "Full-Stack Developer",
   location: "Bangalore, India",
+  education: {
+    school: "REVA University",
+    schoolUrl: "https://www.reva.edu.in",
+    degree: "B.Tech in Computer Science and Engineering",
+    since: "2024",
+  },
   twitter: "@BinitGupta21",
   sameAs: [SOCIAL_LINKS.github, SOCIAL_LINKS.linkedin, SOCIAL_LINKS.peerlist, SOCIAL_LINKS.x],
-  knowsAbout: ["Web development", "React", "Next.js", "TypeScript", "Tailwind CSS", "Node.js", "Express", "Go", "PostgreSQL", "Authentication"],
+  knowsAbout: ["Web development", "React", "Next.js", "TypeScript", "Tailwind CSS", "Node.js", "Express", "Go", "PostgreSQL", "Redis", "Authentication", "API rate limiting", "Debouncing"],
 };
 
 export const SITE_URL = "https://binitt.dev";

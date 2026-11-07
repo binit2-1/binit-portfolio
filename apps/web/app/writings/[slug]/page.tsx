@@ -49,6 +49,7 @@ export async function generateMetadata({
 
   return {
     ...base,
+    keywords: [...frontmatter.keywords, "Binit Gupta", "Binit"],
     authors: [{ name: SITE_AUTHOR.name, url: absoluteUrl("/") }],
     openGraph: {
       ...base.openGraph,
@@ -103,6 +104,7 @@ export default async function WritingPage({
     inLanguage: "en",
     wordCount: content.split(/\s+/).length,
     ...(frontmatter.label && { articleSection: frontmatter.label }),
+    ...(frontmatter.keywords.length > 0 && { keywords: frontmatter.keywords.join(", ") }),
     author: { "@id": PERSON_ID },
     publisher: { "@id": PERSON_ID },
     isPartOf: { "@id": `${absoluteUrl("/writings")}#blog` },

@@ -8,6 +8,8 @@ export type WritingFrontmatter = {
   date: string;
   thumbnail?: string;
   label: string;
+  /** Comma-separated `keywords:` in frontmatter. */
+  keywords: string[];
 };
 
 export type WritingPost = {
@@ -103,6 +105,10 @@ function readWriting(fileName: string): WritingPost {
       date: data.date || "",
       thumbnail: data.thumbnail || undefined,
       label: data.label || title.toUpperCase(),
+      keywords: (data.keywords || "")
+        .split(",")
+        .map((keyword) => keyword.trim())
+        .filter(Boolean),
     },
     content,
   };
