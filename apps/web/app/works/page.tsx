@@ -11,7 +11,7 @@ import { absoluteUrl } from "@/lib/site";
 export const metadata: Metadata = pageMetadata({
   title: "Works and Projects",
   description:
-    "Projects built by Binit Gupta: Composter, a component vault for React teams; Authingo, headless auth for React and Go; Hackersquare; and Munshi.",
+    "Projects built by Binit Gupta: Skiddie, navigation components for React Native and Expo; Composter, a component vault for React teams; Authingo, headless auth for React and Go; Hackersquare; and Munshi.",
   path: "/works",
 });
 

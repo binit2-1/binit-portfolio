@@ -33,6 +33,16 @@ const GITHUB = "https://github.com/binit2-1";
 // Add new projects here; order is the display order.
 export const PROJECTS: Project[] = [
   {
+    slug: "skiddie",
+    name: "Skiddie",
+    description: "Navigation components for React Native and Expo.",
+    liveUrl: "https://skiddie.binitt.dev",
+    tone: "black",
+    logo: { src: "/images/logo/skiddie.svg", width: 62, height: 75, className: "h-[18px] w-auto" },
+    image: "/images/work/skiddie.png",
+    featured: true,
+  },
+  {
     slug: "composter",
     name: "Composter",
     description: "Component vault for React teams.",
@@ -63,7 +73,6 @@ export const PROJECTS: Project[] = [
     tone: "black",
     logo: { src: "/images/logo/hackersquare.svg", width: 22, height: 16, className: "h-3.5 w-auto" },
     video: { src: "/videos/work/mobile/hackersquare.mp4", poster: "/images/work/hackersquare.jpg" },
-    featured: true,
   },
   {
     slug: "munshi",

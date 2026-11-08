@@ -22,7 +22,9 @@ export const SITE_KEYWORDS = [
   "freelance web developer India",
   "Next.js developer",
   "React developer",
+  "React Native developer",
   "Go developer",
+  "Skiddie",
   "Composter",
   "Authingo",
   "Hackersquare",
@@ -43,7 +45,7 @@ export const SITE_AUTHOR = {
   },
   twitter: "@BinitGupta21",
   sameAs: [SOCIAL_LINKS.github, SOCIAL_LINKS.linkedin, SOCIAL_LINKS.peerlist, SOCIAL_LINKS.x],
-  knowsAbout: ["Web development", "React", "Next.js", "TypeScript", "Tailwind CSS", "Node.js", "Express", "Go", "PostgreSQL", "Redis", "Authentication", "API rate limiting", "Debouncing"],
+  knowsAbout: ["Web development", "React", "Next.js", "React Native", "Expo", "TypeScript", "Tailwind CSS", "Node.js", "Express", "Go", "PostgreSQL", "Redis", "Authentication", "API rate limiting", "Debouncing"],
 };
 
 export const SITE_URL = "https://binitt.dev";
